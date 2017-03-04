@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using com.hankcs.hanlp;
 using com.hankcs.hanlp.dictionary;
+using com.hankcs.hanlp.dictionary.py;
 using com.hankcs.hanlp.dictionary.stopword;
 using com.hankcs.hanlp.tokenizer;
 
@@ -203,6 +204,11 @@ namespace HanLP_Utils
             }
         }
 
+        private void chkTermNature_CheckedChanged( object sender, EventArgs e )
+        {
+            HanLP.Config.ShowTermNature = chkTermNature.Checked;
+        }
+
         private void edSrc_KeyUp( object sender, KeyEventArgs e )
         {
             if ( e.Control && e.KeyCode == Keys.A )
@@ -284,10 +290,30 @@ namespace HanLP_Utils
             edDst.Text = string.Join( "\n", sb );
         }
 
-        private void chkTermNature_CheckedChanged( object sender, EventArgs e )
+        private void miSrc2Py_Click( object sender, EventArgs e )
         {
-            HanLP.Config.ShowTermNature = chkTermNature.Checked;
         }
 
+        private void btnSrc2Py_Click( object sender, EventArgs e )
+        {
+            var mode = Convert.ToInt32( ( sender as Button ).Tag );
+            StringBuilder sb = new StringBuilder();
+            foreach ( string line in edSrc.Lines )
+            {
+                List<string> text = new List<string>();
+                foreach ( Pinyin py in HanLP.convertToPinyinList( line.Trim().Replace( "　", " " ) ).toArray() )
+                {
+                    if ( mode == 0 )
+                        text.Add( py.getPinyinWithoutTone().ToString() );
+                    else if ( mode == 1 )
+                        text.Add( py.ToString() );
+                    else if ( mode == 2 )
+                        text.Add( py.getPinyinWithToneMark().ToString() );
+                }
+                if ( text.Count <= 0 ) continue;
+                sb.AppendLine( string.Join( ", ", text ).Trim() );
+            }
+            edDst.Text = string.Join( "\n", sb );
+        }
     }
 }
