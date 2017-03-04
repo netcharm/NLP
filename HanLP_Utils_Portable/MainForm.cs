@@ -290,10 +290,6 @@ namespace HanLP_Utils
             edDst.Text = string.Join( "\n", sb );
         }
 
-        private void miSrc2Py_Click( object sender, EventArgs e )
-        {
-        }
-
         private void btnSrc2Py_Click( object sender, EventArgs e )
         {
             var mode = Convert.ToInt32( ( sender as Button ).Tag );
