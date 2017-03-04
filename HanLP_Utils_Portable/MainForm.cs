@@ -103,9 +103,9 @@ namespace HanLP_Utils
                         }
                     }
                 }
-                java.lang.System.getProperties().setProperty( "java.class.path", $"{ROOT};." );
-                chkTermNature.Checked = HanLP.Config.ShowTermNature;
             }
+            java.lang.System.getProperties().setProperty( "java.class.path", $"{ROOT};." );
+            chkTermNature.Checked = HanLP.Config.ShowTermNature;
         }
 
         private void AddCustomDict()
@@ -118,6 +118,10 @@ namespace HanLP_Utils
                 try
                 {
                     var fn = $"{Path.GetDirectoryName(file)}\\{Path.GetFileNameWithoutExtension(file)}.txt";
+                    if(!Directory.Exists(ROOT))
+                    {
+                        fn = fn.Replace( ROOT, CWD );
+                    }
                     var nt = Path.GetExtension(file).Split();
                     if ( File.Exists( fn ) )
                     {

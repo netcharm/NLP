@@ -145,6 +145,8 @@
             // 
             this.chkTermNature.AutoSize = true;
             this.chkTermNature.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkTermNature.Checked = true;
+            this.chkTermNature.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkTermNature.Dock = System.Windows.Forms.DockStyle.Right;
             this.chkTermNature.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkTermNature.Location = new System.Drawing.Point(581, 0);
