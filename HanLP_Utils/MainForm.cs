@@ -31,7 +31,7 @@ namespace HanLP_Utils
         private string CustomDictionaryPath = $"data/dictionary/custom/CustomDictionary.txt; 现代汉语补充词库.txt; 全国地名大全.txt ns; 人名词典.txt; 机构名词典.txt; 上海地名.txt ns; netcharm.txt nrf; 战舰少女N.txt nrf; data/dictionary/person/nrf.txt nrf";
         private string CRFSegmentModelPath = $"data/model/segment/CRFSegmentModel.txt";
         private string HMMSegmentModelPath = $"data/model/segment/HMMSegmentModel.bin";
-        private string ShowTermNature="true";
+        private bool ShowTermNature = true;
 
         public MainForm()
         {
@@ -99,18 +99,41 @@ namespace HanLP_Utils
                         }
                         else if ( k.Equals( "ShowTermNature", StringComparison.CurrentCultureIgnoreCase ) )
                         {
-                            ShowTermNature = v;
+                            if ( bool.TryParse( v, out ShowTermNature ) )
+                            {
+                                //HanLP.Config.ShowTermNature = ShowTermNature;
+                            }
                         }
                     }
                 }
             }
             java.lang.System.getProperties().setProperty( "java.class.path", $"{ROOT};." );
+            HanLP.Config.ShowTermNature = ShowTermNature;
             chkTermNature.Checked = HanLP.Config.ShowTermNature;
         }
 
         private void AddCustomDict()
         {
-            var filelist = CustomDictionary.path;
+            List<string> filelist = new List<string>();
+            filelist.AddRange(CustomDictionary.path);
+            var CustomDict = CustomDictionaryPath.Split(';');
+            if ( CustomDict.Length > filelist.Count )
+            {
+                filelist.Clear();
+                string lastfolder = "";
+                for ( int i = 0; i < CustomDict.Length; i++ )
+                {
+                    if ( string.IsNullOrEmpty( Path.GetDirectoryName( CustomDict[i] ) ) )
+                    {
+                        filelist.Add( Path.Combine( ROOT, lastfolder, CustomDict[i].Trim() ) );
+                    }
+                    else
+                    {
+                        filelist.Add( Path.Combine( ROOT, CustomDict[i].Trim() ) );
+                        lastfolder = Path.GetDirectoryName( CustomDict[i] );
+                    }
+                }
+            }
             StringBuilder sb = new StringBuilder();
             List<string> ss = new List<string>();
             foreach ( string file in filelist )
@@ -120,7 +143,7 @@ namespace HanLP_Utils
                     var fn = $"{Path.GetDirectoryName(file)}\\{Path.GetFileNameWithoutExtension(file)}.txt";
                     if(!Directory.Exists(ROOT))
                     {
-                        fn = fn.Replace( ROOT, CWD );
+                        fn = fn.Replace( Path.GetFullPath(ROOT), CWD+Path.DirectorySeparatorChar );
                     }
                     var nt = Path.GetExtension(file).Split();
                     if ( File.Exists( fn ) )
@@ -169,9 +192,9 @@ namespace HanLP_Utils
         private void MainForm_Load( object sender, EventArgs e )
         {
             Icon = Icon.ExtractAssociatedIcon( Application.ExecutablePath );
-            LoadConfig();
             try
             {
+                LoadConfig();
                 AddCustomDict();
             }
             catch ( Exception ex )
