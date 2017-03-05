@@ -5,15 +5,18 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 using com.hankcs.hanlp;
 using com.hankcs.hanlp.dictionary;
 using com.hankcs.hanlp.dictionary.py;
 using com.hankcs.hanlp.dictionary.stopword;
 using com.hankcs.hanlp.tokenizer;
+using HtmlAgilityPack;
 
 namespace HanLP_Utils
 {
@@ -116,7 +119,7 @@ namespace HanLP_Utils
         private void AddCustomDict()
         {
             List<string> filelist = new List<string>();
-            filelist.AddRange(CustomDictionary.path);
+            filelist.AddRange( CustomDictionary.path );
             var CustomDict = CustomDictionaryPath.Split(';');
             if ( CustomDict.Length > filelist.Count )
             {
@@ -142,9 +145,9 @@ namespace HanLP_Utils
                 try
                 {
                     var fn = $"{Path.GetDirectoryName(file)}\\{Path.GetFileNameWithoutExtension(file)}.txt";
-                    if(!Directory.Exists(ROOT))
+                    if ( !Directory.Exists( ROOT ) )
                     {
-                        fn = fn.Replace( Path.GetFullPath(ROOT), CWD+Path.DirectorySeparatorChar );
+                        fn = fn.Replace( Path.GetFullPath( ROOT ), CWD + Path.DirectorySeparatorChar );
                     }
                     var nt = Path.GetExtension(file).Split();
                     if ( File.Exists( fn ) )
@@ -190,6 +193,54 @@ namespace HanLP_Utils
             }
         }
 
+        private string ReadUrl( string url )
+        {
+            string result = string.Empty;
+
+            //HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(URL);
+            //myRequest.Method = "GET";
+            //WebResponse myResponse = myRequest.GetResponse();
+            //StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.UTF8);
+            //result = sr.ReadToEnd();
+            //sr.Close();
+            //myResponse.Close();
+
+            HtmlAgilityPack.HtmlWeb web = new HtmlWeb();
+            HtmlAgilityPack.HtmlDocument doc = web.Load(url);
+            var scripts = doc.DocumentNode.SelectNodes( "//script" );
+            var styles = doc.DocumentNode.SelectNodes( "//style" );
+            var links = doc.DocumentNode.SelectNodes( "//a" );
+            var comments = doc.DocumentNode.SelectNodes( "//comment()" );
+            foreach ( var node in scripts ) { node.Remove(); }
+            foreach ( var node in styles ) { node.Remove(); }
+            foreach ( var node in links ) { node.Remove(); }
+            foreach ( var node in comments ) { node.Remove(); }
+
+            result = doc.DocumentNode.SelectSingleNode( "//body" ).InnerText.Trim();
+
+            result = Regex.Replace( result, @"[ |(\r\n)|(\t)]{2,}", ", ", RegexOptions.IgnoreCase );
+            result = Regex.Replace( result, @"[(&gt;)|(&lt;)|(&amp;)]{1,}", " ", RegexOptions.IgnoreCase );
+
+            return ( result );
+        }
+
+        private string[] GetLinks(string html)
+        {
+            List<string> links = new List<string>();
+
+            HtmlAgilityPack.HtmlWeb web = new HtmlWeb();
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument(); //web.Load(html);
+            doc.LoadHtml( html );
+            var alist = doc.DocumentNode.SelectNodes( "//a" );
+            foreach(var a in alist)
+            {
+                string href = a.GetAttributeValue( "href", "" );
+                links.Add( href );
+            }
+
+            return ( links.ToArray() );
+        }
+
         private void MainForm_Load( object sender, EventArgs e )
         {
             Icon = Icon.ExtractAssociatedIcon( Application.ExecutablePath );
@@ -202,6 +253,87 @@ namespace HanLP_Utils
             {
                 MessageBox.Show( ex.ToString() );
             }
+        }
+
+        private void MainForm_DragOver( object sender, DragEventArgs e )
+        {
+            if ( e.Data.GetDataPresent( DataFormats.FileDrop ) )
+            {
+                string[] dragFiles = (string [])e.Data.GetData(DataFormats.FileDrop, true);
+                if ( dragFiles.Length > 0 )
+                {
+                    e.Effect = DragDropEffects.Copy;
+                }
+            }
+            else if ( e.Data.GetDataPresent( DataFormats.Text ) || e.Data.GetDataPresent( DataFormats.UnicodeText ) )
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            return;
+        }
+
+        private void MainForm_DragDrop( object sender, DragEventArgs e )
+        {
+            // Determine whether string data exists in the drop data. If not, then 
+            // the drop effect reflects that the drop cannot occur. 
+            if ( e.Data.GetDataPresent( DataFormats.FileDrop ) )
+            {
+                //e.Effect = DragDropEffects.Copy;
+                try
+                {
+                    string[] dragFiles = (string [])e.Data.GetData(DataFormats.FileDrop, true);
+                    if ( dragFiles.Length > 0 )
+                    {
+                        string dragFileName = dragFiles[0].ToString();
+                        string ext = Path.GetExtension(dragFileName).ToLower();
+                        string[] text = { ".txt", ".text"};
+                        string[] html = { ".htm", ".html", ".xml"};
+
+                        if ( dragFileName.EndsWith( ".url", StringComparison.CurrentCultureIgnoreCase ) )
+                        {
+                            var content = File.ReadAllLines( dragFileName );
+                            foreach ( var line in content )
+                            {
+
+                            }
+                        }
+                        else if ( text.Contains( ext )) 
+                        {
+                            edSrc.Text = File.ReadAllText( dragFileName );
+                        }
+                        else if ( html.Contains( ext ) ) 
+                        {
+                            edSrc.Text = ReadUrl( dragFileName );
+                        }
+                    }
+                }
+                catch
+                {
+
+                }
+            }
+            //else if ( e.Data.GetDataPresent( DataFormats.Html ) )
+            //{
+            //    var content = e.Data.GetData( DataFormats.Html, true ).ToString();
+            //    edSrc.Text = string.Join("\n", GetLinks( content ));
+            //}
+            else if ( e.Data.GetDataPresent( DataFormats.Text ) || 
+                      e.Data.GetDataPresent( DataFormats.UnicodeText ))
+            {
+                var content = e.Data.GetData( "System.String", true ).ToString();
+                if ( content.StartsWith( "http://", StringComparison.CurrentCultureIgnoreCase ) ||
+                     content.StartsWith( "https://", StringComparison.CurrentCultureIgnoreCase ) ||
+                     content.StartsWith( "ftp://", StringComparison.CurrentCultureIgnoreCase ) ||
+                     content.StartsWith( "file://", StringComparison.CurrentCultureIgnoreCase ) )
+                {
+                    edSrc.Text = ReadUrl( content );
+                }
+                else
+                {
+                    edSrc.Text = content;
+                }
+            }
+            return;
         }
 
         private void chkTermNature_CheckedChanged( object sender, EventArgs e )
