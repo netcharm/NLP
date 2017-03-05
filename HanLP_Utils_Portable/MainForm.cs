@@ -138,6 +138,12 @@ namespace HanLP_Utils
                     }
                 }
             }
+            string userdict = Path.Combine(ROOT, "data", "dictionary", "custom", "userdict.txt");
+            if (File.Exists(userdict))
+            {
+                filelist.Add( userdict );
+            }
+
             StringBuilder sb = new StringBuilder();
             List<string> ss = new List<string>();
             foreach ( string file in filelist )
@@ -186,10 +192,30 @@ namespace HanLP_Utils
                 }
                 catch { }
             }
-            var stopwords = new string[] { "。" , "，", "　" };
-            foreach ( var w in stopwords )
+        }
+
+        private void AddStopWords()
+        {
+            try
             {
-                CoreStopWordDictionary.add( w );
+                List<string> stopwords = new List<string>();
+                stopwords.AddRange(new string[]{ "。" , "，", "　" });
+
+                string stopword = Path.Combine(ROOT, "data", "dictionary", "stopwords.txt");
+                if ( File.Exists( stopword ) )
+                {
+                    var lines = File.ReadAllLines(stopword);
+                    stopwords.AddRange( lines );
+                }
+                foreach ( var w in stopwords )
+                {
+                    if(w.Trim().Length>0)
+                        CoreStopWordDictionary.add( w );
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show( ex.ToString() );
             }
         }
 
@@ -248,6 +274,7 @@ namespace HanLP_Utils
             {
                 LoadConfig();
                 AddCustomDict();
+                AddStopWords();
             }
             catch ( Exception ex )
             {
