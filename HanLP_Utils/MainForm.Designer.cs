@@ -38,16 +38,20 @@
             this.btnKeyword = new System.Windows.Forms.Button();
             this.layoutMain = new System.Windows.Forms.TableLayoutPanel();
             this.pnlTools = new System.Windows.Forms.Panel();
-            this.chkTermNature = new System.Windows.Forms.CheckBox();
+            this.btnSrc2PyTM = new System.Windows.Forms.Button();
+            this.btnSrc2PyT = new System.Windows.Forms.Button();
+            this.btnSrc2Py = new System.Windows.Forms.Button();
             this.btnTC2SC = new System.Windows.Forms.Button();
             this.btnSC2TC = new System.Windows.Forms.Button();
             this.btnPhrase = new System.Windows.Forms.Button();
-            this.btnSrc2Py = new System.Windows.Forms.Button();
-            this.btnSrc2PyT = new System.Windows.Forms.Button();
-            this.btnSrc2PyTM = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.btnWordFreq = new System.Windows.Forms.Button();
+            this.pnlOption = new System.Windows.Forms.Panel();
+            this.chkTermNature = new System.Windows.Forms.CheckBox();
+            this.lblInfo = new System.Windows.Forms.Label();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
+            this.pnlOption.SuspendLayout();
             this.SuspendLayout();
             // 
             // edSrc
@@ -68,6 +72,7 @@
             // 
             resources.ApplyResources(this.edDst, "edDst");
             this.edDst.Name = "edDst";
+            this.edDst.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edDst_KeyUp);
             // 
             // btnTokenizer
             // 
@@ -104,10 +109,11 @@
             // pnlTools
             // 
             this.layoutMain.SetColumnSpan(this.pnlTools, 2);
+            this.pnlTools.Controls.Add(this.pnlOption);
+            this.pnlTools.Controls.Add(this.btnWordFreq);
             this.pnlTools.Controls.Add(this.btnSrc2PyTM);
             this.pnlTools.Controls.Add(this.btnSrc2PyT);
             this.pnlTools.Controls.Add(this.btnSrc2Py);
-            this.pnlTools.Controls.Add(this.chkTermNature);
             this.pnlTools.Controls.Add(this.btnTC2SC);
             this.pnlTools.Controls.Add(this.btnSC2TC);
             this.pnlTools.Controls.Add(this.btnPhrase);
@@ -118,14 +124,32 @@
             resources.ApplyResources(this.pnlTools, "pnlTools");
             this.pnlTools.Name = "pnlTools";
             // 
-            // chkTermNature
+            // btnSrc2PyTM
             // 
-            resources.ApplyResources(this.chkTermNature, "chkTermNature");
-            this.chkTermNature.Checked = true;
-            this.chkTermNature.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTermNature.Name = "chkTermNature";
-            this.chkTermNature.UseVisualStyleBackColor = true;
-            this.chkTermNature.CheckedChanged += new System.EventHandler(this.chkTermNature_CheckedChanged);
+            resources.ApplyResources(this.btnSrc2PyTM, "btnSrc2PyTM");
+            this.btnSrc2PyTM.Name = "btnSrc2PyTM";
+            this.btnSrc2PyTM.Tag = "2";
+            this.toolTip.SetToolTip(this.btnSrc2PyTM, resources.GetString("btnSrc2PyTM.ToolTip"));
+            this.btnSrc2PyTM.UseVisualStyleBackColor = true;
+            this.btnSrc2PyTM.Click += new System.EventHandler(this.btnSrc2Py_Click);
+            // 
+            // btnSrc2PyT
+            // 
+            resources.ApplyResources(this.btnSrc2PyT, "btnSrc2PyT");
+            this.btnSrc2PyT.Name = "btnSrc2PyT";
+            this.btnSrc2PyT.Tag = "1";
+            this.toolTip.SetToolTip(this.btnSrc2PyT, resources.GetString("btnSrc2PyT.ToolTip"));
+            this.btnSrc2PyT.UseVisualStyleBackColor = true;
+            this.btnSrc2PyT.Click += new System.EventHandler(this.btnSrc2Py_Click);
+            // 
+            // btnSrc2Py
+            // 
+            resources.ApplyResources(this.btnSrc2Py, "btnSrc2Py");
+            this.btnSrc2Py.Name = "btnSrc2Py";
+            this.btnSrc2Py.Tag = "0";
+            this.toolTip.SetToolTip(this.btnSrc2Py, resources.GetString("btnSrc2Py.ToolTip"));
+            this.btnSrc2Py.UseVisualStyleBackColor = true;
+            this.btnSrc2Py.Click += new System.EventHandler(this.btnSrc2Py_Click);
             // 
             // btnTC2SC
             // 
@@ -151,32 +175,34 @@
             this.btnPhrase.UseVisualStyleBackColor = true;
             this.btnPhrase.Click += new System.EventHandler(this.btnPhrase_Click);
             // 
-            // btnSrc2Py
+            // btnWordFreq
             // 
-            resources.ApplyResources(this.btnSrc2Py, "btnSrc2Py");
-            this.btnSrc2Py.Name = "btnSrc2Py";
-            this.btnSrc2Py.Tag = "0";
-            this.toolTip.SetToolTip(this.btnSrc2Py, resources.GetString("btnSrc2Py.ToolTip"));
-            this.btnSrc2Py.UseVisualStyleBackColor = true;
-            this.btnSrc2Py.Click += new System.EventHandler(this.btnSrc2Py_Click);
+            resources.ApplyResources(this.btnWordFreq, "btnWordFreq");
+            this.btnWordFreq.Name = "btnWordFreq";
+            this.btnWordFreq.UseVisualStyleBackColor = true;
+            this.btnWordFreq.Click += new System.EventHandler(this.btnWordFreq_Click);
             // 
-            // btnSrc2PyT
+            // pnlOption
             // 
-            resources.ApplyResources(this.btnSrc2PyT, "btnSrc2PyT");
-            this.btnSrc2PyT.Name = "btnSrc2PyT";
-            this.btnSrc2PyT.Tag = "1";
-            this.toolTip.SetToolTip(this.btnSrc2PyT, resources.GetString("btnSrc2PyT.ToolTip"));
-            this.btnSrc2PyT.UseVisualStyleBackColor = true;
-            this.btnSrc2PyT.Click += new System.EventHandler(this.btnSrc2Py_Click);
+            this.pnlOption.Controls.Add(this.lblInfo);
+            this.pnlOption.Controls.Add(this.chkTermNature);
+            resources.ApplyResources(this.pnlOption, "pnlOption");
+            this.pnlOption.Name = "pnlOption";
             // 
-            // btnSrc2PyTM
+            // chkTermNature
             // 
-            resources.ApplyResources(this.btnSrc2PyTM, "btnSrc2PyTM");
-            this.btnSrc2PyTM.Name = "btnSrc2PyTM";
-            this.btnSrc2PyTM.Tag = "2";
-            this.toolTip.SetToolTip(this.btnSrc2PyTM, resources.GetString("btnSrc2PyTM.ToolTip"));
-            this.btnSrc2PyTM.UseVisualStyleBackColor = true;
-            this.btnSrc2PyTM.Click += new System.EventHandler(this.btnSrc2Py_Click);
+            resources.ApplyResources(this.chkTermNature, "chkTermNature");
+            this.chkTermNature.Checked = true;
+            this.chkTermNature.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTermNature.Name = "chkTermNature";
+            this.chkTermNature.UseVisualStyleBackColor = true;
+            this.chkTermNature.CheckedChanged += new System.EventHandler(this.chkTermNature_CheckedChanged);
+            // 
+            // lblInfo
+            // 
+            this.lblInfo.AutoEllipsis = true;
+            resources.ApplyResources(this.lblInfo, "lblInfo");
+            this.lblInfo.Name = "lblInfo";
             // 
             // MainForm
             // 
@@ -191,7 +217,8 @@
             this.layoutMain.ResumeLayout(false);
             this.layoutMain.PerformLayout();
             this.pnlTools.ResumeLayout(false);
-            this.pnlTools.PerformLayout();
+            this.pnlOption.ResumeLayout(false);
+            this.pnlOption.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -209,11 +236,14 @@
         private System.Windows.Forms.Button btnTC2SC;
         private System.Windows.Forms.Button btnSC2TC;
         private System.Windows.Forms.Button btnPhrase;
-        private System.Windows.Forms.CheckBox chkTermNature;
         private System.Windows.Forms.Button btnSrc2Py;
         private System.Windows.Forms.Button btnSrc2PyTM;
         private System.Windows.Forms.Button btnSrc2PyT;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.Button btnWordFreq;
+        private System.Windows.Forms.Panel pnlOption;
+        private System.Windows.Forms.CheckBox chkTermNature;
+        private System.Windows.Forms.Label lblInfo;
     }
 }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ using com.hankcs.hanlp;
 using com.hankcs.hanlp.dictionary;
 using com.hankcs.hanlp.dictionary.py;
 using com.hankcs.hanlp.dictionary.stopword;
+using com.hankcs.hanlp.seg.common;
 using com.hankcs.hanlp.tokenizer;
 using HtmlAgilityPack;
 
@@ -22,7 +24,8 @@ namespace HanLP_Utils
 {
     public partial class MainForm : Form
     {
-        private string CWD = Path.GetDirectoryName(Application.ExecutablePath);
+        private string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
+        private string CWD = Path.GetDirectoryName(Directory.GetCurrentDirectory());
 
         private string ROOT = Path.GetDirectoryName(Application.ExecutablePath);
         private string CoreDictionaryPath = $"data/dictionary/CoreNatureDictionary.txt";
@@ -37,6 +40,8 @@ namespace HanLP_Utils
         private string HMMSegmentModelPath = $"data/model/segment/HMMSegmentModel.bin";
         private bool ShowTermNature = true;
 
+        private HanLP_Result HR = new HanLP_Result();
+
         public MainForm()
         {
             InitializeComponent();
@@ -44,7 +49,7 @@ namespace HanLP_Utils
 
         private void LoadConfig()
         {
-            var config = Path.Combine(CWD, "hanlp.properties");
+            var config = Path.Combine(AppPath, "hanlp.properties");
             if ( File.Exists( config ) )
             {
                 var lines = File.ReadAllLines(config);
@@ -118,6 +123,8 @@ namespace HanLP_Utils
 
         private void AddCustomDict()
         {
+            var sw = Stopwatch.StartNew();
+
             List<string> filelist = new List<string>();
             filelist.AddRange( CustomDictionary.path );
             var CustomDict = CustomDictionaryPath.Split(';');
@@ -138,10 +145,20 @@ namespace HanLP_Utils
                     }
                 }
             }
-            string userdict = Path.Combine(ROOT, "data", "dictionary", "custom", "userdict.txt");
-            if (File.Exists(userdict))
+
+            List<string> userdict = new List<string>() {
+                    Path.Combine( ROOT, "data", "dictionary", "userdict.txt" ),
+                    Path.Combine( AppPath, "userdict.txt" ),
+                }.ToList();
+            if ( !CWD.Equals( AppPath, StringComparison.CurrentCultureIgnoreCase ) )
+                userdict.Add( Path.Combine( CWD, "userdict.txt" ) );
+
+            foreach ( var f in userdict )
             {
-                filelist.Add( userdict );
+                if ( File.Exists( f ) )
+                {
+                    filelist.Add( f );
+                }
             }
 
             StringBuilder sb = new StringBuilder();
@@ -153,7 +170,7 @@ namespace HanLP_Utils
                     var fn = $"{Path.GetDirectoryName(file)}\\{Path.GetFileNameWithoutExtension(file)}.txt";
                     if ( !Directory.Exists( ROOT ) )
                     {
-                        fn = fn.Replace( Path.GetFullPath( ROOT ), CWD + Path.DirectorySeparatorChar );
+                        fn = fn.Replace( Path.GetFullPath( ROOT ), AppPath + Path.DirectorySeparatorChar );
                     }
                     var nt = Path.GetExtension(file).Split();
                     if ( File.Exists( fn ) )
@@ -179,19 +196,30 @@ namespace HanLP_Utils
             {
                 try
                 {
-                    var ws = w.Split();
                     if ( string.IsNullOrEmpty( w ) )
                         continue;
-                    else if ( ws.Length == 1 )
-                        CustomDictionary.add( ws[0].Trim() );
+                    var ws = w.Split();
+                    var uw = ws[0].Trim();
+                    if ( ws.Length == 1 )
+                        CustomDictionary.add( uw );
                     else if ( ws.Length >= 2 )
                     {
                         var nf = string.Join(" ", ws.Skip(1));
-                        CustomDictionary.add( ws[0].Trim(), nf.Trim() );
+                        CustomDictionary.add( uw, nf.Trim() );
+                    }
+                    if ( CoreStopWordDictionary.contains( uw ) )
+                    {
+                        CoreStopWordDictionary.remove( uw );
                     }
                 }
-                catch { }
+                catch ( Exception ex )
+                {
+                    MessageBox.Show( ex.ToString() );
+                }
             }
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void AddStopWords()
@@ -199,17 +227,26 @@ namespace HanLP_Utils
             try
             {
                 List<string> stopwords = new List<string>();
-                stopwords.AddRange(new string[]{ "。" , "，", "　" });
+                stopwords.AddRange(new string[]{ "。", "、", "，", "　", "　　", "□", "□□", "一", "一一" } );
 
-                string stopword = Path.Combine(ROOT, "data", "dictionary", "stopwords.txt");
-                if ( File.Exists( stopword ) )
+                List<string> stopfile = new List<string>() {
+                    Path.Combine( ROOT, "data", "dictionary", "stopwords.txt" ),
+                    Path.Combine( AppPath, "stopwords.txt" ),
+                }.ToList();
+                if ( !CWD.Equals( AppPath, StringComparison.CurrentCultureIgnoreCase ) )
+                    stopfile.Add(Path.Combine( CWD, "stopwords.txt" ));
+
+                foreach ( var f in stopfile )
                 {
-                    var lines = File.ReadAllLines(stopword);
-                    stopwords.AddRange( lines );
+                    if ( File.Exists( f ) )
+                    {
+                        var lines = File.ReadAllLines( f );
+                        stopwords.AddRange( lines );
+                    }
                 }
                 foreach ( var w in stopwords )
                 {
-                    if(w.Trim().Length>0)
+                    if ( w.Trim().Length > 0 && !CustomDictionary.contains( w.Trim() ) )
                         CoreStopWordDictionary.add( w );
                 }
             }
@@ -376,12 +413,20 @@ namespace HanLP_Utils
             }
         }
 
+        private void edDst_KeyUp( object sender, KeyEventArgs e )
+        {
+            if ( e.Control && e.KeyCode == Keys.A )
+            {
+                edDst.SelectAll();
+            }
+        }
+
         private void btnSegment_Click( object sender, EventArgs e )
         {
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
-                var text = HanLP.segment( line.Trim().Replace("　", " ") ).toArray();
+                var text = HanLP.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
                 if ( text.Length <= 0 ) continue;
                 sb.AppendLine( string.Join( ", ", text ).Trim() );
             }
@@ -393,7 +438,7 @@ namespace HanLP_Utils
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
-                var text = NLPTokenizer.segment( line.Trim().Replace("　", " ") ).toArray();
+                var text = NLPTokenizer.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
                 if ( text.Length <= 0 ) continue;
                 sb.AppendLine( string.Join( ", ", text ).Trim() );
             }
@@ -420,7 +465,7 @@ namespace HanLP_Utils
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
-                var text = HanLP.extractPhrase( line.Trim().Replace("　", " "), 10 ).toArray();                
+                var text = HanLP.extractPhrase( line.Trim().Replace("　", " ").Replace("□", " "), 10 ).toArray();                
                 if ( text.Length <= 0 ) continue;
                 sb.AppendLine( string.Join(", ", text ).Trim() );
             }
@@ -456,7 +501,7 @@ namespace HanLP_Utils
             foreach ( string line in edSrc.Lines )
             {
                 List<string> text = new List<string>();
-                foreach ( Pinyin py in HanLP.convertToPinyinList( line.Trim().Replace( "　", " " ) ).toArray() )
+                foreach ( Pinyin py in HanLP.convertToPinyinList( line.Trim().Replace( "　", " " ).Replace( "□", " ") ).toArray() )
                 {
                     if ( mode == 0 )
                         text.Add( py.getPinyinWithoutTone().ToString() );
@@ -470,5 +515,50 @@ namespace HanLP_Utils
             }
             edDst.Text = string.Join( "\n", sb );
         }
+
+        private void btnWordFreq_Click( object sender, EventArgs e )
+        {
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                Dictionary<string, int> freq = new Dictionary<string, int>( );
+                foreach ( string line in edSrc.Lines )
+                {
+                    var text = NLPTokenizer.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
+                    //var text = HanLP.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
+                    if ( text.Length <= 0 ) continue;
+                    foreach ( Term t in text )
+                    {
+                        var word = t.ToString().Trim();
+                        var wt = t.word.Trim();
+                        if ( string.IsNullOrEmpty( wt ) || wt.Length <= 1 ) continue;
+                        if ( CoreStopWordDictionary.contains( wt ) ) continue;
+
+                        if ( freq.ContainsKey( word ) )
+                            freq[word]++;
+                        else
+                            freq.Add( word, 1 );
+                    }
+                }
+
+                var sortedword = freq.ToList();
+                sortedword.Sort( ( pair1, pair2 ) => pair2.Value.CompareTo( pair1.Value ) );
+
+                StringBuilder sb = new StringBuilder();
+                foreach ( var w in sortedword )
+                {
+                    sb.AppendLine( $"{w.Key}\t{w.Value}".Replace( "/", "\t" ) );
+                }
+                edDst.Text = string.Join( "\n", sb );
+            }
+            catch ( Exception ex )
+            {
+                MessageBox.Show( ex.ToString() );
+            }
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
+        }
+
     }
 }
