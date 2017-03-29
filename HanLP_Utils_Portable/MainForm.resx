@@ -157,7 +157,7 @@
     <value>1</value>
   </data>
   <data name="btnSegment.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 6</value>
+    <value>13, 6</value>
   </data>
   <data name="btnSegment.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -220,7 +220,7 @@
     <value>2</value>
   </data>
   <data name="btnTokenizer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>88, 6</value>
+    <value>94, 6</value>
   </data>
   <data name="btnTokenizer.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -247,7 +247,7 @@
     <value>10</value>
   </data>
   <data name="btnSummary.Location" type="System.Drawing.Point, System.Drawing">
-    <value>250, 6</value>
+    <value>256, 6</value>
   </data>
   <data name="btnSummary.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -274,7 +274,7 @@
     <value>11</value>
   </data>
   <data name="btnKeyword.Location" type="System.Drawing.Point, System.Drawing">
-    <value>169, 6</value>
+    <value>175, 6</value>
   </data>
   <data name="btnKeyword.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -331,13 +331,13 @@
     <value>Right</value>
   </data>
   <data name="pnlOption.Location" type="System.Drawing.Point, System.Drawing">
-    <value>557, 0</value>
+    <value>562, 0</value>
   </data>
   <data name="pnlOption.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>8, 8, 8, 8</value>
   </data>
   <data name="pnlOption.Size" type="System.Drawing.Size, System.Drawing">
-    <value>149, 66</value>
+    <value>144, 66</value>
   </data>
   <data name="pnlOption.TabIndex" type="System.Int32, mscorlib">
     <value>14</value>
@@ -355,7 +355,7 @@
     <value>0</value>
   </data>
   <data name="btnWordFreq.Location" type="System.Drawing.Point, System.Drawing">
-    <value>412, 6</value>
+    <value>418, 6</value>
   </data>
   <data name="btnWordFreq.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -379,7 +379,7 @@
     <value>1</value>
   </data>
   <data name="btnSrc2PyTM.Location" type="System.Drawing.Point, System.Drawing">
-    <value>331, 37</value>
+    <value>337, 37</value>
   </data>
   <data name="btnSrc2PyTM.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -406,7 +406,7 @@
     <value>2</value>
   </data>
   <data name="btnSrc2PyT.Location" type="System.Drawing.Point, System.Drawing">
-    <value>250, 37</value>
+    <value>256, 37</value>
   </data>
   <data name="btnSrc2PyT.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -433,7 +433,7 @@
     <value>3</value>
   </data>
   <data name="btnSrc2Py.Location" type="System.Drawing.Point, System.Drawing">
-    <value>169, 37</value>
+    <value>175, 37</value>
   </data>
   <data name="btnSrc2Py.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -460,7 +460,7 @@
     <value>4</value>
   </data>
   <data name="btnTC2SC.Location" type="System.Drawing.Point, System.Drawing">
-    <value>88, 37</value>
+    <value>94, 37</value>
   </data>
   <data name="btnTC2SC.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -487,7 +487,7 @@
     <value>5</value>
   </data>
   <data name="btnSC2TC.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 37</value>
+    <value>13, 37</value>
   </data>
   <data name="btnSC2TC.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -514,7 +514,7 @@
     <value>6</value>
   </data>
   <data name="btnPhrase.Location" type="System.Drawing.Point, System.Drawing">
-    <value>331, 6</value>
+    <value>337, 6</value>
   </data>
   <data name="btnPhrase.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -594,45 +594,6 @@
   <data name="layoutMain.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
     <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnlTools" Row="1" RowSpan="1" Column="0" ColumnSpan="2" /&gt;&lt;Control Name="edSrc" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="edDst" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,100,Absolute,72" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
-  <data name="chkTermNature.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="chkTermNature.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleRight</value>
-  </data>
-  <data name="chkTermNature.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="chkTermNature.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
-    <value>Flat</value>
-  </data>
-  <data name="chkTermNature.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="chkTermNature.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 8</value>
-  </data>
-  <data name="chkTermNature.Size" type="System.Drawing.Size, System.Drawing">
-    <value>133, 16</value>
-  </data>
-  <data name="chkTermNature.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
-  </data>
-  <data name="chkTermNature.Text" xml:space="preserve">
-    <value>Show Term Nature</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Name" xml:space="preserve">
-    <value>chkTermNature</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Parent" xml:space="preserve">
-    <value>pnlOption</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="lblInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Bottom</value>
   </data>
@@ -640,7 +601,7 @@
     <value>8, 37</value>
   </data>
   <data name="lblInfo.Size" type="System.Drawing.Size, System.Drawing">
-    <value>133, 21</value>
+    <value>128, 21</value>
   </data>
   <data name="lblInfo.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -662,6 +623,45 @@
   </data>
   <data name="&gt;&gt;lblInfo.ZOrder" xml:space="preserve">
     <value>0</value>
+  </data>
+  <data name="chkTermNature.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkTermNature.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
+  </data>
+  <data name="chkTermNature.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="chkTermNature.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="chkTermNature.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chkTermNature.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 8</value>
+  </data>
+  <data name="chkTermNature.Size" type="System.Drawing.Size, System.Drawing">
+    <value>128, 16</value>
+  </data>
+  <data name="chkTermNature.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="chkTermNature.Text" xml:space="preserve">
+    <value>Show Term Nature</value>
+  </data>
+  <data name="&gt;&gt;chkTermNature.Name" xml:space="preserve">
+    <value>chkTermNature</value>
+  </data>
+  <data name="&gt;&gt;chkTermNature.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;chkTermNature.Parent" xml:space="preserve">
+    <value>pnlOption</value>
+  </data>
+  <data name="&gt;&gt;chkTermNature.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

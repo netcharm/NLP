@@ -38,6 +38,10 @@
             this.btnKeyword = new System.Windows.Forms.Button();
             this.layoutMain = new System.Windows.Forms.TableLayoutPanel();
             this.pnlTools = new System.Windows.Forms.Panel();
+            this.pnlOption = new System.Windows.Forms.Panel();
+            this.lblInfo = new System.Windows.Forms.Label();
+            this.chkTermNature = new System.Windows.Forms.CheckBox();
+            this.btnWordFreq = new System.Windows.Forms.Button();
             this.btnSrc2PyTM = new System.Windows.Forms.Button();
             this.btnSrc2PyT = new System.Windows.Forms.Button();
             this.btnSrc2Py = new System.Windows.Forms.Button();
@@ -45,10 +49,6 @@
             this.btnSC2TC = new System.Windows.Forms.Button();
             this.btnPhrase = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.btnWordFreq = new System.Windows.Forms.Button();
-            this.pnlOption = new System.Windows.Forms.Panel();
-            this.chkTermNature = new System.Windows.Forms.CheckBox();
-            this.lblInfo = new System.Windows.Forms.Label();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
             this.pnlOption.SuspendLayout();
@@ -124,6 +124,35 @@
             resources.ApplyResources(this.pnlTools, "pnlTools");
             this.pnlTools.Name = "pnlTools";
             // 
+            // pnlOption
+            // 
+            this.pnlOption.Controls.Add(this.lblInfo);
+            this.pnlOption.Controls.Add(this.chkTermNature);
+            resources.ApplyResources(this.pnlOption, "pnlOption");
+            this.pnlOption.Name = "pnlOption";
+            // 
+            // lblInfo
+            // 
+            this.lblInfo.AutoEllipsis = true;
+            resources.ApplyResources(this.lblInfo, "lblInfo");
+            this.lblInfo.Name = "lblInfo";
+            // 
+            // chkTermNature
+            // 
+            resources.ApplyResources(this.chkTermNature, "chkTermNature");
+            this.chkTermNature.Checked = true;
+            this.chkTermNature.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTermNature.Name = "chkTermNature";
+            this.chkTermNature.UseVisualStyleBackColor = true;
+            this.chkTermNature.CheckedChanged += new System.EventHandler(this.chkTermNature_CheckedChanged);
+            // 
+            // btnWordFreq
+            // 
+            resources.ApplyResources(this.btnWordFreq, "btnWordFreq");
+            this.btnWordFreq.Name = "btnWordFreq";
+            this.btnWordFreq.UseVisualStyleBackColor = true;
+            this.btnWordFreq.Click += new System.EventHandler(this.btnWordFreq_Click);
+            // 
             // btnSrc2PyTM
             // 
             resources.ApplyResources(this.btnSrc2PyTM, "btnSrc2PyTM");
@@ -174,35 +203,6 @@
             this.toolTip.SetToolTip(this.btnPhrase, resources.GetString("btnPhrase.ToolTip"));
             this.btnPhrase.UseVisualStyleBackColor = true;
             this.btnPhrase.Click += new System.EventHandler(this.btnPhrase_Click);
-            // 
-            // btnWordFreq
-            // 
-            resources.ApplyResources(this.btnWordFreq, "btnWordFreq");
-            this.btnWordFreq.Name = "btnWordFreq";
-            this.btnWordFreq.UseVisualStyleBackColor = true;
-            this.btnWordFreq.Click += new System.EventHandler(this.btnWordFreq_Click);
-            // 
-            // pnlOption
-            // 
-            this.pnlOption.Controls.Add(this.lblInfo);
-            this.pnlOption.Controls.Add(this.chkTermNature);
-            resources.ApplyResources(this.pnlOption, "pnlOption");
-            this.pnlOption.Name = "pnlOption";
-            // 
-            // chkTermNature
-            // 
-            resources.ApplyResources(this.chkTermNature, "chkTermNature");
-            this.chkTermNature.Checked = true;
-            this.chkTermNature.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTermNature.Name = "chkTermNature";
-            this.chkTermNature.UseVisualStyleBackColor = true;
-            this.chkTermNature.CheckedChanged += new System.EventHandler(this.chkTermNature_CheckedChanged);
-            // 
-            // lblInfo
-            // 
-            this.lblInfo.AutoEllipsis = true;
-            resources.ApplyResources(this.lblInfo, "lblInfo");
-            this.lblInfo.Name = "lblInfo";
             // 
             // MainForm
             // 

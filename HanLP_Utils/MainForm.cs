@@ -25,7 +25,7 @@ namespace HanLP_Utils
     public partial class MainForm : Form
     {
         private string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
-        private string CWD = Path.GetDirectoryName(Directory.GetCurrentDirectory());
+        private string CWD = Directory.GetCurrentDirectory();
 
         private string ROOT = Path.GetDirectoryName(Application.ExecutablePath);
         private string CoreDictionaryPath = $"data/dictionary/CoreNatureDictionary.txt";
