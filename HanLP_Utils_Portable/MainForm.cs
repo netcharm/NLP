@@ -560,5 +560,28 @@ namespace HanLP_Utils
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
+        private void cmiFilterText_Click( object sender, EventArgs e )
+        {
+            try
+            {
+                var txt = edSrc.Text;
+                var mi = sender as ToolStripMenuItem;
+                if ( mi.Name == cmiFilterSub.Name )
+                {
+                    txt = filterASS( txt );
+                }
+                else if ( mi.Name == cmiFilterLrc.Name )
+                {
+                    txt = filterLrc( txt );
+                }
+                else if ( mi.Name == cmiFilterMlTag.Name )
+                {
+                    txt = filterHtmlTag( txt );
+                }
+                edSrc.Text = filterMisc( txt );
+            }
+            catch { }
+        }
+
     }
 }

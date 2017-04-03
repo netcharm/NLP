@@ -153,6 +153,36 @@
   <data name="&gt;&gt;edSrc.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <metadata name="cmFilterText.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>112, 17</value>
+  </metadata>
+  <data name="cmiFilterSub.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiFilterSub.Text" xml:space="preserve">
+    <value>Filter Sub</value>
+  </data>
+  <data name="cmiFilterLrc.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiFilterLrc.Text" xml:space="preserve">
+    <value>Filter LRC</value>
+  </data>
+  <data name="cmiFilterMlTag.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiFilterMlTag.Text" xml:space="preserve">
+    <value>Filter HTML/XML Tags</value>
+  </data>
+  <data name="cmFilterText.Size" type="System.Drawing.Size, System.Drawing">
+    <value>191, 70</value>
+  </data>
+  <data name="&gt;&gt;cmFilterText.Name" xml:space="preserve">
+    <value>cmFilterText</value>
+  </data>
+  <data name="&gt;&gt;cmFilterText.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
@@ -300,24 +330,6 @@
   <data name="layoutMain.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
-  <data name="lblInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Bottom</value>
-  </data>
-  <data name="lblInfo.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 35</value>
-  </data>
-  <data name="lblInfo.Size" type="System.Drawing.Size, System.Drawing">
-    <value>128, 23</value>
-  </data>
-  <data name="lblInfo.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="lblInfo.Text" xml:space="preserve">
-    <value>OK</value>
-  </data>
-  <data name="lblInfo.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleRight</value>
-  </data>
   <data name="&gt;&gt;lblInfo.Name" xml:space="preserve">
     <value>lblInfo</value>
   </data>
@@ -329,30 +341,6 @@
   </data>
   <data name="&gt;&gt;lblInfo.ZOrder" xml:space="preserve">
     <value>0</value>
-  </data>
-  <data name="chkTermNature.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="chkTermNature.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleRight</value>
-  </data>
-  <data name="chkTermNature.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="chkTermNature.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
-    <value>Flat</value>
-  </data>
-  <data name="chkTermNature.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 8</value>
-  </data>
-  <data name="chkTermNature.Size" type="System.Drawing.Size, System.Drawing">
-    <value>128, 16</value>
-  </data>
-  <data name="chkTermNature.TabIndex" type="System.Int32, mscorlib">
-    <value>9</value>
-  </data>
-  <data name="chkTermNature.Text" xml:space="preserve">
-    <value>Show Term Nature</value>
   </data>
   <data name="&gt;&gt;chkTermNature.Name" xml:space="preserve">
     <value>chkTermNature</value>
@@ -628,10 +616,76 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;layoutMain.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="layoutMain.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
     <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnlTools" Row="1" RowSpan="1" Column="0" ColumnSpan="2" /&gt;&lt;Control Name="edSrc" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="edDst" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,100,Absolute,72" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="lblInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Bottom</value>
+  </data>
+  <data name="lblInfo.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 35</value>
+  </data>
+  <data name="lblInfo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>128, 23</value>
+  </data>
+  <data name="lblInfo.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="lblInfo.Text" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="lblInfo.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
+  </data>
+  <data name="&gt;&gt;lblInfo.Name" xml:space="preserve">
+    <value>lblInfo</value>
+  </data>
+  <data name="&gt;&gt;lblInfo.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblInfo.Parent" xml:space="preserve">
+    <value>pnlOption</value>
+  </data>
+  <data name="&gt;&gt;lblInfo.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="chkTermNature.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkTermNature.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
+  </data>
+  <data name="chkTermNature.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="chkTermNature.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="chkTermNature.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 8</value>
+  </data>
+  <data name="chkTermNature.Size" type="System.Drawing.Size, System.Drawing">
+    <value>128, 16</value>
+  </data>
+  <data name="chkTermNature.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="chkTermNature.Text" xml:space="preserve">
+    <value>Show Term Nature</value>
+  </data>
+  <data name="&gt;&gt;chkTermNature.Name" xml:space="preserve">
+    <value>chkTermNature</value>
+  </data>
+  <data name="&gt;&gt;chkTermNature.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;chkTermNature.Parent" xml:space="preserve">
+    <value>pnlOption</value>
+  </data>
+  <data name="&gt;&gt;chkTermNature.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
@@ -653,6 +707,24 @@
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>HanLP</value>
+  </data>
+  <data name="&gt;&gt;cmiFilterSub.Name" xml:space="preserve">
+    <value>cmiFilterSub</value>
+  </data>
+  <data name="&gt;&gt;cmiFilterSub.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiFilterLrc.Name" xml:space="preserve">
+    <value>cmiFilterLrc</value>
+  </data>
+  <data name="&gt;&gt;cmiFilterLrc.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiFilterMlTag.Name" xml:space="preserve">
+    <value>cmiFilterMlTag</value>
+  </data>
+  <data name="&gt;&gt;cmiFilterMlTag.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
     <value>toolTip</value>

@@ -227,14 +227,14 @@ namespace HanLP_Utils
             try
             {
                 List<string> stopwords = new List<string>();
-                stopwords.AddRange(new string[]{ "。", "、", "，", "　", "　　", "□", "□□", "一", "一一" } );
+                stopwords.AddRange( new string[] { "。", "、", "，", "　", "　　", "□", "□□", "一", "一一" } );
 
                 List<string> stopfile = new List<string>() {
                     Path.Combine( ROOT, "data", "dictionary", "stopwords.txt" ),
                     Path.Combine( AppPath, "stopwords.txt" ),
                 }.ToList();
                 if ( !CWD.Equals( AppPath, StringComparison.CurrentCultureIgnoreCase ) )
-                    stopfile.Add(Path.Combine( CWD, "stopwords.txt" ));
+                    stopfile.Add( Path.Combine( CWD, "stopwords.txt" ) );
 
                 foreach ( var f in stopfile )
                 {
@@ -250,7 +250,7 @@ namespace HanLP_Utils
                         CoreStopWordDictionary.add( w );
                 }
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 MessageBox.Show( ex.ToString() );
             }
@@ -268,7 +268,7 @@ namespace HanLP_Utils
             //sr.Close();
             //myResponse.Close();
 
-            HtmlAgilityPack.HtmlWeb web = new HtmlWeb();
+            HtmlWeb web = new HtmlWeb();
             HtmlAgilityPack.HtmlDocument doc = web.Load(url);
             var scripts = doc.DocumentNode.SelectNodes( "//script" );
             var styles = doc.DocumentNode.SelectNodes( "//style" );
@@ -287,7 +287,7 @@ namespace HanLP_Utils
             return ( result );
         }
 
-        private string[] GetLinks(string html)
+        private string[] GetLinks( string html )
         {
             List<string> links = new List<string>();
 
@@ -295,7 +295,7 @@ namespace HanLP_Utils
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument(); //web.Load(html);
             doc.LoadHtml( html );
             var alist = doc.DocumentNode.SelectNodes( "//a" );
-            foreach(var a in alist)
+            foreach ( var a in alist )
             {
                 string href = a.GetAttributeValue( "href", "" );
                 links.Add( href );
@@ -361,11 +361,11 @@ namespace HanLP_Utils
 
                             }
                         }
-                        else if ( text.Contains( ext )) 
+                        else if ( text.Contains( ext ) )
                         {
                             edSrc.Text = File.ReadAllText( dragFileName );
                         }
-                        else if ( html.Contains( ext ) ) 
+                        else if ( html.Contains( ext ) )
                         {
                             edSrc.Text = ReadUrl( dragFileName );
                         }
@@ -381,8 +381,8 @@ namespace HanLP_Utils
             //    var content = e.Data.GetData( DataFormats.Html, true ).ToString();
             //    edSrc.Text = string.Join("\n", GetLinks( content ));
             //}
-            else if ( e.Data.GetDataPresent( DataFormats.Text ) || 
-                      e.Data.GetDataPresent( DataFormats.UnicodeText ))
+            else if ( e.Data.GetDataPresent( DataFormats.Text ) ||
+                      e.Data.GetDataPresent( DataFormats.UnicodeText ) )
             {
                 var content = e.Data.GetData( "System.String", true ).ToString();
                 if ( content.StartsWith( "http://", StringComparison.CurrentCultureIgnoreCase ) ||
@@ -442,14 +442,14 @@ namespace HanLP_Utils
                 if ( text.Length <= 0 ) continue;
                 sb.AppendLine( string.Join( ", ", text ).Trim() );
             }
-            edDst.Text = string.Join( "\n", sb);
+            edDst.Text = string.Join( "\n", sb );
         }
 
         private void btnKeyword_Click( object sender, EventArgs e )
         {
             var text = HanLP.extractKeyword( edSrc.Text, 25 ).toArray();
             if ( text.Length <= 0 ) return;
-            edDst.Text = string.Join( ", ", text);
+            edDst.Text = string.Join( ", ", text );
         }
 
         private void btnSummary_Click( object sender, EventArgs e )
@@ -457,7 +457,7 @@ namespace HanLP_Utils
             var text = HanLP.extractSummary( edSrc.Text, 15 ).toArray();
             if ( text.Length <= 0 ) return;
             var ro = RegexOptions.IgnoreCase | RegexOptions.Multiline;
-            edDst.Text = Regex.Replace(string.Join( ", ", text), @"[　| ]{2,}", " ", ro );
+            edDst.Text = Regex.Replace( string.Join( ", ", text ), @"[　| ]{2,}", " ", ro );
         }
 
         private void btnPhrase_Click( object sender, EventArgs e )
@@ -465,9 +465,9 @@ namespace HanLP_Utils
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
-                var text = HanLP.extractPhrase( line.Trim().Replace("　", " ").Replace("□", " "), 10 ).toArray();                
+                var text = HanLP.extractPhrase( line.Trim().Replace("　", " ").Replace("□", " "), 10 ).toArray();
                 if ( text.Length <= 0 ) continue;
-                sb.AppendLine( string.Join(", ", text ).Trim() );
+                sb.AppendLine( string.Join( ", ", text ).Trim() );
             }
             edDst.Text = string.Join( "\n", sb );
 
@@ -481,7 +481,7 @@ namespace HanLP_Utils
                 sb.AppendLine( HanLP.convertToTraditionalChinese( line ).ToString() );
             }
             edDst.Text = string.Join( "\n", sb );
-            
+
         }
 
         private void btnTC2SC_Click( object sender, EventArgs e )
@@ -501,7 +501,7 @@ namespace HanLP_Utils
             foreach ( string line in edSrc.Lines )
             {
                 List<string> text = new List<string>();
-                foreach ( Pinyin py in HanLP.convertToPinyinList( line.Trim().Replace( "　", " " ).Replace( "□", " ") ).toArray() )
+                foreach ( Pinyin py in HanLP.convertToPinyinList( line.Trim().Replace( "　", " " ).Replace( "□", " " ) ).toArray() )
                 {
                     if ( mode == 0 )
                         text.Add( py.getPinyinWithoutTone().ToString() );
@@ -560,5 +560,27 @@ namespace HanLP_Utils
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
+        private void cmiFilterText_Click( object sender, EventArgs e )
+        {
+            try
+            {
+                var txt = edSrc.Text;
+                var mi = sender as ToolStripMenuItem;
+                if(mi.Name == cmiFilterSub.Name)
+                {
+                    txt = filterASS( txt );
+                }
+                else if ( mi.Name == cmiFilterLrc.Name )
+                {
+                    txt = filterLrc( txt );
+                }
+                else if ( mi.Name == cmiFilterMlTag.Name )
+                {
+                    txt = filterHtmlTag( txt );
+                }
+                edSrc.Text = filterMisc( txt );                
+            }
+            catch {}
+        }
     }
 }
