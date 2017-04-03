@@ -38,6 +38,10 @@
             this.btnKeyword = new System.Windows.Forms.Button();
             this.layoutMain = new System.Windows.Forms.TableLayoutPanel();
             this.pnlTools = new System.Windows.Forms.Panel();
+            this.cmFilterText = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmiFilterSub = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiFilterMlTag = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiFilterLrc = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlOption = new System.Windows.Forms.Panel();
             this.lblInfo = new System.Windows.Forms.Label();
             this.chkTermNature = new System.Windows.Forms.CheckBox();
@@ -49,14 +53,10 @@
             this.btnSC2TC = new System.Windows.Forms.Button();
             this.btnPhrase = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.cmFilterText = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.cmiFilterSub = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiFilterLrc = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiFilterMlTag = new System.Windows.Forms.ToolStripMenuItem();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
-            this.pnlOption.SuspendLayout();
             this.cmFilterText.SuspendLayout();
+            this.pnlOption.SuspendLayout();
             this.SuspendLayout();
             // 
             // edSrc
@@ -129,6 +129,33 @@
             this.pnlTools.Controls.Add(this.btnSummary);
             resources.ApplyResources(this.pnlTools, "pnlTools");
             this.pnlTools.Name = "pnlTools";
+            // 
+            // cmFilterText
+            // 
+            this.cmFilterText.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cmiFilterSub,
+            this.cmiFilterLrc,
+            this.cmiFilterMlTag});
+            this.cmFilterText.Name = "cmFilterText";
+            resources.ApplyResources(this.cmFilterText, "cmFilterText");
+            // 
+            // cmiFilterSub
+            // 
+            this.cmiFilterSub.Name = "cmiFilterSub";
+            resources.ApplyResources(this.cmiFilterSub, "cmiFilterSub");
+            this.cmiFilterSub.Click += new System.EventHandler(this.cmiFilterText_Click);
+            // 
+            // cmiFilterMlTag
+            // 
+            this.cmiFilterMlTag.Name = "cmiFilterMlTag";
+            resources.ApplyResources(this.cmiFilterMlTag, "cmiFilterMlTag");
+            this.cmiFilterMlTag.Click += new System.EventHandler(this.cmiFilterText_Click);
+            // 
+            // cmiFilterLrc
+            // 
+            this.cmiFilterLrc.Name = "cmiFilterLrc";
+            resources.ApplyResources(this.cmiFilterLrc, "cmiFilterLrc");
+            this.cmiFilterLrc.Click += new System.EventHandler(this.cmiFilterText_Click);
             // 
             // pnlOption
             // 
@@ -210,33 +237,6 @@
             this.btnPhrase.UseVisualStyleBackColor = true;
             this.btnPhrase.Click += new System.EventHandler(this.btnPhrase_Click);
             // 
-            // cmFilterText
-            // 
-            this.cmFilterText.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cmiFilterSub,
-            this.cmiFilterMlTag,
-            this.cmiFilterLrc});
-            this.cmFilterText.Name = "cmFilterText";
-            resources.ApplyResources(this.cmFilterText, "cmFilterText");
-            // 
-            // cmiFilterSub
-            // 
-            this.cmiFilterSub.Name = "cmiFilterSub";
-            resources.ApplyResources(this.cmiFilterSub, "cmiFilterSub");
-            this.cmiFilterSub.Click += new System.EventHandler(this.cmiFilterText_Click);
-            // 
-            // cmiFilterLrc
-            // 
-            this.cmiFilterLrc.Name = "cmiFilterLrc";
-            resources.ApplyResources(this.cmiFilterLrc, "cmiFilterLrc");
-            this.cmiFilterLrc.Click += new System.EventHandler(this.cmiFilterText_Click);
-            // 
-            // cmiFilterMlTag
-            // 
-            this.cmiFilterMlTag.Name = "cmiFilterMlTag";
-            resources.ApplyResources(this.cmiFilterMlTag, "cmiFilterMlTag");
-            this.cmiFilterMlTag.Click += new System.EventHandler(this.cmiFilterText_Click);
-            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -250,9 +250,9 @@
             this.layoutMain.ResumeLayout(false);
             this.layoutMain.PerformLayout();
             this.pnlTools.ResumeLayout(false);
+            this.cmFilterText.ResumeLayout(false);
             this.pnlOption.ResumeLayout(false);
             this.pnlOption.PerformLayout();
-            this.cmFilterText.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

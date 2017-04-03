@@ -100,11 +100,11 @@ namespace HanLP_Utils
         {
             string result = text;
 
-            string pat_misc = @"(&#\d+;)|([\u0001-\u001F,\u0021-\u0040,\u005B-\u0060,\u007B-\u00FF,\u2000-\u206F,\u2190-\u2426,\u3000-\u303F,\u31C0-\u31E3,\uFE10-\uFE4F])|([\.|·|　|…])";
-            result = Regex.Replace( result, pat_misc, "", RegexOptions.IgnoreCase ); 
+            string pat_misc = @"(&#\d+;)|([\u0000-\u0009,\u000B-\u000C,\u000E-\u001F,\u0021-\u0040,\u005B-\u0060,\u007B-\u00FF,\u2000-\u206F,\u2190-\u2426,\u3000-\u303F,\u31C0-\u31E3,\uFE10-\uFE4F])|([\.|·|　|…])";
+            result = Regex.Replace( result, pat_misc, "", RegexOptions.IgnoreCase | RegexOptions.Multiline ); 
 
             if(!_KeepNumber)
-                result = Regex.Replace( result, @"\d+", "", RegexOptions.IgnoreCase );
+                result = Regex.Replace( result, @"\d+", "", RegexOptions.IgnoreCase | RegexOptions.Multiline );
 
             return ( result.Trim() );
         }

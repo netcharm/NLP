@@ -303,6 +303,48 @@
   <data name="layoutMain.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
+  <data name="&gt;&gt;pnlTools.Name" xml:space="preserve">
+    <value>pnlTools</value>
+  </data>
+  <data name="&gt;&gt;pnlTools.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;pnlTools.Parent" xml:space="preserve">
+    <value>layoutMain</value>
+  </data>
+  <data name="&gt;&gt;pnlTools.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="layoutMain.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="layoutMain.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="layoutMain.RowCount" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="layoutMain.Size" type="System.Drawing.Size, System.Drawing">
+    <value>712, 453</value>
+  </data>
+  <data name="layoutMain.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;layoutMain.Name" xml:space="preserve">
+    <value>layoutMain</value>
+  </data>
+  <data name="&gt;&gt;layoutMain.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;layoutMain.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;layoutMain.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="layoutMain.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnlTools" Row="1" RowSpan="1" Column="0" ColumnSpan="2" /&gt;&lt;Control Name="edSrc" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="edDst" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,100,Absolute,72" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
   <metadata name="cmFilterText.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>93, 20</value>
   </metadata>
@@ -312,20 +354,20 @@
   <data name="cmiFilterSub.Text" xml:space="preserve">
     <value>Filter Sub</value>
   </data>
-  <data name="cmiFilterMlTag.Size" type="System.Drawing.Size, System.Drawing">
-    <value>190, 22</value>
-  </data>
-  <data name="cmiFilterMlTag.Text" xml:space="preserve">
-    <value>Filter HTML/XML Tags</value>
-  </data>
   <data name="cmiFilterLrc.Size" type="System.Drawing.Size, System.Drawing">
     <value>190, 22</value>
   </data>
   <data name="cmiFilterLrc.Text" xml:space="preserve">
     <value>Filter LRC</value>
   </data>
+  <data name="cmiFilterMlTag.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiFilterMlTag.Text" xml:space="preserve">
+    <value>Filter HTML/XML Tags</value>
+  </data>
   <data name="cmFilterText.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 70</value>
+    <value>191, 92</value>
   </data>
   <data name="&gt;&gt;cmFilterText.Name" xml:space="preserve">
     <value>cmFilterText</value>
@@ -594,36 +636,6 @@
   <data name="&gt;&gt;pnlTools.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="layoutMain.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="layoutMain.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="layoutMain.RowCount" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="layoutMain.Size" type="System.Drawing.Size, System.Drawing">
-    <value>712, 453</value>
-  </data>
-  <data name="layoutMain.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="&gt;&gt;layoutMain.Name" xml:space="preserve">
-    <value>layoutMain</value>
-  </data>
-  <data name="&gt;&gt;layoutMain.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;layoutMain.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;layoutMain.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="layoutMain.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnlTools" Row="1" RowSpan="1" Column="0" ColumnSpan="2" /&gt;&lt;Control Name="edSrc" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="edDst" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,100,Absolute,72" /&gt;&lt;/TableLayoutSettings&gt;</value>
-  </data>
   <data name="lblInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Bottom</value>
   </data>
@@ -714,16 +726,16 @@
   <data name="$this.Text" xml:space="preserve">
     <value>HanLP</value>
   </data>
-  <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
-    <value>toolTip</value>
-  </data>
-  <data name="&gt;&gt;toolTip.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;cmiFilterSub.Name" xml:space="preserve">
     <value>cmiFilterSub</value>
   </data>
   <data name="&gt;&gt;cmiFilterSub.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiFilterMlTag.Name" xml:space="preserve">
+    <value>cmiFilterMlTag</value>
+  </data>
+  <data name="&gt;&gt;cmiFilterMlTag.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;cmiFilterLrc.Name" xml:space="preserve">
@@ -732,11 +744,11 @@
   <data name="&gt;&gt;cmiFilterLrc.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;cmiFilterMlTag.Name" xml:space="preserve">
-    <value>cmiFilterMlTag</value>
+  <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
+    <value>toolTip</value>
   </data>
-  <data name="&gt;&gt;cmiFilterMlTag.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;toolTip.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>MainForm</value>
