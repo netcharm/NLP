@@ -125,10 +125,16 @@
   <data name="edSrc.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 10pt</value>
   </data>
+  <data name="edSrc.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>On</value>
+  </data>
   <data name="edSrc.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 3</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="edSrc.MaxLength" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
   <data name="edSrc.Multiline" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -153,41 +159,8 @@
   <data name="&gt;&gt;edSrc.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <metadata name="cmFilterText.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>112, 17</value>
-  </metadata>
-  <data name="cmiFilterSub.Size" type="System.Drawing.Size, System.Drawing">
-    <value>190, 22</value>
-  </data>
-  <data name="cmiFilterSub.Text" xml:space="preserve">
-    <value>Filter Sub</value>
-  </data>
-  <data name="cmiFilterLrc.Size" type="System.Drawing.Size, System.Drawing">
-    <value>190, 22</value>
-  </data>
-  <data name="cmiFilterLrc.Text" xml:space="preserve">
-    <value>Filter LRC</value>
-  </data>
-  <data name="cmiFilterMlTag.Size" type="System.Drawing.Size, System.Drawing">
-    <value>190, 22</value>
-  </data>
-  <data name="cmiFilterMlTag.Text" xml:space="preserve">
-    <value>Filter HTML/XML Tags</value>
-  </data>
-  <data name="cmFilterText.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 70</value>
-  </data>
-  <data name="&gt;&gt;cmFilterText.Name" xml:space="preserve">
-    <value>cmFilterText</value>
-  </data>
-  <data name="&gt;&gt;cmFilterText.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="btnSegment.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 6</value>
+    <value>9, 6</value>
   </data>
   <data name="btnSegment.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -198,6 +171,9 @@
   <data name="btnSegment.Text" xml:space="preserve">
     <value>Segment</value>
   </data>
+  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <data name="btnSegment.ToolTip" xml:space="preserve">
     <value>Take the Segments from Source Text</value>
   </data>
@@ -218,6 +194,9 @@
   </data>
   <data name="edDst.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 10pt</value>
+  </data>
+  <data name="edDst.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>On</value>
   </data>
   <data name="edDst.Location" type="System.Drawing.Point, System.Drawing">
     <value>359, 3</value>
@@ -247,7 +226,7 @@
     <value>2</value>
   </data>
   <data name="btnTokenizer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>94, 6</value>
+    <value>90, 6</value>
   </data>
   <data name="btnTokenizer.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -274,7 +253,7 @@
     <value>10</value>
   </data>
   <data name="btnSummary.Location" type="System.Drawing.Point, System.Drawing">
-    <value>256, 6</value>
+    <value>252, 6</value>
   </data>
   <data name="btnSummary.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -301,7 +280,7 @@
     <value>11</value>
   </data>
   <data name="btnKeyword.Location" type="System.Drawing.Point, System.Drawing">
-    <value>175, 6</value>
+    <value>171, 6</value>
   </data>
   <data name="btnKeyword.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -330,6 +309,93 @@
   <data name="layoutMain.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
+  <metadata name="cmActions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>93, 20</value>
+  </metadata>
+  <data name="cmiActionFilterSub.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiActionFilterSub.Text" xml:space="preserve">
+    <value>Filter Sub</value>
+  </data>
+  <data name="cmiActionFilterLrc.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiActionFilterLrc.Text" xml:space="preserve">
+    <value>Filter LRC</value>
+  </data>
+  <data name="cmiActionFilterMlTag.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiActionFilterMlTag.Text" xml:space="preserve">
+    <value>Filter HTML/XML Tags</value>
+  </data>
+  <data name="cmiSep0.Size" type="System.Drawing.Size, System.Drawing">
+    <value>187, 6</value>
+  </data>
+  <data name="cmiOptionCutStandard.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiOptionCutStandard.Text" xml:space="preserve">
+    <value>Standard Tokenizer</value>
+  </data>
+  <data name="cmiOptionCutCRF.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiOptionCutCRF.Text" xml:space="preserve">
+    <value>CRF Tokenizer</value>
+  </data>
+  <data name="cmiOptionCutNShort.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiOptionCutNShort.Text" xml:space="preserve">
+    <value>N-Short Tokenizer</value>
+  </data>
+  <data name="cmiOptionCutIndex.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiOptionCutIndex.Text" xml:space="preserve">
+    <value>Index Tokenizer</value>
+  </data>
+  <data name="cmiOptionCutNLP.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiOptionCutNLP.Text" xml:space="preserve">
+    <value>NLP Tokenizer</value>
+  </data>
+  <data name="cmiOptionCutHighSpeed.Size" type="System.Drawing.Size, System.Drawing">
+    <value>190, 22</value>
+  </data>
+  <data name="cmiOptionCutHighSpeed.Text" xml:space="preserve">
+    <value>HighSpeed Tokenizer</value>
+  </data>
+  <data name="cmActions.Size" type="System.Drawing.Size, System.Drawing">
+    <value>191, 230</value>
+  </data>
+  <data name="&gt;&gt;cmActions.Name" xml:space="preserve">
+    <value>cmActions</value>
+  </data>
+  <data name="&gt;&gt;cmActions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="lblInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Bottom</value>
+  </data>
+  <data name="lblInfo.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 37</value>
+  </data>
+  <data name="lblInfo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>128, 21</value>
+  </data>
+  <data name="lblInfo.TabIndex" type="System.Int32, mscorlib">
+    <value>11</value>
+  </data>
+  <data name="lblInfo.Text" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="lblInfo.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
+  </data>
   <data name="&gt;&gt;lblInfo.Name" xml:space="preserve">
     <value>lblInfo</value>
   </data>
@@ -341,6 +407,33 @@
   </data>
   <data name="&gt;&gt;lblInfo.ZOrder" xml:space="preserve">
     <value>0</value>
+  </data>
+  <data name="chkTermNature.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkTermNature.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
+  </data>
+  <data name="chkTermNature.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="chkTermNature.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="chkTermNature.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chkTermNature.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 8</value>
+  </data>
+  <data name="chkTermNature.Size" type="System.Drawing.Size, System.Drawing">
+    <value>128, 16</value>
+  </data>
+  <data name="chkTermNature.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="chkTermNature.Text" xml:space="preserve">
+    <value>Show Term Nature</value>
   </data>
   <data name="&gt;&gt;chkTermNature.Name" xml:space="preserve">
     <value>chkTermNature</value>
@@ -367,7 +460,7 @@
     <value>144, 66</value>
   </data>
   <data name="pnlOption.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
+    <value>14</value>
   </data>
   <data name="&gt;&gt;pnlOption.Name" xml:space="preserve">
     <value>pnlOption</value>
@@ -382,13 +475,13 @@
     <value>0</value>
   </data>
   <data name="btnWordFreq.Location" type="System.Drawing.Point, System.Drawing">
-    <value>418, 6</value>
+    <value>414, 6</value>
   </data>
   <data name="btnWordFreq.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
   </data>
   <data name="btnWordFreq.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
+    <value>13</value>
   </data>
   <data name="btnWordFreq.Text" xml:space="preserve">
     <value>Word Freq</value>
@@ -406,7 +499,7 @@
     <value>1</value>
   </data>
   <data name="btnSrc2PyTM.Location" type="System.Drawing.Point, System.Drawing">
-    <value>337, 37</value>
+    <value>333, 37</value>
   </data>
   <data name="btnSrc2PyTM.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -433,7 +526,7 @@
     <value>2</value>
   </data>
   <data name="btnSrc2PyT.Location" type="System.Drawing.Point, System.Drawing">
-    <value>256, 37</value>
+    <value>252, 37</value>
   </data>
   <data name="btnSrc2PyT.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -460,7 +553,7 @@
     <value>3</value>
   </data>
   <data name="btnSrc2Py.Location" type="System.Drawing.Point, System.Drawing">
-    <value>175, 37</value>
+    <value>171, 37</value>
   </data>
   <data name="btnSrc2Py.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -487,7 +580,7 @@
     <value>4</value>
   </data>
   <data name="btnTC2SC.Location" type="System.Drawing.Point, System.Drawing">
-    <value>94, 37</value>
+    <value>90, 37</value>
   </data>
   <data name="btnTC2SC.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -514,7 +607,7 @@
     <value>5</value>
   </data>
   <data name="btnSC2TC.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 37</value>
+    <value>9, 37</value>
   </data>
   <data name="btnSC2TC.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -541,7 +634,7 @@
     <value>6</value>
   </data>
   <data name="btnPhrase.Location" type="System.Drawing.Point, System.Drawing">
-    <value>337, 6</value>
+    <value>333, 6</value>
   </data>
   <data name="btnPhrase.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -621,75 +714,6 @@
   <data name="layoutMain.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
     <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnlTools" Row="1" RowSpan="1" Column="0" ColumnSpan="2" /&gt;&lt;Control Name="edSrc" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="edDst" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,100,Absolute,72" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
-  <data name="lblInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Bottom</value>
-  </data>
-  <data name="lblInfo.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 35</value>
-  </data>
-  <data name="lblInfo.Size" type="System.Drawing.Size, System.Drawing">
-    <value>128, 23</value>
-  </data>
-  <data name="lblInfo.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="lblInfo.Text" xml:space="preserve">
-    <value>OK</value>
-  </data>
-  <data name="lblInfo.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleRight</value>
-  </data>
-  <data name="&gt;&gt;lblInfo.Name" xml:space="preserve">
-    <value>lblInfo</value>
-  </data>
-  <data name="&gt;&gt;lblInfo.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lblInfo.Parent" xml:space="preserve">
-    <value>pnlOption</value>
-  </data>
-  <data name="&gt;&gt;lblInfo.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="chkTermNature.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="chkTermNature.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleRight</value>
-  </data>
-  <data name="chkTermNature.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="chkTermNature.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
-    <value>Flat</value>
-  </data>
-  <data name="chkTermNature.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 8</value>
-  </data>
-  <data name="chkTermNature.Size" type="System.Drawing.Size, System.Drawing">
-    <value>128, 16</value>
-  </data>
-  <data name="chkTermNature.TabIndex" type="System.Int32, mscorlib">
-    <value>9</value>
-  </data>
-  <data name="chkTermNature.Text" xml:space="preserve">
-    <value>Show Term Nature</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Name" xml:space="preserve">
-    <value>chkTermNature</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Parent" xml:space="preserve">
-    <value>pnlOption</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -708,22 +732,40 @@
   <data name="$this.Text" xml:space="preserve">
     <value>HanLP</value>
   </data>
-  <data name="&gt;&gt;cmiFilterSub.Name" xml:space="preserve">
-    <value>cmiFilterSub</value>
+  <data name="&gt;&gt;cmiActionFilterSub.Name" xml:space="preserve">
+    <value>cmiActionFilterSub</value>
   </data>
-  <data name="&gt;&gt;cmiFilterSub.Type" xml:space="preserve">
+  <data name="&gt;&gt;cmiActionFilterSub.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;cmiFilterLrc.Name" xml:space="preserve">
-    <value>cmiFilterLrc</value>
+  <data name="&gt;&gt;cmiActionFilterLrc.Name" xml:space="preserve">
+    <value>cmiActionFilterLrc</value>
   </data>
-  <data name="&gt;&gt;cmiFilterLrc.Type" xml:space="preserve">
+  <data name="&gt;&gt;cmiActionFilterLrc.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;cmiFilterMlTag.Name" xml:space="preserve">
-    <value>cmiFilterMlTag</value>
+  <data name="&gt;&gt;cmiActionFilterMlTag.Name" xml:space="preserve">
+    <value>cmiActionFilterMlTag</value>
   </data>
-  <data name="&gt;&gt;cmiFilterMlTag.Type" xml:space="preserve">
+  <data name="&gt;&gt;cmiActionFilterMlTag.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiSep0.Name" xml:space="preserve">
+    <value>cmiSep0</value>
+  </data>
+  <data name="&gt;&gt;cmiSep0.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutCRF.Name" xml:space="preserve">
+    <value>cmiOptionCutCRF</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutCRF.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutStandard.Name" xml:space="preserve">
+    <value>cmiOptionCutStandard</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutStandard.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
@@ -731,6 +773,30 @@
   </data>
   <data name="&gt;&gt;toolTip.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutNShort.Name" xml:space="preserve">
+    <value>cmiOptionCutNShort</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutNShort.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutIndex.Name" xml:space="preserve">
+    <value>cmiOptionCutIndex</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutIndex.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutNLP.Name" xml:space="preserve">
+    <value>cmiOptionCutNLP</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutNLP.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutHighSpeed.Name" xml:space="preserve">
+    <value>cmiOptionCutHighSpeed</value>
+  </data>
+  <data name="&gt;&gt;cmiOptionCutHighSpeed.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>MainForm</value>

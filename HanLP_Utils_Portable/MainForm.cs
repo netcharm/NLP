@@ -16,7 +16,10 @@ using com.hankcs.hanlp;
 using com.hankcs.hanlp.dictionary;
 using com.hankcs.hanlp.dictionary.py;
 using com.hankcs.hanlp.dictionary.stopword;
+using com.hankcs.hanlp.seg;
 using com.hankcs.hanlp.seg.common;
+using com.hankcs.hanlp.seg.CRF;
+using com.hankcs.hanlp.seg.NShort;
 using com.hankcs.hanlp.tokenizer;
 using HtmlAgilityPack;
 
@@ -400,6 +403,21 @@ namespace HanLP_Utils
             return;
         }
 
+        private void cmiOptionCut_Click( object sender, EventArgs e )
+        {
+            foreach ( var cmi in cmActions.Items )
+            {
+                if ( cmi.GetType() == typeof( ToolStripMenuItem ) )
+                {
+                    var mi = cmi as ToolStripMenuItem;
+                    if ( mi.CheckOnClick && mi != sender )
+                    {
+                        mi.Checked = !( sender as ToolStripMenuItem ).Checked;
+                    }
+                }
+            }
+        }
+
         private void chkTermNature_CheckedChanged( object sender, EventArgs e )
         {
             HanLP.Config.ShowTermNature = chkTermNature.Checked;
@@ -426,7 +444,45 @@ namespace HanLP_Utils
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
-                var text = HanLP.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
+                var t = line.Trim().Replace("　", " ").Replace("□", " ");
+                var text = new object[0];
+                if( cmiOptionCutStandard.Checked )
+                {
+                    var result = HanLP.segment( t );
+                    text = result.toArray();
+                }
+                else if( cmiOptionCutCRF.Checked )
+                {
+                    Segment segment = new CRFSegment();
+                    segment.enablePartOfSpeechTagging( true );
+                    var result = segment.seg(t);
+                    text = result.toArray();
+                }
+                else if ( cmiOptionCutNShort.Checked )
+                {
+                    Segment segment = new NShortSegment();
+                    segment.enableCustomDictionary( true );
+                    //segment.enablePlaceRecognize( true );
+                    //segment.enableOrganizationRecognize(true);
+                    //segment.enablePartOfSpeechTagging( true );
+                    var result = segment.seg(t);
+                    text = result.toArray();
+                }
+                else if ( cmiOptionCutIndex.Checked )
+                {
+                    var result = IndexTokenizer.segment(t);
+                    text = result.toArray();
+                }
+                else if ( cmiOptionCutNLP.Checked )
+                {
+                    var result = NLPTokenizer.segment(t);
+                    text = result.toArray();
+                }
+                else if ( cmiOptionCutHighSpeed.Checked )
+                {
+                    var result = SpeedTokenizer.segment(t);
+                    text = result.toArray();
+                }
                 if ( text.Length <= 0 ) continue;
                 sb.AppendLine( string.Join( ", ", text ).Trim() );
             }
@@ -566,15 +622,15 @@ namespace HanLP_Utils
             {
                 var txt = edSrc.Text;
                 var mi = sender as ToolStripMenuItem;
-                if ( mi.Name == cmiFilterSub.Name )
+                if ( mi.Name == cmiActionFilterSub.Name )
                 {
                     txt = filterASS( txt );
                 }
-                else if ( mi.Name == cmiFilterLrc.Name )
+                else if ( mi.Name == cmiActionFilterLrc.Name )
                 {
                     txt = filterLrc( txt );
                 }
-                else if ( mi.Name == cmiFilterMlTag.Name )
+                else if ( mi.Name == cmiActionFilterMlTag.Name )
                 {
                     txt = filterHtmlTag( txt );
                 }

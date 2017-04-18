@@ -38,10 +38,13 @@
             this.btnKeyword = new System.Windows.Forms.Button();
             this.layoutMain = new System.Windows.Forms.TableLayoutPanel();
             this.pnlTools = new System.Windows.Forms.Panel();
-            this.cmFilterText = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.cmiFilterSub = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiFilterMlTag = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiFilterLrc = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmActions = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmiActionFilterSub = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiActionFilterLrc = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiActionFilterMlTag = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.cmiOptionCutCRF = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiOptionCutStandard = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlOption = new System.Windows.Forms.Panel();
             this.lblInfo = new System.Windows.Forms.Label();
             this.chkTermNature = new System.Windows.Forms.CheckBox();
@@ -53,9 +56,13 @@
             this.btnSC2TC = new System.Windows.Forms.Button();
             this.btnPhrase = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.cmiOptionCutNShort = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiOptionCutIndex = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiOptionCutNLP = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiOptionCutHighSpeed = new System.Windows.Forms.ToolStripMenuItem();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
-            this.cmFilterText.SuspendLayout();
+            this.cmActions.SuspendLayout();
             this.pnlOption.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -114,7 +121,7 @@
             // pnlTools
             // 
             this.layoutMain.SetColumnSpan(this.pnlTools, 2);
-            this.pnlTools.ContextMenuStrip = this.cmFilterText;
+            this.pnlTools.ContextMenuStrip = this.cmActions;
             this.pnlTools.Controls.Add(this.pnlOption);
             this.pnlTools.Controls.Add(this.btnWordFreq);
             this.pnlTools.Controls.Add(this.btnSrc2PyTM);
@@ -130,32 +137,60 @@
             resources.ApplyResources(this.pnlTools, "pnlTools");
             this.pnlTools.Name = "pnlTools";
             // 
-            // cmFilterText
+            // cmActions
             // 
-            this.cmFilterText.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cmiFilterSub,
-            this.cmiFilterLrc,
-            this.cmiFilterMlTag});
-            this.cmFilterText.Name = "cmFilterText";
-            resources.ApplyResources(this.cmFilterText, "cmFilterText");
+            this.cmActions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cmiActionFilterSub,
+            this.cmiActionFilterLrc,
+            this.cmiActionFilterMlTag,
+            this.cmiSep0,
+            this.cmiOptionCutStandard,
+            this.cmiOptionCutCRF,
+            this.cmiOptionCutNShort,
+            this.cmiOptionCutIndex,
+            this.cmiOptionCutNLP,
+            this.cmiOptionCutHighSpeed});
+            this.cmActions.Name = "cmFilterText";
+            resources.ApplyResources(this.cmActions, "cmActions");
             // 
-            // cmiFilterSub
+            // cmiActionFilterSub
             // 
-            this.cmiFilterSub.Name = "cmiFilterSub";
-            resources.ApplyResources(this.cmiFilterSub, "cmiFilterSub");
-            this.cmiFilterSub.Click += new System.EventHandler(this.cmiFilterText_Click);
+            this.cmiActionFilterSub.Name = "cmiActionFilterSub";
+            resources.ApplyResources(this.cmiActionFilterSub, "cmiActionFilterSub");
+            this.cmiActionFilterSub.Click += new System.EventHandler(this.cmiFilterText_Click);
             // 
-            // cmiFilterMlTag
+            // cmiActionFilterLrc
             // 
-            this.cmiFilterMlTag.Name = "cmiFilterMlTag";
-            resources.ApplyResources(this.cmiFilterMlTag, "cmiFilterMlTag");
-            this.cmiFilterMlTag.Click += new System.EventHandler(this.cmiFilterText_Click);
+            this.cmiActionFilterLrc.Name = "cmiActionFilterLrc";
+            resources.ApplyResources(this.cmiActionFilterLrc, "cmiActionFilterLrc");
+            this.cmiActionFilterLrc.Click += new System.EventHandler(this.cmiFilterText_Click);
             // 
-            // cmiFilterLrc
+            // cmiActionFilterMlTag
             // 
-            this.cmiFilterLrc.Name = "cmiFilterLrc";
-            resources.ApplyResources(this.cmiFilterLrc, "cmiFilterLrc");
-            this.cmiFilterLrc.Click += new System.EventHandler(this.cmiFilterText_Click);
+            this.cmiActionFilterMlTag.Name = "cmiActionFilterMlTag";
+            resources.ApplyResources(this.cmiActionFilterMlTag, "cmiActionFilterMlTag");
+            this.cmiActionFilterMlTag.Click += new System.EventHandler(this.cmiFilterText_Click);
+            // 
+            // cmiSep0
+            // 
+            this.cmiSep0.Name = "cmiSep0";
+            resources.ApplyResources(this.cmiSep0, "cmiSep0");
+            // 
+            // cmiOptionCutCRF
+            // 
+            this.cmiOptionCutCRF.CheckOnClick = true;
+            this.cmiOptionCutCRF.Name = "cmiOptionCutCRF";
+            resources.ApplyResources(this.cmiOptionCutCRF, "cmiOptionCutCRF");
+            this.cmiOptionCutCRF.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            // 
+            // cmiOptionCutStandard
+            // 
+            this.cmiOptionCutStandard.Checked = true;
+            this.cmiOptionCutStandard.CheckOnClick = true;
+            this.cmiOptionCutStandard.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiOptionCutStandard.Name = "cmiOptionCutStandard";
+            resources.ApplyResources(this.cmiOptionCutStandard, "cmiOptionCutStandard");
+            this.cmiOptionCutStandard.Click += new System.EventHandler(this.cmiOptionCut_Click);
             // 
             // pnlOption
             // 
@@ -237,6 +272,34 @@
             this.btnPhrase.UseVisualStyleBackColor = true;
             this.btnPhrase.Click += new System.EventHandler(this.btnPhrase_Click);
             // 
+            // cmiOptionCutNShort
+            // 
+            this.cmiOptionCutNShort.CheckOnClick = true;
+            this.cmiOptionCutNShort.Name = "cmiOptionCutNShort";
+            resources.ApplyResources(this.cmiOptionCutNShort, "cmiOptionCutNShort");
+            this.cmiOptionCutNShort.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            // 
+            // cmiOptionCutIndex
+            // 
+            this.cmiOptionCutIndex.CheckOnClick = true;
+            this.cmiOptionCutIndex.Name = "cmiOptionCutIndex";
+            resources.ApplyResources(this.cmiOptionCutIndex, "cmiOptionCutIndex");
+            this.cmiOptionCutIndex.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            // 
+            // cmiOptionCutNLP
+            // 
+            this.cmiOptionCutNLP.CheckOnClick = true;
+            this.cmiOptionCutNLP.Name = "cmiOptionCutNLP";
+            resources.ApplyResources(this.cmiOptionCutNLP, "cmiOptionCutNLP");
+            this.cmiOptionCutNLP.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            // 
+            // cmiOptionCutHighSpeed
+            // 
+            this.cmiOptionCutHighSpeed.CheckOnClick = true;
+            this.cmiOptionCutHighSpeed.Name = "cmiOptionCutHighSpeed";
+            resources.ApplyResources(this.cmiOptionCutHighSpeed, "cmiOptionCutHighSpeed");
+            this.cmiOptionCutHighSpeed.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -250,7 +313,7 @@
             this.layoutMain.ResumeLayout(false);
             this.layoutMain.PerformLayout();
             this.pnlTools.ResumeLayout(false);
-            this.cmFilterText.ResumeLayout(false);
+            this.cmActions.ResumeLayout(false);
             this.pnlOption.ResumeLayout(false);
             this.pnlOption.PerformLayout();
             this.ResumeLayout(false);
@@ -278,10 +341,17 @@
         private System.Windows.Forms.Panel pnlOption;
         private System.Windows.Forms.CheckBox chkTermNature;
         private System.Windows.Forms.Label lblInfo;
-        private System.Windows.Forms.ContextMenuStrip cmFilterText;
-        private System.Windows.Forms.ToolStripMenuItem cmiFilterSub;
-        private System.Windows.Forms.ToolStripMenuItem cmiFilterLrc;
-        private System.Windows.Forms.ToolStripMenuItem cmiFilterMlTag;
+        private System.Windows.Forms.ContextMenuStrip cmActions;
+        private System.Windows.Forms.ToolStripMenuItem cmiActionFilterSub;
+        private System.Windows.Forms.ToolStripMenuItem cmiActionFilterLrc;
+        private System.Windows.Forms.ToolStripMenuItem cmiActionFilterMlTag;
+        private System.Windows.Forms.ToolStripSeparator cmiSep0;
+        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutStandard;
+        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutCRF;
+        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutNShort;
+        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutIndex;
+        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutNLP;
+        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutHighSpeed;
     }
 }
 
