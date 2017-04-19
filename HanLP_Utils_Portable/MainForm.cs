@@ -19,6 +19,7 @@ using com.hankcs.hanlp.dictionary.stopword;
 using com.hankcs.hanlp.seg;
 using com.hankcs.hanlp.seg.common;
 using com.hankcs.hanlp.seg.CRF;
+using com.hankcs.hanlp.seg.Dijkstra;
 using com.hankcs.hanlp.seg.NShort;
 using com.hankcs.hanlp.tokenizer;
 using HtmlAgilityPack;
@@ -44,6 +45,8 @@ namespace HanLP_Utils
         private bool ShowTermNature = true;
 
         private HanLP_Result HR = new HanLP_Result();
+
+        private Font DefaultOutputFont = null;
 
         public MainForm()
         {
@@ -315,6 +318,8 @@ namespace HanLP_Utils
                 LoadConfig();
                 AddCustomDict();
                 AddStopWords();
+
+                DefaultOutputFont = edDst.Font;
             }
             catch ( Exception ex )
             {
@@ -403,14 +408,14 @@ namespace HanLP_Utils
             return;
         }
 
-        private void cmiOptionCut_Click( object sender, EventArgs e )
+        private void cmiCutMethod_Click( object sender, EventArgs e )
         {
             foreach ( var cmi in cmActions.Items )
             {
-                if ( cmi.GetType() == typeof( ToolStripMenuItem ) )
+                if ( cmi.GetType() == typeof( ToolStripMenuItem ))
                 {
                     var mi = cmi as ToolStripMenuItem;
-                    if ( mi.CheckOnClick && mi != sender )
+                    if ( mi.CheckOnClick && mi != sender && mi.Name.StartsWith( "cmiCutMethod", StringComparison.CurrentCultureIgnoreCase))
                     {
                         mi.Checked = !( sender as ToolStripMenuItem ).Checked;
                     }
@@ -441,52 +446,68 @@ namespace HanLP_Utils
 
         private void btnSegment_Click( object sender, EventArgs e )
         {
+            var sw = Stopwatch.StartNew();
+
+            #region Create Segment
+            Segment segment = HanLP.newSegment();
+
+            if ( cmiCutMethodDefault.Checked )
+            {
+            }
+            else if ( cmiCutMethodStandard.Checked )
+            {
+                segment = StandardTokenizer.SEGMENT;
+            }
+            else if ( cmiCutMethodNLP.Checked )
+            {
+                segment = NLPTokenizer.SEGMENT;
+            }
+            else if ( cmiCutMethodIndex.Checked )
+            {
+                segment = IndexTokenizer.SEGMENT;
+            }
+            else if ( cmiCutMethodNShort.Checked )
+            {
+                segment = new NShortSegment();
+            }
+            else if ( cmiCutMethodShortest.Checked )
+            {
+                segment = new DijkstraSegment();
+            }
+            else if ( cmiCutMethodCRF.Checked )
+            {
+                segment = new CRFSegment();
+            }
+            else if ( cmiCutMethodHighSpeed.Checked )
+            {
+                segment = SpeedTokenizer.SEGMENT;
+            }
+
+            segment.enableCustomDictionary( true );
+            segment.enablePartOfSpeechTagging( true );
+            segment.enableNameRecognize( cmiCutRecognizeChineseName.Checked );
+            segment.enableTranslatedNameRecognize( cmiCutRecognizeTranslatedName.Checked );
+            segment.enableJapaneseNameRecognize( cmiCutRecognizeJapaneseName.Checked );
+            segment.enablePlaceRecognize( cmiCutRecognizePlace.Checked );
+            segment.enableOrganizationRecognize( cmiCutRecognizeOrganization.Checked );
+            #endregion
+
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
                 var t = line.Trim().Replace("　", " ").Replace("□", " ");
-                var text = new object[0];
-                if( cmiOptionCutStandard.Checked )
-                {
-                    var result = HanLP.segment( t );
-                    text = result.toArray();
-                }
-                else if( cmiOptionCutCRF.Checked )
-                {
-                    Segment segment = new CRFSegment();
-                    segment.enablePartOfSpeechTagging( true );
-                    var result = segment.seg(t);
-                    text = result.toArray();
-                }
-                else if ( cmiOptionCutNShort.Checked )
-                {
-                    Segment segment = new NShortSegment();
-                    segment.enableCustomDictionary( true );
-                    //segment.enablePlaceRecognize( true );
-                    //segment.enableOrganizationRecognize(true);
-                    //segment.enablePartOfSpeechTagging( true );
-                    var result = segment.seg(t);
-                    text = result.toArray();
-                }
-                else if ( cmiOptionCutIndex.Checked )
-                {
-                    var result = IndexTokenizer.segment(t);
-                    text = result.toArray();
-                }
-                else if ( cmiOptionCutNLP.Checked )
-                {
-                    var result = NLPTokenizer.segment(t);
-                    text = result.toArray();
-                }
-                else if ( cmiOptionCutHighSpeed.Checked )
-                {
-                    var result = SpeedTokenizer.segment(t);
-                    text = result.toArray();
-                }
-                if ( text.Length <= 0 ) continue;
-                sb.AppendLine( string.Join( ", ", text ).Trim() );
+                var result = segment.seg( t );
+                var text = result.toArray();
+                if ( text.Length <= 0 )
+                    sb.AppendLine();
+                else
+                    sb.AppendLine( string.Join( ", ", text ).Trim() );
             }
+            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( "\n", sb );
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void btnTokenizer_Click( object sender, EventArgs e )
@@ -498,6 +519,7 @@ namespace HanLP_Utils
                 if ( text.Length <= 0 ) continue;
                 sb.AppendLine( string.Join( ", ", text ).Trim() );
             }
+            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( "\n", sb);
         }
 
@@ -505,6 +527,7 @@ namespace HanLP_Utils
         {
             var text = HanLP.extractKeyword( edSrc.Text, 25 ).toArray();
             if ( text.Length <= 0 ) return;
+            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( ", ", text);
         }
 
@@ -513,6 +536,7 @@ namespace HanLP_Utils
             var text = HanLP.extractSummary( edSrc.Text, 15 ).toArray();
             if ( text.Length <= 0 ) return;
             var ro = RegexOptions.IgnoreCase | RegexOptions.Multiline;
+            edDst.Font = DefaultOutputFont;
             edDst.Text = Regex.Replace(string.Join( ", ", text), @"[　| ]{2,}", " ", ro );
         }
 
@@ -525,8 +549,8 @@ namespace HanLP_Utils
                 if ( text.Length <= 0 ) continue;
                 sb.AppendLine( string.Join(", ", text ).Trim() );
             }
+            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( "\n", sb );
-
         }
 
         private void btnSC2TC_Click( object sender, EventArgs e )
@@ -536,8 +560,8 @@ namespace HanLP_Utils
             {
                 sb.AppendLine( HanLP.convertToTraditionalChinese( line ).ToString() );
             }
-            edDst.Text = string.Join( "\n", sb );
-            
+            edDst.Font = DefaultOutputFont;
+            edDst.Text = string.Join( "\n", sb );            
         }
 
         private void btnTC2SC_Click( object sender, EventArgs e )
@@ -547,6 +571,7 @@ namespace HanLP_Utils
             {
                 sb.AppendLine( HanLP.convertToSimplifiedChinese( line ).ToString() );
             }
+            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( "\n", sb );
         }
 
@@ -557,18 +582,28 @@ namespace HanLP_Utils
             foreach ( string line in edSrc.Lines )
             {
                 List<string> text = new List<string>();
-                foreach ( Pinyin py in HanLP.convertToPinyinList( line.Trim().Replace( "　", " " ).Replace( "□", " ") ).toArray() )
+                string lt = line.Trim().Replace( "　", " " ).Replace( "□", " ");
+                int idx = -1;
+                foreach ( Pinyin py in HanLP.convertToPinyinList( lt ).toArray() )
                 {
-                    if ( mode == 0 )
+                    idx++;
+                    if ( py.getPinyinWithoutTone().ToString().Equals( "none", StringComparison.CurrentCultureIgnoreCase ) )
+                        text.Add( lt[idx].ToString() );
+                    else if ( mode == 0 )
                         text.Add( py.getPinyinWithoutTone().ToString() );
                     else if ( mode == 1 )
                         text.Add( py.ToString() );
                     else if ( mode == 2 )
                         text.Add( py.getPinyinWithToneMark().ToString() );
                 }
-                if ( text.Count <= 0 ) continue;
-                sb.AppendLine( string.Join( ", ", text ).Trim() );
+                if ( text.Count <= 0 ) { sb.AppendLine(); continue; }
+                var conn = ", ";
+                if ( !cmiPySeprateCommas.Checked ) conn = " ";
+                //if( cmiPyShowPunctuation.Checked )
+                sb.AppendLine( string.Join( conn, text ).Trim() );
             }
+            //edDst.Font = new Font( "Courier New", 10 );
+            edDst.Font = new Font( "Consolas", 10 );
             edDst.Text = string.Join( "\n", sb );
         }
 

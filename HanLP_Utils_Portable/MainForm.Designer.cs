@@ -42,9 +42,16 @@
             this.cmiActionFilterSub = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiActionFilterLrc = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiActionFilterMlTag = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiSep0 = new System.Windows.Forms.ToolStripSeparator();
-            this.cmiOptionCutCRF = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiOptionCutStandard = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiSepCutMethod = new System.Windows.Forms.ToolStripSeparator();
+            this.cmiCutMethodStandard = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutMethodNLP = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutMethodIndex = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutMethodNShort = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutMethodShortest = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutMethodCRF = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutMethodHighSpeed = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiSepCutRecognize = new System.Windows.Forms.ToolStripSeparator();
+            this.cmiCutRecognizePlace = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlOption = new System.Windows.Forms.Panel();
             this.lblInfo = new System.Windows.Forms.Label();
             this.chkTermNature = new System.Windows.Forms.CheckBox();
@@ -56,10 +63,14 @@
             this.btnSC2TC = new System.Windows.Forms.Button();
             this.btnPhrase = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.cmiOptionCutNShort = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiOptionCutIndex = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiOptionCutNLP = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiOptionCutHighSpeed = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutRecognizeChineseName = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutRecognizeTranslatedName = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutRecognizeJapaneseName = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutRecognizeOrganization = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutMethodDefault = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiSepToPy = new System.Windows.Forms.ToolStripSeparator();
+            this.cmiPyShowPunctuation = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiPySeprateCommas = new System.Windows.Forms.ToolStripMenuItem();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
             this.cmActions.SuspendLayout();
@@ -143,13 +154,24 @@
             this.cmiActionFilterSub,
             this.cmiActionFilterLrc,
             this.cmiActionFilterMlTag,
-            this.cmiSep0,
-            this.cmiOptionCutStandard,
-            this.cmiOptionCutCRF,
-            this.cmiOptionCutNShort,
-            this.cmiOptionCutIndex,
-            this.cmiOptionCutNLP,
-            this.cmiOptionCutHighSpeed});
+            this.cmiSepCutMethod,
+            this.cmiCutMethodDefault,
+            this.cmiCutMethodStandard,
+            this.cmiCutMethodNLP,
+            this.cmiCutMethodIndex,
+            this.cmiCutMethodNShort,
+            this.cmiCutMethodShortest,
+            this.cmiCutMethodCRF,
+            this.cmiCutMethodHighSpeed,
+            this.cmiSepCutRecognize,
+            this.cmiCutRecognizeChineseName,
+            this.cmiCutRecognizeTranslatedName,
+            this.cmiCutRecognizeJapaneseName,
+            this.cmiCutRecognizePlace,
+            this.cmiCutRecognizeOrganization,
+            this.cmiSepToPy,
+            this.cmiPyShowPunctuation,
+            this.cmiPySeprateCommas});
             this.cmActions.Name = "cmFilterText";
             resources.ApplyResources(this.cmActions, "cmActions");
             // 
@@ -171,26 +193,70 @@
             resources.ApplyResources(this.cmiActionFilterMlTag, "cmiActionFilterMlTag");
             this.cmiActionFilterMlTag.Click += new System.EventHandler(this.cmiFilterText_Click);
             // 
-            // cmiSep0
+            // cmiSepCutMethod
             // 
-            this.cmiSep0.Name = "cmiSep0";
-            resources.ApplyResources(this.cmiSep0, "cmiSep0");
+            this.cmiSepCutMethod.Name = "cmiSepCutMethod";
+            resources.ApplyResources(this.cmiSepCutMethod, "cmiSepCutMethod");
             // 
-            // cmiOptionCutCRF
+            // cmiCutMethodStandard
             // 
-            this.cmiOptionCutCRF.CheckOnClick = true;
-            this.cmiOptionCutCRF.Name = "cmiOptionCutCRF";
-            resources.ApplyResources(this.cmiOptionCutCRF, "cmiOptionCutCRF");
-            this.cmiOptionCutCRF.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            this.cmiCutMethodStandard.CheckOnClick = true;
+            this.cmiCutMethodStandard.Name = "cmiCutMethodStandard";
+            resources.ApplyResources(this.cmiCutMethodStandard, "cmiCutMethodStandard");
+            this.cmiCutMethodStandard.Click += new System.EventHandler(this.cmiCutMethod_Click);
             // 
-            // cmiOptionCutStandard
+            // cmiCutMethodNLP
             // 
-            this.cmiOptionCutStandard.Checked = true;
-            this.cmiOptionCutStandard.CheckOnClick = true;
-            this.cmiOptionCutStandard.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cmiOptionCutStandard.Name = "cmiOptionCutStandard";
-            resources.ApplyResources(this.cmiOptionCutStandard, "cmiOptionCutStandard");
-            this.cmiOptionCutStandard.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            this.cmiCutMethodNLP.CheckOnClick = true;
+            this.cmiCutMethodNLP.Name = "cmiCutMethodNLP";
+            resources.ApplyResources(this.cmiCutMethodNLP, "cmiCutMethodNLP");
+            this.cmiCutMethodNLP.Click += new System.EventHandler(this.cmiCutMethod_Click);
+            // 
+            // cmiCutMethodIndex
+            // 
+            this.cmiCutMethodIndex.CheckOnClick = true;
+            this.cmiCutMethodIndex.Name = "cmiCutMethodIndex";
+            resources.ApplyResources(this.cmiCutMethodIndex, "cmiCutMethodIndex");
+            this.cmiCutMethodIndex.Click += new System.EventHandler(this.cmiCutMethod_Click);
+            // 
+            // cmiCutMethodNShort
+            // 
+            this.cmiCutMethodNShort.CheckOnClick = true;
+            this.cmiCutMethodNShort.Name = "cmiCutMethodNShort";
+            resources.ApplyResources(this.cmiCutMethodNShort, "cmiCutMethodNShort");
+            this.cmiCutMethodNShort.Click += new System.EventHandler(this.cmiCutMethod_Click);
+            // 
+            // cmiCutMethodShortest
+            // 
+            this.cmiCutMethodShortest.CheckOnClick = true;
+            this.cmiCutMethodShortest.Name = "cmiCutMethodShortest";
+            resources.ApplyResources(this.cmiCutMethodShortest, "cmiCutMethodShortest");
+            this.cmiCutMethodShortest.Click += new System.EventHandler(this.cmiCutMethod_Click);
+            // 
+            // cmiCutMethodCRF
+            // 
+            this.cmiCutMethodCRF.CheckOnClick = true;
+            this.cmiCutMethodCRF.Name = "cmiCutMethodCRF";
+            resources.ApplyResources(this.cmiCutMethodCRF, "cmiCutMethodCRF");
+            this.cmiCutMethodCRF.Click += new System.EventHandler(this.cmiCutMethod_Click);
+            // 
+            // cmiCutMethodHighSpeed
+            // 
+            this.cmiCutMethodHighSpeed.CheckOnClick = true;
+            this.cmiCutMethodHighSpeed.Name = "cmiCutMethodHighSpeed";
+            resources.ApplyResources(this.cmiCutMethodHighSpeed, "cmiCutMethodHighSpeed");
+            this.cmiCutMethodHighSpeed.Click += new System.EventHandler(this.cmiCutMethod_Click);
+            // 
+            // cmiSepCutRecognize
+            // 
+            this.cmiSepCutRecognize.Name = "cmiSepCutRecognize";
+            resources.ApplyResources(this.cmiSepCutRecognize, "cmiSepCutRecognize");
+            // 
+            // cmiCutRecognizePlace
+            // 
+            this.cmiCutRecognizePlace.CheckOnClick = true;
+            this.cmiCutRecognizePlace.Name = "cmiCutRecognizePlace";
+            resources.ApplyResources(this.cmiCutRecognizePlace, "cmiCutRecognizePlace");
             // 
             // pnlOption
             // 
@@ -272,33 +338,61 @@
             this.btnPhrase.UseVisualStyleBackColor = true;
             this.btnPhrase.Click += new System.EventHandler(this.btnPhrase_Click);
             // 
-            // cmiOptionCutNShort
+            // cmiCutRecognizeChineseName
             // 
-            this.cmiOptionCutNShort.CheckOnClick = true;
-            this.cmiOptionCutNShort.Name = "cmiOptionCutNShort";
-            resources.ApplyResources(this.cmiOptionCutNShort, "cmiOptionCutNShort");
-            this.cmiOptionCutNShort.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            this.cmiCutRecognizeChineseName.Checked = true;
+            this.cmiCutRecognizeChineseName.CheckOnClick = true;
+            this.cmiCutRecognizeChineseName.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiCutRecognizeChineseName.Name = "cmiCutRecognizeChineseName";
+            resources.ApplyResources(this.cmiCutRecognizeChineseName, "cmiCutRecognizeChineseName");
             // 
-            // cmiOptionCutIndex
+            // cmiCutRecognizeTranslatedName
             // 
-            this.cmiOptionCutIndex.CheckOnClick = true;
-            this.cmiOptionCutIndex.Name = "cmiOptionCutIndex";
-            resources.ApplyResources(this.cmiOptionCutIndex, "cmiOptionCutIndex");
-            this.cmiOptionCutIndex.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            this.cmiCutRecognizeTranslatedName.CheckOnClick = true;
+            this.cmiCutRecognizeTranslatedName.Name = "cmiCutRecognizeTranslatedName";
+            resources.ApplyResources(this.cmiCutRecognizeTranslatedName, "cmiCutRecognizeTranslatedName");
             // 
-            // cmiOptionCutNLP
+            // cmiCutRecognizeJapaneseName
             // 
-            this.cmiOptionCutNLP.CheckOnClick = true;
-            this.cmiOptionCutNLP.Name = "cmiOptionCutNLP";
-            resources.ApplyResources(this.cmiOptionCutNLP, "cmiOptionCutNLP");
-            this.cmiOptionCutNLP.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            this.cmiCutRecognizeJapaneseName.CheckOnClick = true;
+            this.cmiCutRecognizeJapaneseName.Name = "cmiCutRecognizeJapaneseName";
+            resources.ApplyResources(this.cmiCutRecognizeJapaneseName, "cmiCutRecognizeJapaneseName");
             // 
-            // cmiOptionCutHighSpeed
+            // cmiCutRecognizeOrganization
             // 
-            this.cmiOptionCutHighSpeed.CheckOnClick = true;
-            this.cmiOptionCutHighSpeed.Name = "cmiOptionCutHighSpeed";
-            resources.ApplyResources(this.cmiOptionCutHighSpeed, "cmiOptionCutHighSpeed");
-            this.cmiOptionCutHighSpeed.Click += new System.EventHandler(this.cmiOptionCut_Click);
+            this.cmiCutRecognizeOrganization.CheckOnClick = true;
+            this.cmiCutRecognizeOrganization.Name = "cmiCutRecognizeOrganization";
+            resources.ApplyResources(this.cmiCutRecognizeOrganization, "cmiCutRecognizeOrganization");
+            // 
+            // cmiCutMethodDefault
+            // 
+            this.cmiCutMethodDefault.Checked = true;
+            this.cmiCutMethodDefault.CheckOnClick = true;
+            this.cmiCutMethodDefault.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiCutMethodDefault.Name = "cmiCutMethodDefault";
+            resources.ApplyResources(this.cmiCutMethodDefault, "cmiCutMethodDefault");
+            this.cmiCutMethodDefault.Click += new System.EventHandler(this.cmiCutMethod_Click);
+            // 
+            // cmiSepToPy
+            // 
+            this.cmiSepToPy.Name = "cmiSepToPy";
+            resources.ApplyResources(this.cmiSepToPy, "cmiSepToPy");
+            // 
+            // cmiPyShowPunctuation
+            // 
+            this.cmiPyShowPunctuation.Checked = true;
+            this.cmiPyShowPunctuation.CheckOnClick = true;
+            this.cmiPyShowPunctuation.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiPyShowPunctuation.Name = "cmiPyShowPunctuation";
+            resources.ApplyResources(this.cmiPyShowPunctuation, "cmiPyShowPunctuation");
+            // 
+            // cmiPySeprateCommas
+            // 
+            this.cmiPySeprateCommas.Checked = true;
+            this.cmiPySeprateCommas.CheckOnClick = true;
+            this.cmiPySeprateCommas.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiPySeprateCommas.Name = "cmiPySeprateCommas";
+            resources.ApplyResources(this.cmiPySeprateCommas, "cmiPySeprateCommas");
             // 
             // MainForm
             // 
@@ -345,13 +439,24 @@
         private System.Windows.Forms.ToolStripMenuItem cmiActionFilterSub;
         private System.Windows.Forms.ToolStripMenuItem cmiActionFilterLrc;
         private System.Windows.Forms.ToolStripMenuItem cmiActionFilterMlTag;
-        private System.Windows.Forms.ToolStripSeparator cmiSep0;
-        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutStandard;
-        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutCRF;
-        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutNShort;
-        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutIndex;
-        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutNLP;
-        private System.Windows.Forms.ToolStripMenuItem cmiOptionCutHighSpeed;
+        private System.Windows.Forms.ToolStripSeparator cmiSepCutMethod;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutMethodStandard;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutMethodCRF;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutMethodNShort;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutMethodIndex;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutMethodNLP;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutMethodHighSpeed;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutMethodShortest;
+        private System.Windows.Forms.ToolStripSeparator cmiSepCutRecognize;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutRecognizePlace;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutRecognizeChineseName;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutRecognizeTranslatedName;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutRecognizeJapaneseName;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutRecognizeOrganization;
+        private System.Windows.Forms.ToolStripMenuItem cmiCutMethodDefault;
+        private System.Windows.Forms.ToolStripSeparator cmiSepToPy;
+        private System.Windows.Forms.ToolStripMenuItem cmiPyShowPunctuation;
+        private System.Windows.Forms.ToolStripMenuItem cmiPySeprateCommas;
     }
 }
 
