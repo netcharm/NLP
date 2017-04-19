@@ -43,6 +43,7 @@
             this.cmiActionFilterLrc = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiActionFilterMlTag = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiSepCutMethod = new System.Windows.Forms.ToolStripSeparator();
+            this.cmiCutMethodDefault = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiCutMethodStandard = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiCutMethodNLP = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiCutMethodIndex = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,7 +52,14 @@
             this.cmiCutMethodCRF = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiCutMethodHighSpeed = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiSepCutRecognize = new System.Windows.Forms.ToolStripSeparator();
+            this.cmiCutRecognizeChineseName = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutRecognizeTranslatedName = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutRecognizeJapaneseName = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiCutRecognizePlace = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCutRecognizeOrganization = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiSepToPy = new System.Windows.Forms.ToolStripSeparator();
+            this.cmiPyShowPunctuation = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiPySeprateCommas = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlOption = new System.Windows.Forms.Panel();
             this.lblInfo = new System.Windows.Forms.Label();
             this.chkTermNature = new System.Windows.Forms.CheckBox();
@@ -63,14 +71,6 @@
             this.btnSC2TC = new System.Windows.Forms.Button();
             this.btnPhrase = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.cmiCutRecognizeChineseName = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiCutRecognizeTranslatedName = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiCutRecognizeJapaneseName = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiCutRecognizeOrganization = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiCutMethodDefault = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiSepToPy = new System.Windows.Forms.ToolStripSeparator();
-            this.cmiPyShowPunctuation = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmiPySeprateCommas = new System.Windows.Forms.ToolStripMenuItem();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
             this.cmActions.SuspendLayout();
@@ -132,7 +132,6 @@
             // pnlTools
             // 
             this.layoutMain.SetColumnSpan(this.pnlTools, 2);
-            this.pnlTools.ContextMenuStrip = this.cmActions;
             this.pnlTools.Controls.Add(this.pnlOption);
             this.pnlTools.Controls.Add(this.btnWordFreq);
             this.pnlTools.Controls.Add(this.btnSrc2PyTM);
@@ -198,6 +197,15 @@
             this.cmiSepCutMethod.Name = "cmiSepCutMethod";
             resources.ApplyResources(this.cmiSepCutMethod, "cmiSepCutMethod");
             // 
+            // cmiCutMethodDefault
+            // 
+            this.cmiCutMethodDefault.Checked = true;
+            this.cmiCutMethodDefault.CheckOnClick = true;
+            this.cmiCutMethodDefault.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiCutMethodDefault.Name = "cmiCutMethodDefault";
+            resources.ApplyResources(this.cmiCutMethodDefault, "cmiCutMethodDefault");
+            this.cmiCutMethodDefault.Click += new System.EventHandler(this.cmiCutMethod_Click);
+            // 
             // cmiCutMethodStandard
             // 
             this.cmiCutMethodStandard.CheckOnClick = true;
@@ -252,11 +260,58 @@
             this.cmiSepCutRecognize.Name = "cmiSepCutRecognize";
             resources.ApplyResources(this.cmiSepCutRecognize, "cmiSepCutRecognize");
             // 
+            // cmiCutRecognizeChineseName
+            // 
+            this.cmiCutRecognizeChineseName.Checked = true;
+            this.cmiCutRecognizeChineseName.CheckOnClick = true;
+            this.cmiCutRecognizeChineseName.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiCutRecognizeChineseName.Name = "cmiCutRecognizeChineseName";
+            resources.ApplyResources(this.cmiCutRecognizeChineseName, "cmiCutRecognizeChineseName");
+            // 
+            // cmiCutRecognizeTranslatedName
+            // 
+            this.cmiCutRecognizeTranslatedName.CheckOnClick = true;
+            this.cmiCutRecognizeTranslatedName.Name = "cmiCutRecognizeTranslatedName";
+            resources.ApplyResources(this.cmiCutRecognizeTranslatedName, "cmiCutRecognizeTranslatedName");
+            // 
+            // cmiCutRecognizeJapaneseName
+            // 
+            this.cmiCutRecognizeJapaneseName.CheckOnClick = true;
+            this.cmiCutRecognizeJapaneseName.Name = "cmiCutRecognizeJapaneseName";
+            resources.ApplyResources(this.cmiCutRecognizeJapaneseName, "cmiCutRecognizeJapaneseName");
+            // 
             // cmiCutRecognizePlace
             // 
             this.cmiCutRecognizePlace.CheckOnClick = true;
             this.cmiCutRecognizePlace.Name = "cmiCutRecognizePlace";
             resources.ApplyResources(this.cmiCutRecognizePlace, "cmiCutRecognizePlace");
+            // 
+            // cmiCutRecognizeOrganization
+            // 
+            this.cmiCutRecognizeOrganization.CheckOnClick = true;
+            this.cmiCutRecognizeOrganization.Name = "cmiCutRecognizeOrganization";
+            resources.ApplyResources(this.cmiCutRecognizeOrganization, "cmiCutRecognizeOrganization");
+            // 
+            // cmiSepToPy
+            // 
+            this.cmiSepToPy.Name = "cmiSepToPy";
+            resources.ApplyResources(this.cmiSepToPy, "cmiSepToPy");
+            // 
+            // cmiPyShowPunctuation
+            // 
+            this.cmiPyShowPunctuation.Checked = true;
+            this.cmiPyShowPunctuation.CheckOnClick = true;
+            this.cmiPyShowPunctuation.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiPyShowPunctuation.Name = "cmiPyShowPunctuation";
+            resources.ApplyResources(this.cmiPyShowPunctuation, "cmiPyShowPunctuation");
+            // 
+            // cmiPySeprateCommas
+            // 
+            this.cmiPySeprateCommas.Checked = true;
+            this.cmiPySeprateCommas.CheckOnClick = true;
+            this.cmiPySeprateCommas.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cmiPySeprateCommas.Name = "cmiPySeprateCommas";
+            resources.ApplyResources(this.cmiPySeprateCommas, "cmiPySeprateCommas");
             // 
             // pnlOption
             // 
@@ -338,67 +393,12 @@
             this.btnPhrase.UseVisualStyleBackColor = true;
             this.btnPhrase.Click += new System.EventHandler(this.btnPhrase_Click);
             // 
-            // cmiCutRecognizeChineseName
-            // 
-            this.cmiCutRecognizeChineseName.Checked = true;
-            this.cmiCutRecognizeChineseName.CheckOnClick = true;
-            this.cmiCutRecognizeChineseName.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cmiCutRecognizeChineseName.Name = "cmiCutRecognizeChineseName";
-            resources.ApplyResources(this.cmiCutRecognizeChineseName, "cmiCutRecognizeChineseName");
-            // 
-            // cmiCutRecognizeTranslatedName
-            // 
-            this.cmiCutRecognizeTranslatedName.CheckOnClick = true;
-            this.cmiCutRecognizeTranslatedName.Name = "cmiCutRecognizeTranslatedName";
-            resources.ApplyResources(this.cmiCutRecognizeTranslatedName, "cmiCutRecognizeTranslatedName");
-            // 
-            // cmiCutRecognizeJapaneseName
-            // 
-            this.cmiCutRecognizeJapaneseName.CheckOnClick = true;
-            this.cmiCutRecognizeJapaneseName.Name = "cmiCutRecognizeJapaneseName";
-            resources.ApplyResources(this.cmiCutRecognizeJapaneseName, "cmiCutRecognizeJapaneseName");
-            // 
-            // cmiCutRecognizeOrganization
-            // 
-            this.cmiCutRecognizeOrganization.CheckOnClick = true;
-            this.cmiCutRecognizeOrganization.Name = "cmiCutRecognizeOrganization";
-            resources.ApplyResources(this.cmiCutRecognizeOrganization, "cmiCutRecognizeOrganization");
-            // 
-            // cmiCutMethodDefault
-            // 
-            this.cmiCutMethodDefault.Checked = true;
-            this.cmiCutMethodDefault.CheckOnClick = true;
-            this.cmiCutMethodDefault.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cmiCutMethodDefault.Name = "cmiCutMethodDefault";
-            resources.ApplyResources(this.cmiCutMethodDefault, "cmiCutMethodDefault");
-            this.cmiCutMethodDefault.Click += new System.EventHandler(this.cmiCutMethod_Click);
-            // 
-            // cmiSepToPy
-            // 
-            this.cmiSepToPy.Name = "cmiSepToPy";
-            resources.ApplyResources(this.cmiSepToPy, "cmiSepToPy");
-            // 
-            // cmiPyShowPunctuation
-            // 
-            this.cmiPyShowPunctuation.Checked = true;
-            this.cmiPyShowPunctuation.CheckOnClick = true;
-            this.cmiPyShowPunctuation.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cmiPyShowPunctuation.Name = "cmiPyShowPunctuation";
-            resources.ApplyResources(this.cmiPyShowPunctuation, "cmiPyShowPunctuation");
-            // 
-            // cmiPySeprateCommas
-            // 
-            this.cmiPySeprateCommas.Checked = true;
-            this.cmiPySeprateCommas.CheckOnClick = true;
-            this.cmiPySeprateCommas.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cmiPySeprateCommas.Name = "cmiPySeprateCommas";
-            resources.ApplyResources(this.cmiPySeprateCommas, "cmiPySeprateCommas");
-            // 
             // MainForm
             // 
             this.AllowDrop = true;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ContextMenuStrip = this.cmActions;
             this.Controls.Add(this.layoutMain);
             this.Name = "MainForm";
             this.Load += new System.EventHandler(this.MainForm_Load);

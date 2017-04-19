@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 using com.hankcs.hanlp;
 using com.hankcs.hanlp.dictionary;
 using com.hankcs.hanlp.dictionary.py;
@@ -423,6 +418,34 @@ namespace HanLP_Utils
             }
         }
 
+        private void cmiFilterText_Click( object sender, EventArgs e )
+        {
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                var txt = edSrc.Text;
+                var mi = sender as ToolStripMenuItem;
+                if ( mi.Name == cmiActionFilterSub.Name )
+                {
+                    txt = filterASS( txt );
+                }
+                else if ( mi.Name == cmiActionFilterLrc.Name )
+                {
+                    txt = filterLrc( txt );
+                }
+                else if ( mi.Name == cmiActionFilterMlTag.Name )
+                {
+                    txt = filterHtmlTag( txt );
+                }
+                edSrc.Text = filterMisc( txt );
+            }
+            catch { }
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
+        }
+
         private void chkTermNature_CheckedChanged( object sender, EventArgs e )
         {
             HanLP.Config.ShowTermNature = chkTermNature.Checked;
@@ -512,6 +535,8 @@ namespace HanLP_Utils
 
         private void btnTokenizer_Click( object sender, EventArgs e )
         {
+            var sw = Stopwatch.StartNew();
+
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
@@ -521,27 +546,42 @@ namespace HanLP_Utils
             }
             edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( "\n", sb);
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void btnKeyword_Click( object sender, EventArgs e )
         {
+            var sw = Stopwatch.StartNew();
+
             var text = HanLP.extractKeyword( edSrc.Text, 25 ).toArray();
             if ( text.Length <= 0 ) return;
             edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( ", ", text);
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void btnSummary_Click( object sender, EventArgs e )
         {
+            var sw = Stopwatch.StartNew();
+
             var text = HanLP.extractSummary( edSrc.Text, 15 ).toArray();
             if ( text.Length <= 0 ) return;
             var ro = RegexOptions.IgnoreCase | RegexOptions.Multiline;
             edDst.Font = DefaultOutputFont;
             edDst.Text = Regex.Replace(string.Join( ", ", text), @"[　| ]{2,}", " ", ro );
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void btnPhrase_Click( object sender, EventArgs e )
         {
+            var sw = Stopwatch.StartNew();
+
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
@@ -551,21 +591,31 @@ namespace HanLP_Utils
             }
             edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( "\n", sb );
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void btnSC2TC_Click( object sender, EventArgs e )
         {
+            var sw = Stopwatch.StartNew();
+
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
                 sb.AppendLine( HanLP.convertToTraditionalChinese( line ).ToString() );
             }
             edDst.Font = DefaultOutputFont;
-            edDst.Text = string.Join( "\n", sb );            
+            edDst.Text = string.Join( "\n", sb );
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void btnTC2SC_Click( object sender, EventArgs e )
         {
+            var sw = Stopwatch.StartNew();
+
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
             {
@@ -573,10 +623,15 @@ namespace HanLP_Utils
             }
             edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join( "\n", sb );
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void btnSrc2Py_Click( object sender, EventArgs e )
         {
+            var sw = Stopwatch.StartNew();
+
             var mode = Convert.ToInt32( ( sender as Button ).Tag );
             StringBuilder sb = new StringBuilder();
             foreach ( string line in edSrc.Lines )
@@ -605,6 +660,9 @@ namespace HanLP_Utils
             //edDst.Font = new Font( "Courier New", 10 );
             edDst.Font = new Font( "Consolas", 10 );
             edDst.Text = string.Join( "\n", sb );
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
         }
 
         private void btnWordFreq_Click( object sender, EventArgs e )
@@ -649,29 +707,6 @@ namespace HanLP_Utils
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
-        }
-
-        private void cmiFilterText_Click( object sender, EventArgs e )
-        {
-            try
-            {
-                var txt = edSrc.Text;
-                var mi = sender as ToolStripMenuItem;
-                if ( mi.Name == cmiActionFilterSub.Name )
-                {
-                    txt = filterASS( txt );
-                }
-                else if ( mi.Name == cmiActionFilterLrc.Name )
-                {
-                    txt = filterLrc( txt );
-                }
-                else if ( mi.Name == cmiActionFilterMlTag.Name )
-                {
-                    txt = filterHtmlTag( txt );
-                }
-                edSrc.Text = filterMisc( txt );
-            }
-            catch { }
         }
 
     }

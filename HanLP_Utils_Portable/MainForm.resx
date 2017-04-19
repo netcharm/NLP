@@ -309,135 +309,6 @@
   <data name="layoutMain.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
-  <metadata name="cmActions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>93, 20</value>
-  </metadata>
-  <data name="cmiActionFilterSub.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiActionFilterSub.Text" xml:space="preserve">
-    <value>Filter Sub</value>
-  </data>
-  <data name="cmiActionFilterLrc.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiActionFilterLrc.Text" xml:space="preserve">
-    <value>Filter LRC</value>
-  </data>
-  <data name="cmiActionFilterMlTag.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiActionFilterMlTag.Text" xml:space="preserve">
-    <value>Filter HTML/XML Tags</value>
-  </data>
-  <data name="cmiSepCutMethod.Size" type="System.Drawing.Size, System.Drawing">
-    <value>229, 6</value>
-  </data>
-  <data name="cmiCutMethodDefault.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutMethodDefault.Text" xml:space="preserve">
-    <value>Default Tokenizer</value>
-  </data>
-  <data name="cmiCutMethodStandard.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutMethodStandard.Text" xml:space="preserve">
-    <value>Standard Tokenizer</value>
-  </data>
-  <data name="cmiCutMethodNLP.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutMethodNLP.Text" xml:space="preserve">
-    <value>NLP Tokenizer</value>
-  </data>
-  <data name="cmiCutMethodIndex.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutMethodIndex.Text" xml:space="preserve">
-    <value>Index Tokenizer</value>
-  </data>
-  <data name="cmiCutMethodNShort.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutMethodNShort.Text" xml:space="preserve">
-    <value>N-Short Tokenizer</value>
-  </data>
-  <data name="cmiCutMethodShortest.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutMethodShortest.Text" xml:space="preserve">
-    <value>Shortest Tokenizer</value>
-  </data>
-  <data name="cmiCutMethodCRF.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutMethodCRF.Text" xml:space="preserve">
-    <value>CRF Tokenizer</value>
-  </data>
-  <data name="cmiCutMethodHighSpeed.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutMethodHighSpeed.Text" xml:space="preserve">
-    <value>HighSpeed Tokenizer</value>
-  </data>
-  <data name="cmiSepCutRecognize.Size" type="System.Drawing.Size, System.Drawing">
-    <value>229, 6</value>
-  </data>
-  <data name="cmiCutRecognizeChineseName.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutRecognizeChineseName.Text" xml:space="preserve">
-    <value>Recognize Chinese Name</value>
-  </data>
-  <data name="cmiCutRecognizeTranslatedName.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutRecognizeTranslatedName.Text" xml:space="preserve">
-    <value>Recognize Translated Name</value>
-  </data>
-  <data name="cmiCutRecognizeJapaneseName.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutRecognizeJapaneseName.Text" xml:space="preserve">
-    <value>Recognize Japanese Name</value>
-  </data>
-  <data name="cmiCutRecognizePlace.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutRecognizePlace.Text" xml:space="preserve">
-    <value>Recognize Place</value>
-  </data>
-  <data name="cmiCutRecognizeOrganization.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiCutRecognizeOrganization.Text" xml:space="preserve">
-    <value>Recognize Organization</value>
-  </data>
-  <data name="cmiSepToPy.Size" type="System.Drawing.Size, System.Drawing">
-    <value>229, 6</value>
-  </data>
-  <data name="cmiPyShowPunctuation.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiPyShowPunctuation.Text" xml:space="preserve">
-    <value>Show pinyin punctuation</value>
-  </data>
-  <data name="cmiPySeprateCommas.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 22</value>
-  </data>
-  <data name="cmiPySeprateCommas.Text" xml:space="preserve">
-    <value>Separate pinyin with commas</value>
-  </data>
-  <data name="cmActions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>233, 440</value>
-  </data>
-  <data name="&gt;&gt;cmActions.Name" xml:space="preserve">
-    <value>cmActions</value>
-  </data>
-  <data name="&gt;&gt;cmActions.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="lblInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Bottom</value>
   </data>
@@ -774,6 +645,135 @@
   <data name="layoutMain.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
     <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnlTools" Row="1" RowSpan="1" Column="0" ColumnSpan="2" /&gt;&lt;Control Name="edSrc" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="edDst" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,100,Absolute,72" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
+  <metadata name="cmActions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>93, 20</value>
+  </metadata>
+  <data name="cmiActionFilterSub.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiActionFilterSub.Text" xml:space="preserve">
+    <value>Filter Sub</value>
+  </data>
+  <data name="cmiActionFilterLrc.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiActionFilterLrc.Text" xml:space="preserve">
+    <value>Filter LRC</value>
+  </data>
+  <data name="cmiActionFilterMlTag.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiActionFilterMlTag.Text" xml:space="preserve">
+    <value>Filter HTML/XML Tags</value>
+  </data>
+  <data name="cmiSepCutMethod.Size" type="System.Drawing.Size, System.Drawing">
+    <value>229, 6</value>
+  </data>
+  <data name="cmiCutMethodDefault.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutMethodDefault.Text" xml:space="preserve">
+    <value>Default Tokenizer</value>
+  </data>
+  <data name="cmiCutMethodStandard.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutMethodStandard.Text" xml:space="preserve">
+    <value>Standard Tokenizer</value>
+  </data>
+  <data name="cmiCutMethodNLP.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutMethodNLP.Text" xml:space="preserve">
+    <value>NLP Tokenizer</value>
+  </data>
+  <data name="cmiCutMethodIndex.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutMethodIndex.Text" xml:space="preserve">
+    <value>Index Tokenizer</value>
+  </data>
+  <data name="cmiCutMethodNShort.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutMethodNShort.Text" xml:space="preserve">
+    <value>N-Short Tokenizer</value>
+  </data>
+  <data name="cmiCutMethodShortest.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutMethodShortest.Text" xml:space="preserve">
+    <value>Shortest Tokenizer</value>
+  </data>
+  <data name="cmiCutMethodCRF.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutMethodCRF.Text" xml:space="preserve">
+    <value>CRF Tokenizer</value>
+  </data>
+  <data name="cmiCutMethodHighSpeed.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutMethodHighSpeed.Text" xml:space="preserve">
+    <value>HighSpeed Tokenizer</value>
+  </data>
+  <data name="cmiSepCutRecognize.Size" type="System.Drawing.Size, System.Drawing">
+    <value>229, 6</value>
+  </data>
+  <data name="cmiCutRecognizeChineseName.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutRecognizeChineseName.Text" xml:space="preserve">
+    <value>Recognize Chinese Name</value>
+  </data>
+  <data name="cmiCutRecognizeTranslatedName.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutRecognizeTranslatedName.Text" xml:space="preserve">
+    <value>Recognize Translated Name</value>
+  </data>
+  <data name="cmiCutRecognizeJapaneseName.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutRecognizeJapaneseName.Text" xml:space="preserve">
+    <value>Recognize Japanese Name</value>
+  </data>
+  <data name="cmiCutRecognizePlace.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutRecognizePlace.Text" xml:space="preserve">
+    <value>Recognize Place</value>
+  </data>
+  <data name="cmiCutRecognizeOrganization.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiCutRecognizeOrganization.Text" xml:space="preserve">
+    <value>Recognize Organization</value>
+  </data>
+  <data name="cmiSepToPy.Size" type="System.Drawing.Size, System.Drawing">
+    <value>229, 6</value>
+  </data>
+  <data name="cmiPyShowPunctuation.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiPyShowPunctuation.Text" xml:space="preserve">
+    <value>Show pinyin punctuation</value>
+  </data>
+  <data name="cmiPySeprateCommas.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 22</value>
+  </data>
+  <data name="cmiPySeprateCommas.Text" xml:space="preserve">
+    <value>Separate pinyin with commas</value>
+  </data>
+  <data name="cmActions.Size" type="System.Drawing.Size, System.Drawing">
+    <value>233, 418</value>
+  </data>
+  <data name="&gt;&gt;cmActions.Name" xml:space="preserve">
+    <value>cmActions</value>
+  </data>
+  <data name="&gt;&gt;cmActions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -815,6 +815,12 @@
   </data>
   <data name="&gt;&gt;cmiSepCutMethod.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmiCutMethodDefault.Name" xml:space="preserve">
+    <value>cmiCutMethodDefault</value>
+  </data>
+  <data name="&gt;&gt;cmiCutMethodDefault.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;cmiCutMethodStandard.Name" xml:space="preserve">
     <value>cmiCutMethodStandard</value>
@@ -864,18 +870,6 @@
   <data name="&gt;&gt;cmiSepCutRecognize.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;cmiCutRecognizePlace.Name" xml:space="preserve">
-    <value>cmiCutRecognizePlace</value>
-  </data>
-  <data name="&gt;&gt;cmiCutRecognizePlace.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
-    <value>toolTip</value>
-  </data>
-  <data name="&gt;&gt;toolTip.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;cmiCutRecognizeChineseName.Name" xml:space="preserve">
     <value>cmiCutRecognizeChineseName</value>
   </data>
@@ -894,16 +888,16 @@
   <data name="&gt;&gt;cmiCutRecognizeJapaneseName.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;cmiCutRecognizePlace.Name" xml:space="preserve">
+    <value>cmiCutRecognizePlace</value>
+  </data>
+  <data name="&gt;&gt;cmiCutRecognizePlace.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;cmiCutRecognizeOrganization.Name" xml:space="preserve">
     <value>cmiCutRecognizeOrganization</value>
   </data>
   <data name="&gt;&gt;cmiCutRecognizeOrganization.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;cmiCutMethodDefault.Name" xml:space="preserve">
-    <value>cmiCutMethodDefault</value>
-  </data>
-  <data name="&gt;&gt;cmiCutMethodDefault.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;cmiSepToPy.Name" xml:space="preserve">
@@ -923,6 +917,12 @@
   </data>
   <data name="&gt;&gt;cmiPySeprateCommas.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
+    <value>toolTip</value>
+  </data>
+  <data name="&gt;&gt;toolTip.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>MainForm</value>
