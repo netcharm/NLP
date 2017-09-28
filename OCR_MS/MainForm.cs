@@ -23,6 +23,7 @@ namespace OCR_MS
         private string AppName = Path.GetFileNameWithoutExtension(Application.ExecutablePath);
         private static Dictionary<string, string> ApiKey = new Dictionary<string, string>();
         private bool CFGSAVE = false;
+        private bool CFGLOADED = false;
 
         #region Monitor Clipboard
         [DllImport( "User32.dll", CharSet = CharSet.Auto )]
@@ -153,6 +154,8 @@ namespace OCR_MS
                 byte[] buffer = ((MemoryStream)png).ToArray();
                 string buf = "data:image/png;base64," + Convert.ToBase64String( buffer );
 
+                string T_SEP = "";
+
                 // Request body
                 using ( var content = new ByteArrayContent( buffer ) )
                 {
@@ -161,15 +164,35 @@ namespace OCR_MS
                     string ocr_result = await response.Content.ReadAsStringAsync();
 
                     JToken token = JObject.Parse( ocr_result );
-                    IEnumerable<JToken> words = token.SelectTokens("$..words", false);
-                    foreach(var word in words)
+
+                    JToken language = token.SelectToken( "$..language" );
+                    if( language != null)
                     {
-                        IEnumerable<JToken> texts = word.SelectTokens("$..text", false);
-                        foreach ( var text in texts )
+                        var ls = language.ToString().ToLower();
+                        if ( ls.StartsWith( "zh-" ) || ls.StartsWith( "ja" ) || ls.StartsWith( "ko" ) )
+                            T_SEP = "";
+                        else T_SEP = " ";
+                    }
+
+                    IEnumerable<JToken> regions = token.SelectTokens("$..regions", false);
+                    foreach ( var region in regions )
+                    {
+                        IEnumerable<JToken> lines = region.SelectTokens("$..lines", false);
+                        foreach ( var line in lines )
                         {
-                            result += text.ToString();
+                            IEnumerable<JToken> words = line.SelectTokens("$..words", false);
+                            foreach ( var word in words )
+                            {
+                                IEnumerable<JToken> texts = word.SelectTokens("$..text", false);
+                                foreach ( var text in texts )
+                                {
+                                    result += T_SEP + text.ToString();
+                                }
+                                result += "\r\n";
+                            }
+                            result += "\r\n";
                         }
-                        result += "\r\n";
+                        result += "\r\n\r\n";
                     }
                 }
             }
@@ -270,6 +293,7 @@ namespace OCR_MS
                     }
                 }
             }
+            CFGLOADED = true;
         }
 
         private void SaveConfig()
@@ -355,7 +379,7 @@ namespace OCR_MS
                     ApiKey["Computer Vision API"] = edResult.Text;
             }
 
-            if ( !ApiKey.ContainsKey( "Computer Vision API" ) )
+            if ( CFGLOADED && !ApiKey.ContainsKey( "Computer Vision API" ) )
             {
                 MessageBox.Show( "Microsoft Azure Cognitive Servise Computer Vision API key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning );
             }
