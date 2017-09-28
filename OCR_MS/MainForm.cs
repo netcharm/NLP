@@ -223,7 +223,7 @@ namespace OCR_MS
                     //Bitmap image = (Bitmap)iData.GetData(DataFormats.Bitmap);
                     // do something with it
                     ClipboardChanged = true;
-                    if ( chkAutoClipboard.Checked && ClipboardChanged )
+                    if ( chkAutoClipboard.Checked )
                     {
                         btnOCR.PerformClick();
                     }
@@ -342,6 +342,13 @@ namespace OCR_MS
             if ( e.Control && e.KeyCode == Keys.S )
             {
                 CFGSAVE = true;
+                //if ( !ApiKey.ContainsKey( "Computer Vision API" ) && edResult.Text.Trim().Length == 32 )
+                if ( edResult.Text.Trim().Length == 32 )
+                {
+                    var dlgResult = MessageBox.Show( "Text in result box will be saved as API Key!", "Note", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning );
+                    if ( dlgResult == DialogResult.OK )
+                        ApiKey["Computer Vision API"] = edResult.Text;
+                }
                 SaveConfig();
                 CFGSAVE = false;
             }
@@ -352,8 +359,6 @@ namespace OCR_MS
             if ( ApiKey.ContainsKey( "Computer Vision API" ) && btnOCR.Enabled && Clipboard.ContainsImage() )
             {
                 btnOCR.Enabled = false;
-                //this.UseWaitCursor = true;
-                //edResult.UseWaitCursor = true;
                 pbar.Style = ProgressBarStyle.Marquee;
 
                 Bitmap src = (Bitmap)Clipboard.GetImage();
@@ -366,17 +371,8 @@ namespace OCR_MS
                 }
 
                 pbar.Style = ProgressBarStyle.Blocks;
-                //edResult.UseWaitCursor = false;
-                //this.UseWaitCursor = false;
                 ClipboardChanged = false;
                 btnOCR.Enabled = true;
-            }
-
-            if ( !ApiKey.ContainsKey( "Computer Vision API" ) && edResult.Text.Trim().Length == 32 )
-            {
-                var dlgResult = MessageBox.Show( "Text in result box will be saved as API Key!", "Note", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning );
-                if ( dlgResult == DialogResult.OK )
-                    ApiKey["Computer Vision API"] = edResult.Text;
             }
 
             if ( CFGLOADED && !ApiKey.ContainsKey( "Computer Vision API" ) )
