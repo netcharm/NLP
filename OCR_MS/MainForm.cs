@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace OCR_MS
@@ -19,7 +21,8 @@ namespace OCR_MS
     {
         private string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
         private string AppName = Path.GetFileNameWithoutExtension(Application.ExecutablePath);
-        private static string ApiKey_CV = string.Empty;
+        private static Dictionary<string, string> ApiKey = new Dictionary<string, string>();
+        private bool CFGSAVE = false;
 
         #region Monitor Clipboard
         [DllImport( "User32.dll", CharSet = CharSet.Auto )]
@@ -124,9 +127,11 @@ namespace OCR_MS
             return ( result );
         }
 
-        static async Task<string> MakeRequest( Bitmap src )
+        static async Task<string> MakeRequest( Bitmap src, string lang = "unk" )
         {
             string result = "";
+            string ApiKey_CV = ApiKey.ContainsKey( "Computer Vision API" ) ? ApiKey["Computer Vision API"] : string.Empty;
+
             if ( string.IsNullOrEmpty( ApiKey_CV ) ) return ( result );
 
             var client = new HttpClient();
@@ -136,7 +141,7 @@ namespace OCR_MS
             client.DefaultRequestHeaders.Add( "Ocp-Apim-Subscription-Key", ApiKey_CV );
 
             // Request parameters
-            queryString["language"] = "unk";
+            queryString["language"] = lang;
             queryString["detectOrientation "] = "true";
             var uri = "https://westus.api.cognitive.microsoft.com/vision/v1.0/ocr?" + queryString;
 
@@ -195,6 +200,10 @@ namespace OCR_MS
                     //Bitmap image = (Bitmap)iData.GetData(DataFormats.Bitmap);
                     // do something with it
                     ClipboardChanged = true;
+                    if ( chkAutoClipboard.Checked && ClipboardChanged )
+                    {
+                        btnOCR.PerformClick();
+                    }
                 }
             }
         }
@@ -211,41 +220,144 @@ namespace OCR_MS
             {
                 var json = File.ReadAllText(cfg);
                 JToken token = JObject.Parse( json );
+
                 IEnumerable<JToken> apis = token.SelectTokens("$..api", false);
                 foreach ( var api in apis )
                 {
                     var apikey = api.SelectToken( "$..key", false ).ToString();
-                    ApiKey_CV = apikey;
+                    var apiname = api.SelectToken( "$..name", false ).ToString();
+                    if(apikey != null && apiname != null )
+                    {
+                        ApiKey[apiname] = apikey;
+                    }
+                }
+
+                JToken pos = token.SelectToken("$..pos", false);
+                if ( pos != null )
+                {
+                    var x = pos.SelectToken( "$..x", false ).ToString();
+                    var y = pos.SelectToken( "$..y", false ).ToString();
+                    if(x != null && y != null)
+                    {
+                        try
+                        {
+                            this.Left = Convert.ToInt32( x );
+                            this.Top = Convert.ToInt32( y );
+                        }
+                        catch ( Exception )
+                        {
+                            //throw;
+                        }
+                    }
+                }
+
+                JToken size = token.SelectToken("$..size", false);
+                if(size != null)
+                {
+                    var w = size.SelectToken( "$..w", false ).ToString();
+                    var h = size.SelectToken( "$..h", false ).ToString();
+                    if ( w != null && h != null )
+                    {
+                        try
+                        {
+                            this.Width = Convert.ToInt32( w );
+                            this.Height = Convert.ToInt32( h );
+                        }
+                        catch ( Exception )
+                        {
+                            //throw;
+                        }
+                    }
                 }
             }
+        }
+
+        private void SaveConfig()
+        {
+            var cfg = Path.Combine(AppPath, AppName + ".json");
+
+            Dictionary<string, object> json = new Dictionary<string, object>()
+            {
+                { "pos", new Dictionary<string, int>()
+                    {
+                        { "x", this.Left },
+                        { "y", this.Top  }
+                    }
+                },
+                { "size", new Dictionary<string, int>()
+                    {
+                        { "w", this.Width },
+                        { "h", this.Height }
+                    }
+                },
+                { "api", ApiKey.Select( o => new Dictionary<string, string>() { { "name", o.Key }, { "key", o.Value } } ).ToList() }
+            };
+            
+
+            File.WriteAllText( cfg, JsonConvert.SerializeObject( json, Formatting.Indented ) );
         }
 
         private void MainForm_Load( object sender, EventArgs e )
         {
             Icon = Icon.ExtractAssociatedIcon( Application.ExecutablePath );
 
-            LoadConfig();
             // Adds our form to the chain of clipboard viewers.
             _clipboardViewerNext = SetClipboardViewer( this.Handle );
-                        
-            //init_ocr_lang();
+
+            ////init_ocr_lang();
             cbLanguage.Items.Clear();
             cbLanguage.DataSource = new BindingSource( ocr_languages, null );
             cbLanguage.DisplayMember = "Value";
             cbLanguage.ValueMember = "Key";
+
+            LoadConfig();
+        }
+
+        private void MainForm_KeyDown( object sender, KeyEventArgs e )
+        {
+            if ( e.Control && e.KeyCode == Keys.S )
+            {
+                CFGSAVE = true;
+                SaveConfig();
+                CFGSAVE = false;
+            }
         }
 
         private async void btnOCR_Click( object sender, EventArgs e )
         {
-            if ( !string.IsNullOrEmpty(ApiKey_CV) && Clipboard.ContainsImage() )
+            if ( ApiKey.ContainsKey( "Computer Vision API" ) && btnOCR.Enabled && Clipboard.ContainsImage() )
             {
-                this.UseWaitCursor = true;
-                edResult.UseWaitCursor = true;
+                btnOCR.Enabled = false;
+                //this.UseWaitCursor = true;
+                //edResult.UseWaitCursor = true;
+                pbar.Style = ProgressBarStyle.Marquee;
+
                 Bitmap src = (Bitmap)Clipboard.GetImage();
-                edResult.Text = await MakeRequest( src );
-                edResult.UseWaitCursor = false;
-                this.UseWaitCursor = false;
+                string lang = cbLanguage.SelectedValue.ToString();
+                edResult.Text = await MakeRequest( src, lang );
+                if ( !string.IsNullOrEmpty( edResult.Text ) )
+                {
+                    //Clipboard.SetText( edResult.Text );
+                    edResult.SelectAll();
+                }
+
+                pbar.Style = ProgressBarStyle.Blocks;
+                //edResult.UseWaitCursor = false;
+                //this.UseWaitCursor = false;
                 ClipboardChanged = false;
+                btnOCR.Enabled = true;
+            }
+
+            if ( !ApiKey.ContainsKey( "Computer Vision API" ) && edResult.Text.Trim().Length == 32 )
+            {
+                var dlgResult = MessageBox.Show( "Text in result box will be saved as API Key!", "Note", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning );
+                if ( dlgResult == DialogResult.OK )
+                    ApiKey["Computer Vision API"] = edResult.Text;
+            }
+
+            if ( !ApiKey.ContainsKey( "Computer Vision API" ) )
+            {
+                MessageBox.Show( "Microsoft Azure Cognitive Servise Computer Vision API key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning );
             }
         }
 
@@ -254,11 +366,6 @@ namespace OCR_MS
             if(chkAutoClipboard.Checked && ClipboardChanged)
             {
                 btnOCR.PerformClick();
-                if( !string.IsNullOrEmpty( edResult.Text ) )
-                {
-                    //Clipboard.SetText( edResult.Text );
-                }
-                ClipboardChanged = false;
             }
         }
 
@@ -269,5 +376,6 @@ namespace OCR_MS
                 edResult.SelectAll();
             }
         }
+
     }
 }
