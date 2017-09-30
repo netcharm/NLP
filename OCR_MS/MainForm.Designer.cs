@@ -30,38 +30,39 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.btnOCR = new System.Windows.Forms.Button();
             this.edResult = new System.Windows.Forms.TextBox();
-            this.chkAutoClipboard = new System.Windows.Forms.CheckBox();
             this.cbLanguage = new System.Windows.Forms.ComboBox();
             this.lblLanguage = new System.Windows.Forms.Label();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.pbar = new System.Windows.Forms.ProgressBar();
+            this.hint = new System.Windows.Forms.ToolTip(this.components);
+            this.btnShowJSON = new System.Windows.Forms.Button();
+            this.chkAutoClipboard = new System.Windows.Forms.CheckBox();
+            this.btnOCR = new System.Windows.Forms.Button();
+            this.notify = new System.Windows.Forms.NotifyIcon(this.components);
+            this.notifyMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tsmiShowWindow = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiTopMost = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btnOCR
-            // 
-            resources.ApplyResources(this.btnOCR, "btnOCR");
-            this.btnOCR.Name = "btnOCR";
-            this.btnOCR.UseVisualStyleBackColor = true;
-            this.btnOCR.Click += new System.EventHandler(this.btnOCR_Click);
             // 
             // edResult
             // 
+            this.edResult.AcceptsReturn = true;
+            this.edResult.AcceptsTab = true;
+            this.edResult.AccessibleRole = System.Windows.Forms.AccessibleRole.Client;
             resources.ApplyResources(this.edResult, "edResult");
             this.edResult.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.edResult.HideSelection = false;
             this.edResult.Name = "edResult";
             this.edResult.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edResult_KeyUp);
-            // 
-            // chkAutoClipboard
-            // 
-            resources.ApplyResources(this.chkAutoClipboard, "chkAutoClipboard");
-            this.chkAutoClipboard.AutoEllipsis = true;
-            this.chkAutoClipboard.Checked = true;
-            this.chkAutoClipboard.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAutoClipboard.Name = "chkAutoClipboard";
-            this.chkAutoClipboard.UseVisualStyleBackColor = true;
             // 
             // cbLanguage
             // 
@@ -69,6 +70,7 @@
             this.cbLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbLanguage.FormattingEnabled = true;
             this.cbLanguage.Name = "cbLanguage";
+            this.hint.SetToolTip(this.cbLanguage, resources.GetString("cbLanguage.ToolTip"));
             // 
             // lblLanguage
             // 
@@ -85,11 +87,126 @@
             resources.ApplyResources(this.pbar, "pbar");
             this.pbar.Name = "pbar";
             // 
+            // hint
+            // 
+            this.hint.ShowAlways = true;
+            this.hint.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            // 
+            // btnShowJSON
+            // 
+            resources.ApplyResources(this.btnShowJSON, "btnShowJSON");
+            this.btnShowJSON.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnShowJSON.Image = global::OCR_MS.Properties.Resources.JSON_32x;
+            this.btnShowJSON.Name = "btnShowJSON";
+            this.hint.SetToolTip(this.btnShowJSON, resources.GetString("btnShowJSON.ToolTip"));
+            this.btnShowJSON.UseVisualStyleBackColor = true;
+            this.btnShowJSON.Click += new System.EventHandler(this.btnShowJSON_Click);
+            // 
+            // chkAutoClipboard
+            // 
+            resources.ApplyResources(this.chkAutoClipboard, "chkAutoClipboard");
+            this.chkAutoClipboard.AutoEllipsis = true;
+            this.chkAutoClipboard.Checked = true;
+            this.chkAutoClipboard.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkAutoClipboard.Image = global::OCR_MS.Properties.Resources.Watch_32x;
+            this.chkAutoClipboard.Name = "chkAutoClipboard";
+            this.hint.SetToolTip(this.chkAutoClipboard, resources.GetString("chkAutoClipboard.ToolTip"));
+            this.chkAutoClipboard.UseVisualStyleBackColor = true;
+            // 
+            // btnOCR
+            // 
+            resources.ApplyResources(this.btnOCR, "btnOCR");
+            this.btnOCR.Name = "btnOCR";
+            this.hint.SetToolTip(this.btnOCR, resources.GetString("btnOCR.ToolTip"));
+            this.btnOCR.UseVisualStyleBackColor = true;
+            this.btnOCR.Click += new System.EventHandler(this.btnOCR_Click);
+            // 
+            // notify
+            // 
+            this.notify.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.notify.ContextMenuStrip = this.notifyMenu;
+            resources.ApplyResources(this.notify, "notify");
+            this.notify.Click += new System.EventHandler(this.notify_Click);
+            this.notify.DoubleClick += new System.EventHandler(this.notify_DoubleClick);
+            this.notify.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notify_MouseClick);
+            // 
+            // notifyMenu
+            // 
+            this.notifyMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiShowWindow,
+            this.tsmiShowOCRResult,
+            this.tsmiSep0,
+            this.tsmiTopMost,
+            this.tsmiWatchClipboard,
+            this.tsmiSep1,
+            this.tsmiSaveState,
+            this.tsmiSep2,
+            this.tsmiExit});
+            this.notifyMenu.Name = "notifyMenu";
+            resources.ApplyResources(this.notifyMenu, "notifyMenu");
+            // 
+            // tsmiShowWindow
+            // 
+            this.tsmiShowWindow.Name = "tsmiShowWindow";
+            resources.ApplyResources(this.tsmiShowWindow, "tsmiShowWindow");
+            this.tsmiShowWindow.Click += new System.EventHandler(this.tsmiShowWindow_Click);
+            // 
+            // tsmiSep1
+            // 
+            this.tsmiSep1.Name = "tsmiSep1";
+            resources.ApplyResources(this.tsmiSep1, "tsmiSep1");
+            // 
+            // tsmiExit
+            // 
+            this.tsmiExit.Name = "tsmiExit";
+            resources.ApplyResources(this.tsmiExit, "tsmiExit");
+            this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
+            // tsmiSep2
+            // 
+            this.tsmiSep2.Name = "tsmiSep2";
+            resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
+            // 
+            // tsmiTopMost
+            // 
+            this.tsmiTopMost.CheckOnClick = true;
+            this.tsmiTopMost.Name = "tsmiTopMost";
+            resources.ApplyResources(this.tsmiTopMost, "tsmiTopMost");
+            this.tsmiTopMost.Click += new System.EventHandler(this.tsmiTopMost_Click);
+            // 
+            // tsmiShowOCRResult
+            // 
+            this.tsmiShowOCRResult.Name = "tsmiShowOCRResult";
+            resources.ApplyResources(this.tsmiShowOCRResult, "tsmiShowOCRResult");
+            this.tsmiShowOCRResult.Click += new System.EventHandler(this.tsmiShowLastOCRResultJSON_Click);
+            // 
+            // tsmiWatchClipboard
+            // 
+            this.tsmiWatchClipboard.Checked = true;
+            this.tsmiWatchClipboard.CheckOnClick = true;
+            this.tsmiWatchClipboard.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiWatchClipboard.Name = "tsmiWatchClipboard";
+            resources.ApplyResources(this.tsmiWatchClipboard, "tsmiWatchClipboard");
+            this.tsmiWatchClipboard.Click += new System.EventHandler(this.tsmiWatchClipboard_Click);
+            // 
+            // tsmiSaveState
+            // 
+            this.tsmiSaveState.Name = "tsmiSaveState";
+            resources.ApplyResources(this.tsmiSaveState, "tsmiSaveState");
+            this.tsmiSaveState.Click += new System.EventHandler(this.tsmiSaveState_Click);
+            // 
+            // tsmiSep0
+            // 
+            this.tsmiSep0.Name = "tsmiSep0";
+            resources.ApplyResources(this.tsmiSep0, "tsmiSep0");
+            // 
             // MainForm
             // 
             this.AcceptButton = this.btnOCR;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ContextMenuStrip = this.notifyMenu;
+            this.Controls.Add(this.btnShowJSON);
             this.Controls.Add(this.pbar);
             this.Controls.Add(this.lblLanguage);
             this.Controls.Add(this.cbLanguage);
@@ -99,9 +216,10 @@
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Name = "MainForm";
-            this.TopMost = true;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
+            this.notifyMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -116,6 +234,19 @@
         private System.Windows.Forms.Label lblLanguage;
         private System.Windows.Forms.Timer timer;
         private System.Windows.Forms.ProgressBar pbar;
+        private System.Windows.Forms.ToolTip hint;
+        private System.Windows.Forms.Button btnShowJSON;
+        private System.Windows.Forms.NotifyIcon notify;
+        private System.Windows.Forms.ContextMenuStrip notifyMenu;
+        private System.Windows.Forms.ToolStripMenuItem tsmiShowWindow;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep1;
+        private System.Windows.Forms.ToolStripMenuItem tsmiExit;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTopMost;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep2;
+        private System.Windows.Forms.ToolStripMenuItem tsmiShowOCRResult;
+        private System.Windows.Forms.ToolStripMenuItem tsmiWatchClipboard;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep0;
+        private System.Windows.Forms.ToolStripMenuItem tsmiSaveState;
     }
 }
 

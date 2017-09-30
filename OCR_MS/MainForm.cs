@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,8 +22,9 @@ namespace OCR_MS
     {
         private string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
         private string AppName = Path.GetFileNameWithoutExtension(Application.ExecutablePath);
+
         private static Dictionary<string, string> ApiKey = new Dictionary<string, string>();
-        private bool CFGSAVE = false;
+
         private bool CFGLOADED = false;
 
         #region Monitor Clipboard
@@ -34,6 +36,7 @@ namespace OCR_MS
 
         // WM_DRAWCLIPBOARD message
         private const int WM_DRAWCLIPBOARD = 0x0308;
+        private const int WM_CLIPBOARDUPDATE = 0x031D;
         // Our variable that will hold the value to identify the next window in the clipboard viewer chain
         private IntPtr _clipboardViewerNext;
         private bool ClipboardChanged = false;
@@ -71,6 +74,8 @@ namespace OCR_MS
         };
         internal Dictionary<string, string> ocr_lang = new Dictionary<string, string>();
 
+        internal string Result_JSON = string.Empty;
+
         internal void init_ocr_lang()
         {
             ocr_lang.Clear();
@@ -93,7 +98,7 @@ namespace OCR_MS
             return null;
         }
 
-        internal string ocr_ms( Bitmap src )
+        internal string ocr_ms( Bitmap src, string lang = "unk" )
         {
             string result = "";
 
@@ -128,7 +133,7 @@ namespace OCR_MS
             return ( result );
         }
 
-        static async Task<string> MakeRequest( Bitmap src, string lang = "unk" )
+        internal async Task<string> MakeRequest_OCR( Bitmap src, string lang = "unk" )
         {
             string result = "";
             string ApiKey_CV = ApiKey.ContainsKey( "Computer Vision API" ) ? ApiKey["Computer Vision API"] : string.Empty;
@@ -154,7 +159,7 @@ namespace OCR_MS
                 byte[] buffer = ((MemoryStream)png).ToArray();
                 string buf = "data:image/png;base64," + Convert.ToBase64String( buffer );
 
-                string T_SEP = "";
+                string W_SEP = "";
 
                 // Request body
                 using ( var content = new ByteArrayContent( buffer ) )
@@ -164,36 +169,43 @@ namespace OCR_MS
                     string ocr_result = await response.Content.ReadAsStringAsync();
 
                     JToken token = JObject.Parse( ocr_result );
+                    Result_JSON = JsonConvert.SerializeObject( token, Formatting.Indented );
+                    Result_JSON = Result_JSON.Replace( "\\\"", "\"" );
 
                     JToken language = token.SelectToken( "$..language" );
                     if( language != null)
                     {
                         var ls = language.ToString().ToLower();
                         if ( ls.StartsWith( "zh-" ) || ls.StartsWith( "ja" ) || ls.StartsWith( "ko" ) )
-                            T_SEP = "";
-                        else T_SEP = " ";
+                            W_SEP = "";
+                        else W_SEP = " ";
                     }
 
+                    StringBuilder sb = new StringBuilder();
                     IEnumerable<JToken> regions = token.SelectTokens("$..regions", false);
                     foreach ( var region in regions )
                     {
+                        List<string> ocr_line = new List<string>();
                         IEnumerable<JToken> lines = region.SelectTokens("$..lines", false);
                         foreach ( var line in lines )
                         {
                             IEnumerable<JToken> words = line.SelectTokens("$..words", false);
                             foreach ( var word in words )
                             {
+                                List<string> ocr_word = new List<string>();
                                 IEnumerable<JToken> texts = word.SelectTokens("$..text", false);
                                 foreach ( var text in texts )
                                 {
-                                    result += T_SEP + text.ToString();
+                                    ocr_word.Add( text.ToString() );
+                                    //sb.Append( W_SEP + text.ToString() );
                                 }
-                                result += "\r\n";
+                                sb.AppendLine( string.Join( W_SEP, ocr_word ) );
                             }
-                            result += "\r\n";
+                            sb.AppendLine();
                         }
-                        result += "\r\n\r\n";
+                        sb.AppendLine();
                     }
+                    result = sb.ToString().Trim();
                 }
             }
             return ( result );
@@ -204,6 +216,7 @@ namespace OCR_MS
         {
             base.WndProc( ref m );    // Process the message 
 
+            //if ( m.Msg == WM_CLIPBOARDUPDATE )
             if ( m.Msg == WM_DRAWCLIPBOARD )
             {
                 ClipboardChanged = false;
@@ -215,16 +228,16 @@ namespace OCR_MS
                 {
                     // Clipboard text
                     string text = (string)iData.GetData(DataFormats.Text);
-                    // do something with it
                 }
                 else if ( iData.GetDataPresent( DataFormats.Bitmap ) )
                 {
+                    //MessageBox.Show( "Refresh Clipboard" );
+
                     // Clipboard image
-                    //Bitmap image = (Bitmap)iData.GetData(DataFormats.Bitmap);
-                    // do something with it
                     ClipboardChanged = true;
                     if ( chkAutoClipboard.Checked )
                     {
+                        //tsmiShowWindow.PerformClick();
                         btnOCR.PerformClick();
                     }
                 }
@@ -325,6 +338,13 @@ namespace OCR_MS
         {
             Icon = Icon.ExtractAssociatedIcon( Application.ExecutablePath );
 
+            notify.Icon = Icon;
+            notify.BalloonTipTitle = this.Text;
+            notify.BalloonTipText = "Using \"Computer Vision API\" OCR feature.";
+            notify.Text = this.Text;
+
+            hint.ToolTipTitle = this.Text;
+
             // Adds our form to the chain of clipboard viewers.
             _clipboardViewerNext = SetClipboardViewer( this.Handle );
 
@@ -337,20 +357,20 @@ namespace OCR_MS
             LoadConfig();
         }
 
-        private void MainForm_KeyDown( object sender, KeyEventArgs e )
+        private void MainForm_FormClosing( object sender, FormClosingEventArgs e )
+        {
+            if ( e.CloseReason == CloseReason.UserClosing )
+            {
+                e.Cancel = true;
+                this.Hide();
+            }
+        }
+
+        private void MainForm_KeyUp( object sender, KeyEventArgs e )
         {
             if ( e.Control && e.KeyCode == Keys.S )
             {
-                CFGSAVE = true;
-                //if ( !ApiKey.ContainsKey( "Computer Vision API" ) && edResult.Text.Trim().Length == 32 )
-                if ( edResult.Text.Trim().Length == 32 )
-                {
-                    var dlgResult = MessageBox.Show( "Text in result box will be saved as API Key!", "Note", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning );
-                    if ( dlgResult == DialogResult.OK )
-                        ApiKey["Computer Vision API"] = edResult.Text;
-                }
-                SaveConfig();
-                CFGSAVE = false;
+                tsmiSaveState.PerformClick();
             }
         }
 
@@ -358,27 +378,51 @@ namespace OCR_MS
         {
             if ( ApiKey.ContainsKey( "Computer Vision API" ) && btnOCR.Enabled && Clipboard.ContainsImage() )
             {
-                btnOCR.Enabled = false;
-                pbar.Style = ProgressBarStyle.Marquee;
-
-                Bitmap src = (Bitmap)Clipboard.GetImage();
-                string lang = cbLanguage.SelectedValue.ToString();
-                edResult.Text = await MakeRequest( src, lang );
-                if ( !string.IsNullOrEmpty( edResult.Text ) )
+                IDataObject iData = Clipboard.GetDataObject();
+                if( iData.GetDataPresent( DataFormats.Bitmap ) )
                 {
-                    //Clipboard.SetText( edResult.Text );
-                    edResult.SelectAll();
-                }
+                    btnOCR.Enabled = false;
+                    pbar.Style = ProgressBarStyle.Marquee;
 
-                pbar.Style = ProgressBarStyle.Blocks;
-                ClipboardChanged = false;
-                btnOCR.Enabled = true;
+                    //(Bitmap) iData.GetData( DataFormats.Bitmap );
+                    Bitmap src = (Bitmap)Clipboard.GetImage();
+                    string lang = cbLanguage.SelectedValue.ToString();
+                    edResult.Text = await MakeRequest_OCR( src, lang );
+                    if ( !string.IsNullOrEmpty( edResult.Text ) )
+                    {
+                        tsmiShowWindow.PerformClick();
+                    }
+                    Clipboard.Clear();
+
+                    pbar.Style = ProgressBarStyle.Blocks;
+                    ClipboardChanged = false;
+                    btnOCR.Enabled = true;
+                }
             }
 
             if ( CFGLOADED && !ApiKey.ContainsKey( "Computer Vision API" ) )
             {
                 MessageBox.Show( "Microsoft Azure Cognitive Servise Computer Vision API key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning );
             }
+        }
+
+        private void notify_Click( object sender, EventArgs e )
+        {
+            // Show() method can not autoclosed like system contextmenu's behaving
+            //notifyMenu.Show( this, Control.MousePosition );
+
+            MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+            mi.Invoke( notify, null );
+        }
+
+        private void notify_MouseClick( object sender, MouseEventArgs e )
+        {
+            //notifyMenu.Show( this, Cursor.Position.X, Cursor.Position.Y );
+        }
+
+        private void notify_DoubleClick( object sender, EventArgs e )
+        {
+            tsmiShowWindow.PerformClick();
         }
 
         private void timer_Tick( object sender, EventArgs e )
@@ -395,6 +439,59 @@ namespace OCR_MS
             {
                 edResult.SelectAll();
             }
+        }
+
+        private void btnShowJSON_Click( object sender, EventArgs e )
+        {
+            if ( string.IsNullOrEmpty( Result_JSON.Trim() ) ) return;
+            if ( DialogResult.Yes == MessageBox.Show( Result_JSON.Substring(0, 512), "Copy OCR Result?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification ))
+            {
+                Clipboard.SetText( Result_JSON );
+            }
+        }
+
+        private void tsmiExit_Click( object sender, EventArgs e )
+        {
+            Application.Exit();
+        }
+
+        private void tsmiShowWindow_Click( object sender, EventArgs e )
+        {
+            this.Show();
+            if ( this.WindowState == FormWindowState.Minimized )
+            {
+                this.WindowState = FormWindowState.Normal;
+            }
+            this.Activate();
+            edResult.SelectAll();
+            edResult.Focus();
+        }
+
+        private void tsmiTopMost_Click( object sender, EventArgs e )
+        {
+            this.TopMost = tsmiTopMost.Checked;
+        }
+
+        private void tsmiShowLastOCRResultJSON_Click( object sender, EventArgs e )
+        {
+            btnShowJSON.PerformClick();
+        }
+
+        private void tsmiWatchClipboard_Click( object sender, EventArgs e )
+        {
+            chkAutoClipboard.Checked = tsmiWatchClipboard.Checked;
+        }
+
+        private void tsmiSaveState_Click( object sender, EventArgs e )
+        {
+            //if ( !ApiKey.ContainsKey( "Computer Vision API" ) && edResult.Text.Trim().Length == 32 )
+            if ( edResult.Text.Trim().Length == 32 )
+            {
+                var dlgResult = MessageBox.Show( "Text in result box will be saved as API Key!", "Note", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning );
+                if ( dlgResult == DialogResult.OK )
+                    ApiKey["Computer Vision API"] = edResult.Text;
+            }
+            SaveConfig();
         }
 
     }

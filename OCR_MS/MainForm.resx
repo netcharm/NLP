@@ -118,44 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="btnOCR.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Right</value>
-  </data>
-  <data name="btnOCR.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
-    <value>Popup</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="btnOCR.Location" type="System.Drawing.Point, System.Drawing">
-    <value>197, 66</value>
-  </data>
-  <data name="btnOCR.Size" type="System.Drawing.Size, System.Drawing">
-    <value>64, 36</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="btnOCR.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="btnOCR.Text" xml:space="preserve">
-    <value>OCR</value>
-  </data>
-  <data name="&gt;&gt;btnOCR.Name" xml:space="preserve">
-    <value>btnOCR</value>
-  </data>
-  <data name="&gt;&gt;btnOCR.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnOCR.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;btnOCR.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
   <data name="edResult.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="edResult.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 7</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="edResult.Multiline" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -178,44 +148,11 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;edResult.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>6</value>
   </data>
-  <data name="chkAutoClipboard.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Left</value>
-  </data>
-  <data name="chkAutoClipboard.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>BottomLeft</value>
-  </data>
-  <data name="chkAutoClipboard.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
-    <value>Flat</value>
-  </data>
-  <data name="chkAutoClipboard.Location" type="System.Drawing.Point, System.Drawing">
-    <value>100, 66</value>
-  </data>
-  <data name="chkAutoClipboard.Size" type="System.Drawing.Size, System.Drawing">
-    <value>77, 36</value>
-  </data>
-  <data name="chkAutoClipboard.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="chkAutoClipboard.Text" xml:space="preserve">
-    <value>Clipboard Monitor</value>
-  </data>
-  <data name="chkAutoClipboard.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>BottomRight</value>
-  </data>
-  <data name="&gt;&gt;chkAutoClipboard.Name" xml:space="preserve">
-    <value>chkAutoClipboard</value>
-  </data>
-  <data name="&gt;&gt;chkAutoClipboard.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;chkAutoClipboard.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;chkAutoClipboard.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
+  <metadata name="hint.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <data name="cbLanguage.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
   </data>
@@ -229,7 +166,10 @@
     <value>90, 20</value>
   </data>
   <data name="cbLanguage.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
+    <value>2</value>
+  </data>
+  <data name="cbLanguage.ToolTip" xml:space="preserve">
+    <value>Select OCR Target Language</value>
   </data>
   <data name="&gt;&gt;cbLanguage.Name" xml:space="preserve">
     <value>cbLanguage</value>
@@ -241,10 +181,13 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;cbLanguage.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>4</value>
   </data>
   <data name="lblLanguage.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
+  </data>
+  <data name="lblLanguage.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="lblLanguage.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 61</value>
@@ -271,13 +214,16 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;lblLanguage.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>3</value>
   </data>
   <metadata name="timer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
+    <value>93, 17</value>
   </metadata>
   <data name="pbar.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left, Right</value>
+  </data>
+  <data name="pbar.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="pbar.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 58</value>
@@ -298,7 +244,184 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;pbar.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <metadata name="hint.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="btnShowJSON.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="btnShowJSON.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="btnShowJSON.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btnShowJSON.Location" type="System.Drawing.Point, System.Drawing">
+    <value>143, 66</value>
+  </data>
+  <data name="btnShowJSON.Size" type="System.Drawing.Size, System.Drawing">
+    <value>36, 36</value>
+  </data>
+  <data name="btnShowJSON.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="btnShowJSON.ToolTip" xml:space="preserve">
+    <value>Show Result JSON Contents</value>
+  </data>
+  <data name="&gt;&gt;btnShowJSON.Name" xml:space="preserve">
+    <value>btnShowJSON</value>
+  </data>
+  <data name="&gt;&gt;btnShowJSON.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnShowJSON.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;btnShowJSON.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="chkAutoClipboard.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="chkAutoClipboard.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>TopRight</value>
+  </data>
+  <data name="chkAutoClipboard.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="chkAutoClipboard.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chkAutoClipboard.Location" type="System.Drawing.Point, System.Drawing">
+    <value>101, 66</value>
+  </data>
+  <data name="chkAutoClipboard.Size" type="System.Drawing.Size, System.Drawing">
+    <value>36, 36</value>
+  </data>
+  <data name="chkAutoClipboard.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="chkAutoClipboard.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>BottomRight</value>
+  </data>
+  <data name="chkAutoClipboard.ToolTip" xml:space="preserve">
+    <value>Watch Clipboard Changing</value>
+  </data>
+  <data name="&gt;&gt;chkAutoClipboard.Name" xml:space="preserve">
+    <value>chkAutoClipboard</value>
+  </data>
+  <data name="&gt;&gt;chkAutoClipboard.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;chkAutoClipboard.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;chkAutoClipboard.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="btnOCR.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="btnOCR.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Popup</value>
+  </data>
+  <data name="btnOCR.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btnOCR.Location" type="System.Drawing.Point, System.Drawing">
+    <value>197, 66</value>
+  </data>
+  <data name="btnOCR.Size" type="System.Drawing.Size, System.Drawing">
+    <value>64, 36</value>
+  </data>
+  <data name="btnOCR.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
+  </data>
+  <data name="btnOCR.Text" xml:space="preserve">
+    <value>OCR</value>
+  </data>
+  <data name="btnOCR.TextImageRelation" type="System.Windows.Forms.TextImageRelation, System.Windows.Forms">
+    <value>TextBeforeImage</value>
+  </data>
+  <data name="btnOCR.ToolTip" xml:space="preserve">
+    <value>OCR the Clipboard Image</value>
+  </data>
+  <data name="&gt;&gt;btnOCR.Name" xml:space="preserve">
+    <value>btnOCR</value>
+  </data>
+  <data name="&gt;&gt;btnOCR.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnOCR.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;btnOCR.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <metadata name="notify.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>175, 17</value>
+  </metadata>
+  <metadata name="notifyMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>264, 17</value>
+  </metadata>
+  <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>221, 154</value>
+  </data>
+  <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
+    <value>notifyMenu</value>
+  </data>
+  <data name="&gt;&gt;notifyMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="notify.Visible" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="tsmiShowWindow.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiShowWindow.Text" xml:space="preserve">
+    <value>Show Window</value>
+  </data>
+  <data name="tsmiSep1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>217, 6</value>
+  </data>
+  <data name="tsmiExit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiExit.Text" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="tsmiSep2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>217, 6</value>
+  </data>
+  <data name="tsmiTopMost.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiTopMost.Text" xml:space="preserve">
+    <value>Always On Top</value>
+  </data>
+  <data name="tsmiShowOCRResult.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiShowOCRResult.Text" xml:space="preserve">
+    <value>Show Last OCR Result JSON</value>
+  </data>
+  <data name="tsmiWatchClipboard.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiWatchClipboard.Text" xml:space="preserve">
+    <value>Watch Clipboard</value>
+  </data>
+  <data name="tsmiSaveState.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiSaveState.Text" xml:space="preserve">
+    <value>Save Current State/APIKEY</value>
+  </data>
+  <data name="tsmiSep0.Size" type="System.Drawing.Size, System.Drawing">
+    <value>217, 6</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -309,17 +432,86 @@
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>264, 108</value>
   </data>
+  <data name="$this.MaximumSize" type="System.Drawing.Size, System.Drawing">
+    <value>800, 600</value>
+  </data>
   <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
     <value>272, 135</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>Microsoft Azure Cognitive Service OCR</value>
+    <value>Azure Cognitive Service OCR</value>
   </data>
   <data name="&gt;&gt;timer.Name" xml:space="preserve">
     <value>timer</value>
   </data>
   <data name="&gt;&gt;timer.Type" xml:space="preserve">
     <value>System.Windows.Forms.Timer, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;hint.Name" xml:space="preserve">
+    <value>hint</value>
+  </data>
+  <data name="&gt;&gt;hint.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;notify.Name" xml:space="preserve">
+    <value>notify</value>
+  </data>
+  <data name="&gt;&gt;notify.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NotifyIcon, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiShowWindow.Name" xml:space="preserve">
+    <value>tsmiShowWindow</value>
+  </data>
+  <data name="&gt;&gt;tsmiShowWindow.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep1.Name" xml:space="preserve">
+    <value>tsmiSep1</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiExit.Name" xml:space="preserve">
+    <value>tsmiExit</value>
+  </data>
+  <data name="&gt;&gt;tsmiExit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep2.Name" xml:space="preserve">
+    <value>tsmiSep2</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiTopMost.Name" xml:space="preserve">
+    <value>tsmiTopMost</value>
+  </data>
+  <data name="&gt;&gt;tsmiTopMost.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiShowOCRResult.Name" xml:space="preserve">
+    <value>tsmiShowOCRResult</value>
+  </data>
+  <data name="&gt;&gt;tsmiShowOCRResult.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiWatchClipboard.Name" xml:space="preserve">
+    <value>tsmiWatchClipboard</value>
+  </data>
+  <data name="&gt;&gt;tsmiWatchClipboard.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSaveState.Name" xml:space="preserve">
+    <value>tsmiSaveState</value>
+  </data>
+  <data name="&gt;&gt;tsmiSaveState.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep0.Name" xml:space="preserve">
+    <value>tsmiSep0</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep0.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>MainForm</value>
