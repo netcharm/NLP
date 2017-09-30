@@ -38,6 +38,16 @@
             this.btnKeyword = new System.Windows.Forms.Button();
             this.layoutMain = new System.Windows.Forms.TableLayoutPanel();
             this.pnlTools = new System.Windows.Forms.Panel();
+            this.pnlOption = new System.Windows.Forms.Panel();
+            this.lblInfo = new System.Windows.Forms.Label();
+            this.chkTermNature = new System.Windows.Forms.CheckBox();
+            this.btnWordFreq = new System.Windows.Forms.Button();
+            this.btnSrc2PyTM = new System.Windows.Forms.Button();
+            this.btnSrc2PyT = new System.Windows.Forms.Button();
+            this.btnSrc2Py = new System.Windows.Forms.Button();
+            this.btnTC2SC = new System.Windows.Forms.Button();
+            this.btnSC2TC = new System.Windows.Forms.Button();
+            this.btnPhrase = new System.Windows.Forms.Button();
             this.cmActions = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cmiActionFilterSub = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiActionFilterLrc = new System.Windows.Forms.ToolStripMenuItem();
@@ -60,21 +70,12 @@
             this.cmiSepToPy = new System.Windows.Forms.ToolStripSeparator();
             this.cmiPyShowPunctuation = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiPySeprateCommas = new System.Windows.Forms.ToolStripMenuItem();
-            this.pnlOption = new System.Windows.Forms.Panel();
-            this.lblInfo = new System.Windows.Forms.Label();
-            this.chkTermNature = new System.Windows.Forms.CheckBox();
-            this.btnWordFreq = new System.Windows.Forms.Button();
-            this.btnSrc2PyTM = new System.Windows.Forms.Button();
-            this.btnSrc2PyT = new System.Windows.Forms.Button();
-            this.btnSrc2Py = new System.Windows.Forms.Button();
-            this.btnTC2SC = new System.Windows.Forms.Button();
-            this.btnSC2TC = new System.Windows.Forms.Button();
-            this.btnPhrase = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.btnOCR = new System.Windows.Forms.Button();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
-            this.cmActions.SuspendLayout();
             this.pnlOption.SuspendLayout();
+            this.cmActions.SuspendLayout();
             this.SuspendLayout();
             // 
             // edSrc
@@ -132,6 +133,7 @@
             // pnlTools
             // 
             this.layoutMain.SetColumnSpan(this.pnlTools, 2);
+            this.pnlTools.Controls.Add(this.btnOCR);
             this.pnlTools.Controls.Add(this.pnlOption);
             this.pnlTools.Controls.Add(this.btnWordFreq);
             this.pnlTools.Controls.Add(this.btnSrc2PyTM);
@@ -146,6 +148,86 @@
             this.pnlTools.Controls.Add(this.btnSummary);
             resources.ApplyResources(this.pnlTools, "pnlTools");
             this.pnlTools.Name = "pnlTools";
+            // 
+            // pnlOption
+            // 
+            this.pnlOption.Controls.Add(this.lblInfo);
+            this.pnlOption.Controls.Add(this.chkTermNature);
+            resources.ApplyResources(this.pnlOption, "pnlOption");
+            this.pnlOption.Name = "pnlOption";
+            // 
+            // lblInfo
+            // 
+            this.lblInfo.AutoEllipsis = true;
+            resources.ApplyResources(this.lblInfo, "lblInfo");
+            this.lblInfo.Name = "lblInfo";
+            // 
+            // chkTermNature
+            // 
+            resources.ApplyResources(this.chkTermNature, "chkTermNature");
+            this.chkTermNature.Checked = true;
+            this.chkTermNature.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTermNature.Name = "chkTermNature";
+            this.chkTermNature.UseVisualStyleBackColor = true;
+            this.chkTermNature.CheckedChanged += new System.EventHandler(this.chkTermNature_CheckedChanged);
+            // 
+            // btnWordFreq
+            // 
+            resources.ApplyResources(this.btnWordFreq, "btnWordFreq");
+            this.btnWordFreq.Name = "btnWordFreq";
+            this.btnWordFreq.UseVisualStyleBackColor = true;
+            this.btnWordFreq.Click += new System.EventHandler(this.btnWordFreq_Click);
+            // 
+            // btnSrc2PyTM
+            // 
+            resources.ApplyResources(this.btnSrc2PyTM, "btnSrc2PyTM");
+            this.btnSrc2PyTM.Name = "btnSrc2PyTM";
+            this.btnSrc2PyTM.Tag = "2";
+            this.toolTip.SetToolTip(this.btnSrc2PyTM, resources.GetString("btnSrc2PyTM.ToolTip"));
+            this.btnSrc2PyTM.UseVisualStyleBackColor = true;
+            this.btnSrc2PyTM.Click += new System.EventHandler(this.btnSrc2Py_Click);
+            // 
+            // btnSrc2PyT
+            // 
+            resources.ApplyResources(this.btnSrc2PyT, "btnSrc2PyT");
+            this.btnSrc2PyT.Name = "btnSrc2PyT";
+            this.btnSrc2PyT.Tag = "1";
+            this.toolTip.SetToolTip(this.btnSrc2PyT, resources.GetString("btnSrc2PyT.ToolTip"));
+            this.btnSrc2PyT.UseVisualStyleBackColor = true;
+            this.btnSrc2PyT.Click += new System.EventHandler(this.btnSrc2Py_Click);
+            // 
+            // btnSrc2Py
+            // 
+            resources.ApplyResources(this.btnSrc2Py, "btnSrc2Py");
+            this.btnSrc2Py.Name = "btnSrc2Py";
+            this.btnSrc2Py.Tag = "0";
+            this.toolTip.SetToolTip(this.btnSrc2Py, resources.GetString("btnSrc2Py.ToolTip"));
+            this.btnSrc2Py.UseVisualStyleBackColor = true;
+            this.btnSrc2Py.Click += new System.EventHandler(this.btnSrc2Py_Click);
+            // 
+            // btnTC2SC
+            // 
+            resources.ApplyResources(this.btnTC2SC, "btnTC2SC");
+            this.btnTC2SC.Name = "btnTC2SC";
+            this.toolTip.SetToolTip(this.btnTC2SC, resources.GetString("btnTC2SC.ToolTip"));
+            this.btnTC2SC.UseVisualStyleBackColor = true;
+            this.btnTC2SC.Click += new System.EventHandler(this.btnTC2SC_Click);
+            // 
+            // btnSC2TC
+            // 
+            resources.ApplyResources(this.btnSC2TC, "btnSC2TC");
+            this.btnSC2TC.Name = "btnSC2TC";
+            this.toolTip.SetToolTip(this.btnSC2TC, resources.GetString("btnSC2TC.ToolTip"));
+            this.btnSC2TC.UseVisualStyleBackColor = true;
+            this.btnSC2TC.Click += new System.EventHandler(this.btnSC2TC_Click);
+            // 
+            // btnPhrase
+            // 
+            resources.ApplyResources(this.btnPhrase, "btnPhrase");
+            this.btnPhrase.Name = "btnPhrase";
+            this.toolTip.SetToolTip(this.btnPhrase, resources.GetString("btnPhrase.ToolTip"));
+            this.btnPhrase.UseVisualStyleBackColor = true;
+            this.btnPhrase.Click += new System.EventHandler(this.btnPhrase_Click);
             // 
             // cmActions
             // 
@@ -313,85 +395,12 @@
             this.cmiPySeprateCommas.Name = "cmiPySeprateCommas";
             resources.ApplyResources(this.cmiPySeprateCommas, "cmiPySeprateCommas");
             // 
-            // pnlOption
+            // btnOCR
             // 
-            this.pnlOption.Controls.Add(this.lblInfo);
-            this.pnlOption.Controls.Add(this.chkTermNature);
-            resources.ApplyResources(this.pnlOption, "pnlOption");
-            this.pnlOption.Name = "pnlOption";
-            // 
-            // lblInfo
-            // 
-            this.lblInfo.AutoEllipsis = true;
-            resources.ApplyResources(this.lblInfo, "lblInfo");
-            this.lblInfo.Name = "lblInfo";
-            // 
-            // chkTermNature
-            // 
-            resources.ApplyResources(this.chkTermNature, "chkTermNature");
-            this.chkTermNature.Checked = true;
-            this.chkTermNature.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTermNature.Name = "chkTermNature";
-            this.chkTermNature.UseVisualStyleBackColor = true;
-            this.chkTermNature.CheckedChanged += new System.EventHandler(this.chkTermNature_CheckedChanged);
-            // 
-            // btnWordFreq
-            // 
-            resources.ApplyResources(this.btnWordFreq, "btnWordFreq");
-            this.btnWordFreq.Name = "btnWordFreq";
-            this.btnWordFreq.UseVisualStyleBackColor = true;
-            this.btnWordFreq.Click += new System.EventHandler(this.btnWordFreq_Click);
-            // 
-            // btnSrc2PyTM
-            // 
-            resources.ApplyResources(this.btnSrc2PyTM, "btnSrc2PyTM");
-            this.btnSrc2PyTM.Name = "btnSrc2PyTM";
-            this.btnSrc2PyTM.Tag = "2";
-            this.toolTip.SetToolTip(this.btnSrc2PyTM, resources.GetString("btnSrc2PyTM.ToolTip"));
-            this.btnSrc2PyTM.UseVisualStyleBackColor = true;
-            this.btnSrc2PyTM.Click += new System.EventHandler(this.btnSrc2Py_Click);
-            // 
-            // btnSrc2PyT
-            // 
-            resources.ApplyResources(this.btnSrc2PyT, "btnSrc2PyT");
-            this.btnSrc2PyT.Name = "btnSrc2PyT";
-            this.btnSrc2PyT.Tag = "1";
-            this.toolTip.SetToolTip(this.btnSrc2PyT, resources.GetString("btnSrc2PyT.ToolTip"));
-            this.btnSrc2PyT.UseVisualStyleBackColor = true;
-            this.btnSrc2PyT.Click += new System.EventHandler(this.btnSrc2Py_Click);
-            // 
-            // btnSrc2Py
-            // 
-            resources.ApplyResources(this.btnSrc2Py, "btnSrc2Py");
-            this.btnSrc2Py.Name = "btnSrc2Py";
-            this.btnSrc2Py.Tag = "0";
-            this.toolTip.SetToolTip(this.btnSrc2Py, resources.GetString("btnSrc2Py.ToolTip"));
-            this.btnSrc2Py.UseVisualStyleBackColor = true;
-            this.btnSrc2Py.Click += new System.EventHandler(this.btnSrc2Py_Click);
-            // 
-            // btnTC2SC
-            // 
-            resources.ApplyResources(this.btnTC2SC, "btnTC2SC");
-            this.btnTC2SC.Name = "btnTC2SC";
-            this.toolTip.SetToolTip(this.btnTC2SC, resources.GetString("btnTC2SC.ToolTip"));
-            this.btnTC2SC.UseVisualStyleBackColor = true;
-            this.btnTC2SC.Click += new System.EventHandler(this.btnTC2SC_Click);
-            // 
-            // btnSC2TC
-            // 
-            resources.ApplyResources(this.btnSC2TC, "btnSC2TC");
-            this.btnSC2TC.Name = "btnSC2TC";
-            this.toolTip.SetToolTip(this.btnSC2TC, resources.GetString("btnSC2TC.ToolTip"));
-            this.btnSC2TC.UseVisualStyleBackColor = true;
-            this.btnSC2TC.Click += new System.EventHandler(this.btnSC2TC_Click);
-            // 
-            // btnPhrase
-            // 
-            resources.ApplyResources(this.btnPhrase, "btnPhrase");
-            this.btnPhrase.Name = "btnPhrase";
-            this.toolTip.SetToolTip(this.btnPhrase, resources.GetString("btnPhrase.ToolTip"));
-            this.btnPhrase.UseVisualStyleBackColor = true;
-            this.btnPhrase.Click += new System.EventHandler(this.btnPhrase_Click);
+            resources.ApplyResources(this.btnOCR, "btnOCR");
+            this.btnOCR.Name = "btnOCR";
+            this.btnOCR.UseVisualStyleBackColor = true;
+            this.btnOCR.Click += new System.EventHandler(this.btnOCR_Click);
             // 
             // MainForm
             // 
@@ -407,9 +416,9 @@
             this.layoutMain.ResumeLayout(false);
             this.layoutMain.PerformLayout();
             this.pnlTools.ResumeLayout(false);
-            this.cmActions.ResumeLayout(false);
             this.pnlOption.ResumeLayout(false);
             this.pnlOption.PerformLayout();
+            this.cmActions.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -457,6 +466,7 @@
         private System.Windows.Forms.ToolStripSeparator cmiSepToPy;
         private System.Windows.Forms.ToolStripMenuItem cmiPyShowPunctuation;
         private System.Windows.Forms.ToolStripMenuItem cmiPySeprateCommas;
+        private System.Windows.Forms.Button btnOCR;
     }
 }
 

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using HtmlAgilityPack;
 
 namespace HanLP_Utils
 {
@@ -20,23 +23,23 @@ namespace HanLP_Utils
             string result = htmlstr;
             Dictionary<string, string> CHAR_ENTITIES = new Dictionary<string, string>()
             {
-                { "&nbsp", " "}, 
-                { "&160", " "},
-                { "&lt", "<"}, 
-                { "&60", "<"},
-                { "&gt", ">"},
-                { "&62", ">"},
-                { "&amp", "&"},
-                { "&38", "&"},
-                { "&quot", "\""},
-                { "&34", "\""}
+                { "&nbsp", " " },
+                { "&160", " " },
+                { "&lt", "<" },
+                { "&60", "<" },
+                { "&gt", ">" },
+                { "&62", ">" },
+                { "&amp", "&" },
+                { "&38", "&" },
+                { "&quot", "\"" },
+                { "&34", "\"" }
             };
 
-            foreach(var k in CHAR_ENTITIES)
+            foreach ( var k in CHAR_ENTITIES )
             {
                 result = result.Replace( k.Key, k.Value );
             }
-            return( result );
+            return ( result );
         }
 
         internal string filterHtmlTag( string text )
@@ -65,7 +68,7 @@ namespace HanLP_Utils
             return ( result.Trim() );
         }
 
-        internal string filterASS(string text)
+        internal string filterASS( string text )
         {
             string result = text;
 
@@ -101,13 +104,140 @@ namespace HanLP_Utils
             string result = text;
 
             string pat_misc = @"(&#\d+;)|([\u0000-\u0009,\u000B-\u000C,\u000E-\u001F,\u0021-\u0040,\u005B-\u0060,\u007B-\u00FF,\u2000-\u206F,\u2190-\u2426,\u3000-\u303F,\u31C0-\u31E3,\uFE10-\uFE4F])|([\.|·|　|…])";
-            result = Regex.Replace( result, pat_misc, "", RegexOptions.IgnoreCase ); 
+            result = Regex.Replace( result, pat_misc, "", RegexOptions.IgnoreCase | RegexOptions.Multiline );
 
-            if(!_KeepNumber)
-                result = Regex.Replace( result, @"\d+", "", RegexOptions.IgnoreCase );
+            if ( !_KeepNumber )
+                result = Regex.Replace( result, @"\d+", "", RegexOptions.IgnoreCase | RegexOptions.Multiline );
 
             return ( result.Trim() );
         }
+
+        internal List<CUE> loadLrc( string lrcfile )
+        {
+            List<CUE> cues = new List<CUE>();
+
+            if ( File.Exists( lrcfile ) )
+            {
+                var lines = File.ReadAllLines(lrcfile);
+                foreach ( string line in lines )
+                {
+
+                }
+            }
+
+            return ( cues );
+        }
+
+        public class CUE
+        {
+            public DateTime Start;
+            public DateTime End;
+            public TimeSpan Duration;
+            public string Text;
+        }
+
+        #region Screen Snapshot routine
+        // P/Invoke declarations
+        [DllImport( "gdi32.dll" )]
+        static extern bool BitBlt( IntPtr hdcDest,
+            int xDest, int yDest, int wDest, int hDest,
+            IntPtr hdcSource,
+            int xSrc, int ySrc,
+            CopyPixelOperation rop );
+        [DllImport( "user32.dll" )]
+        static extern bool ReleaseDC( IntPtr hWnd, IntPtr hDc );
+        [DllImport( "gdi32.dll" )]
+        static extern IntPtr DeleteDC( IntPtr hDc );
+        [DllImport( "gdi32.dll" )]
+        static extern IntPtr DeleteObject( IntPtr hDc );
+        [DllImport( "gdi32.dll" )]
+        static extern IntPtr CreateCompatibleBitmap( IntPtr hdc, int nWidth, int nHeight );
+        [DllImport( "gdi32.dll" )]
+        static extern IntPtr CreateCompatibleDC( IntPtr hdc );
+        [DllImport( "gdi32.dll" )]
+        static extern IntPtr SelectObject( IntPtr hdc, IntPtr bmp );
+        [DllImport( "user32.dll" )]
+        public static extern IntPtr GetDesktopWindow();
+        [DllImport( "user32.dll" )]
+        public static extern IntPtr GetWindowDC( IntPtr ptr );
+        [DllImport( "user32.dll" )]
+        public static extern bool SetProcessDPIAware();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal Bitmap ScreenShot()
+        {
+            if ( Environment.OSVersion.Version.Major >= 6 ) SetProcessDPIAware();
+
+            //using Screen.AllScreens to fetch all screens
+            Size sz = Screen.PrimaryScreen.Bounds.Size;
+            IntPtr hDesk = GetDesktopWindow();
+            IntPtr hSrce = GetWindowDC(hDesk);
+            IntPtr hDest = CreateCompatibleDC(hSrce);
+            IntPtr hBmp = CreateCompatibleBitmap(hSrce, sz.Width, sz.Height);
+            IntPtr hOldBmp = SelectObject(hDest, hBmp);
+            bool b = BitBlt(hDest, 0, 0, sz.Width, sz.Height, hSrce, 0, 0, CopyPixelOperation.SourceCopy | CopyPixelOperation.CaptureBlt);
+            Bitmap bmp = Bitmap.FromHbitmap(hBmp);
+            SelectObject( hDest, hOldBmp );
+            DeleteObject( hBmp );
+            DeleteDC( hDest );
+            ReleaseDC( hDesk, hSrce );
+            //bmp.Save( @"c:\temp\test.png" );
+            //bmp.Dispose();
+            return ( bmp );
+        }
+        #endregion
+
+        #region OCR with microsoft cognitive api
+        internal static ImageCodecInfo GetEncoder( ImageFormat format )
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+            foreach ( ImageCodecInfo codec in codecs )
+            {
+                if ( codec.FormatID == format.Guid )
+                {
+                    return codec;
+                }
+            }
+            return null;
+        }
+
+        internal string ocr_ms( Bitmap src )
+        {
+            string result = "";
+
+            var uri = @"https://westus.api.cognitive.microsoft.com/vision/v1.0/ocr?language=unk&detectOrientation=true";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.Method = "POST";
+            //request.Timeout = 10000;
+            request.UserAgent = @"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20190101 Firefox/87.0";
+            request.Referer = @"https://westus.api.cognitive.microsoft.com";
+            request.ContentType = "application/octet-stream";
+            request.Headers["Ocp-Apim-Subscription-Key"] = "cd959382432345968384df3cd4663129";
+
+            using ( Stream png = new MemoryStream() )
+            {
+                src.Save( png, ImageFormat.Png );
+                byte[] buffer = ((MemoryStream)png).ToArray();
+                string buf = "data:image/png; base64," + Convert.ToBase64String( buffer );
+                request.ContentLength = buf.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write( Encoding.ASCII.GetBytes( buf ), 0, buf.Length );
+                requestStream.Close();
+                //using ( Stream requestStream = request.GetRequestStream() )
+                //{
+                //    //png.CopyTo( requestStream );
+                //    requestStream.Write( Encoding.ASCII.GetBytes( buf ), 0, buf.Length );
+                //    //requestStream.Flush();
+                //}
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            }
+
+            return ( result );
+        }
+        #endregion
 
     }
 }

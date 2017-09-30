@@ -709,5 +709,13 @@ namespace HanLP_Utils
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
+        private void btnOCR_Click( object sender, EventArgs e )
+        {
+            if ( Clipboard.ContainsImage() )
+            {
+                Bitmap src = (Bitmap)Clipboard.GetImage();
+                ocr_ms( src );
+            }
+        }
     }
 }
