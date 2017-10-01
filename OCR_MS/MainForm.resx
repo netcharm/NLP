@@ -366,8 +366,119 @@
   <metadata name="notifyMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>264, 17</value>
   </metadata>
+  <data name="tsmiShowWindow.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiShowWindow.Text" xml:space="preserve">
+    <value>Show Window</value>
+  </data>
+  <data name="tsmiShowOCRResult.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiShowOCRResult.Text" xml:space="preserve">
+    <value>Show Last OCR Result JSON</value>
+  </data>
+  <data name="tsmiSep0.Size" type="System.Drawing.Size, System.Drawing">
+    <value>217, 6</value>
+  </data>
+  <data name="tsmiTopMost.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiTopMost.Text" xml:space="preserve">
+    <value>Always On Top</value>
+  </data>
+  <data name="tsmiOpacity100.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity100.Text" xml:space="preserve">
+    <value>100%</value>
+  </data>
+  <data name="tsmiOpacity90.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity90.Text" xml:space="preserve">
+    <value>90%</value>
+  </data>
+  <data name="tsmiOpacity80.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity80.Text" xml:space="preserve">
+    <value>80%</value>
+  </data>
+  <data name="tsmiOpacity70.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity70.Text" xml:space="preserve">
+    <value>70%</value>
+  </data>
+  <data name="tsmiOpacity60.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity60.Text" xml:space="preserve">
+    <value>60%</value>
+  </data>
+  <data name="tsmiOpacity50.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity50.Text" xml:space="preserve">
+    <value>50%</value>
+  </data>
+  <data name="tsmiOpacity40.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity40.Text" xml:space="preserve">
+    <value>40%</value>
+  </data>
+  <data name="tsmiOpacity30.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity30.Text" xml:space="preserve">
+    <value>30%</value>
+  </data>
+  <data name="tsmiOpacity20.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity20.Text" xml:space="preserve">
+    <value>20%</value>
+  </data>
+  <data name="tsmiOpacity10.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="tsmiOpacity10.Text" xml:space="preserve">
+    <value>10%</value>
+  </data>
+  <data name="tsmiOpacity.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiOpacity.Text" xml:space="preserve">
+    <value>Opacity</value>
+  </data>
+  <data name="tsmiWatchClipboard.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiWatchClipboard.Text" xml:space="preserve">
+    <value>Watch Clipboard</value>
+  </data>
+  <data name="tsmiSep1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>217, 6</value>
+  </data>
+  <data name="tsmiSaveState.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiSaveState.Text" xml:space="preserve">
+    <value>Save Current State/APIKEY</value>
+  </data>
+  <data name="tsmiSep2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>217, 6</value>
+  </data>
+  <data name="tsmiExit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 22</value>
+  </data>
+  <data name="tsmiExit.Text" xml:space="preserve">
+    <value>Exit</value>
+  </data>
   <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>221, 154</value>
+    <value>221, 198</value>
   </data>
   <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
     <value>notifyMenu</value>
@@ -377,51 +488,6 @@
   </data>
   <data name="notify.Visible" type="System.Boolean, mscorlib">
     <value>True</value>
-  </data>
-  <data name="tsmiShowWindow.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
-  </data>
-  <data name="tsmiShowWindow.Text" xml:space="preserve">
-    <value>Show Window</value>
-  </data>
-  <data name="tsmiSep1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>217, 6</value>
-  </data>
-  <data name="tsmiExit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
-  </data>
-  <data name="tsmiExit.Text" xml:space="preserve">
-    <value>Exit</value>
-  </data>
-  <data name="tsmiSep2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>217, 6</value>
-  </data>
-  <data name="tsmiTopMost.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
-  </data>
-  <data name="tsmiTopMost.Text" xml:space="preserve">
-    <value>Always On Top</value>
-  </data>
-  <data name="tsmiShowOCRResult.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
-  </data>
-  <data name="tsmiShowOCRResult.Text" xml:space="preserve">
-    <value>Show Last OCR Result JSON</value>
-  </data>
-  <data name="tsmiWatchClipboard.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
-  </data>
-  <data name="tsmiWatchClipboard.Text" xml:space="preserve">
-    <value>Watch Clipboard</value>
-  </data>
-  <data name="tsmiSaveState.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
-  </data>
-  <data name="tsmiSaveState.Text" xml:space="preserve">
-    <value>Save Current State/APIKEY</value>
-  </data>
-  <data name="tsmiSep0.Size" type="System.Drawing.Size, System.Drawing">
-    <value>217, 6</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -465,22 +531,16 @@
   <data name="&gt;&gt;tsmiShowWindow.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tsmiSep1.Name" xml:space="preserve">
-    <value>tsmiSep1</value>
+  <data name="&gt;&gt;tsmiShowOCRResult.Name" xml:space="preserve">
+    <value>tsmiShowOCRResult</value>
   </data>
-  <data name="&gt;&gt;tsmiSep1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tsmiExit.Name" xml:space="preserve">
-    <value>tsmiExit</value>
-  </data>
-  <data name="&gt;&gt;tsmiExit.Type" xml:space="preserve">
+  <data name="&gt;&gt;tsmiShowOCRResult.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tsmiSep2.Name" xml:space="preserve">
-    <value>tsmiSep2</value>
+  <data name="&gt;&gt;tsmiSep0.Name" xml:space="preserve">
+    <value>tsmiSep0</value>
   </data>
-  <data name="&gt;&gt;tsmiSep2.Type" xml:space="preserve">
+  <data name="&gt;&gt;tsmiSep0.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tsmiTopMost.Name" xml:space="preserve">
@@ -489,17 +549,17 @@
   <data name="&gt;&gt;tsmiTopMost.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tsmiShowOCRResult.Name" xml:space="preserve">
-    <value>tsmiShowOCRResult</value>
-  </data>
-  <data name="&gt;&gt;tsmiShowOCRResult.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;tsmiWatchClipboard.Name" xml:space="preserve">
     <value>tsmiWatchClipboard</value>
   </data>
   <data name="&gt;&gt;tsmiWatchClipboard.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep1.Name" xml:space="preserve">
+    <value>tsmiSep1</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tsmiSaveState.Name" xml:space="preserve">
     <value>tsmiSaveState</value>
@@ -507,11 +567,83 @@
   <data name="&gt;&gt;tsmiSaveState.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tsmiSep0.Name" xml:space="preserve">
-    <value>tsmiSep0</value>
+  <data name="&gt;&gt;tsmiSep2.Name" xml:space="preserve">
+    <value>tsmiSep2</value>
   </data>
-  <data name="&gt;&gt;tsmiSep0.Type" xml:space="preserve">
+  <data name="&gt;&gt;tsmiSep2.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiExit.Name" xml:space="preserve">
+    <value>tsmiExit</value>
+  </data>
+  <data name="&gt;&gt;tsmiExit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity.Name" xml:space="preserve">
+    <value>tsmiOpacity</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity100.Name" xml:space="preserve">
+    <value>tsmiOpacity100</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity100.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity90.Name" xml:space="preserve">
+    <value>tsmiOpacity90</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity90.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity80.Name" xml:space="preserve">
+    <value>tsmiOpacity80</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity80.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity70.Name" xml:space="preserve">
+    <value>tsmiOpacity70</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity70.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity60.Name" xml:space="preserve">
+    <value>tsmiOpacity60</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity60.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity50.Name" xml:space="preserve">
+    <value>tsmiOpacity50</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity50.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity40.Name" xml:space="preserve">
+    <value>tsmiOpacity40</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity40.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity30.Name" xml:space="preserve">
+    <value>tsmiOpacity30</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity30.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity20.Name" xml:space="preserve">
+    <value>tsmiOpacity20</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity20.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity10.Name" xml:space="preserve">
+    <value>tsmiOpacity10</value>
+  </data>
+  <data name="&gt;&gt;tsmiOpacity10.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>MainForm</value>

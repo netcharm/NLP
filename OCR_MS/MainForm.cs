@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -372,6 +373,10 @@ namespace OCR_MS
             {
                 tsmiSaveState.PerformClick();
             }
+            else if ( e.KeyCode == Keys.Escape )
+            {
+                this.WindowState = FormWindowState.Minimized;
+            }
         }
 
         private async void btnOCR_Click( object sender, EventArgs e )
@@ -489,10 +494,37 @@ namespace OCR_MS
             {
                 var dlgResult = MessageBox.Show( "Text in result box will be saved as API Key!", "Note", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning );
                 if ( dlgResult == DialogResult.OK )
-                    ApiKey["Computer Vision API"] = edResult.Text;
+                    ApiKey["Computer Vision API"] = edResult.Text.Trim();
             }
             SaveConfig();
         }
 
+        private void tsmiOpacityValue_Click( object sender, EventArgs e )
+        {
+            if( sender.GetType() == typeof(ToolStripMenuItem) )
+            {
+                try
+                {
+                    var vs = ( sender as ToolStripMenuItem ).Text.Trim(new char[] { '%' });
+                    this.Opacity = double.Parse( vs, NumberStyles.Number, CultureInfo.CurrentCulture.NumberFormat ) / 100d;
+                }
+                catch ( Exception )
+                {
+                }
+            }
+            try
+            {
+                foreach ( ToolStripMenuItem mi in tsmiOpacity.DropDownItems )
+                {
+                    if ( mi == sender )
+                        mi.Checked = true;
+                    else
+                        mi.Checked = false;
+                }
+            }
+            catch ( Exception )
+            {
+            }
+        }
     }
 }

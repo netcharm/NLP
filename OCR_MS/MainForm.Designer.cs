@@ -42,14 +42,25 @@
             this.notify = new System.Windows.Forms.NotifyIcon(this.components);
             this.notifyMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsmiShowWindow = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiTopMost = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiTopMost = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity100 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity90 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity80 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity70 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity60 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity50 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity40 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity30 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity20 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOpacity10 = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -137,6 +148,7 @@
             this.tsmiShowOCRResult,
             this.tsmiSep0,
             this.tsmiTopMost,
+            this.tsmiOpacity,
             this.tsmiWatchClipboard,
             this.tsmiSep1,
             this.tsmiSaveState,
@@ -151,21 +163,16 @@
             resources.ApplyResources(this.tsmiShowWindow, "tsmiShowWindow");
             this.tsmiShowWindow.Click += new System.EventHandler(this.tsmiShowWindow_Click);
             // 
-            // tsmiSep1
+            // tsmiShowOCRResult
             // 
-            this.tsmiSep1.Name = "tsmiSep1";
-            resources.ApplyResources(this.tsmiSep1, "tsmiSep1");
+            this.tsmiShowOCRResult.Name = "tsmiShowOCRResult";
+            resources.ApplyResources(this.tsmiShowOCRResult, "tsmiShowOCRResult");
+            this.tsmiShowOCRResult.Click += new System.EventHandler(this.tsmiShowLastOCRResultJSON_Click);
             // 
-            // tsmiExit
+            // tsmiSep0
             // 
-            this.tsmiExit.Name = "tsmiExit";
-            resources.ApplyResources(this.tsmiExit, "tsmiExit");
-            this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
-            // 
-            // tsmiSep2
-            // 
-            this.tsmiSep2.Name = "tsmiSep2";
-            resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
+            this.tsmiSep0.Name = "tsmiSep0";
+            resources.ApplyResources(this.tsmiSep0, "tsmiSep0");
             // 
             // tsmiTopMost
             // 
@@ -173,12 +180,6 @@
             this.tsmiTopMost.Name = "tsmiTopMost";
             resources.ApplyResources(this.tsmiTopMost, "tsmiTopMost");
             this.tsmiTopMost.Click += new System.EventHandler(this.tsmiTopMost_Click);
-            // 
-            // tsmiShowOCRResult
-            // 
-            this.tsmiShowOCRResult.Name = "tsmiShowOCRResult";
-            resources.ApplyResources(this.tsmiShowOCRResult, "tsmiShowOCRResult");
-            this.tsmiShowOCRResult.Click += new System.EventHandler(this.tsmiShowLastOCRResultJSON_Click);
             // 
             // tsmiWatchClipboard
             // 
@@ -189,16 +190,105 @@
             resources.ApplyResources(this.tsmiWatchClipboard, "tsmiWatchClipboard");
             this.tsmiWatchClipboard.Click += new System.EventHandler(this.tsmiWatchClipboard_Click);
             // 
+            // tsmiSep1
+            // 
+            this.tsmiSep1.Name = "tsmiSep1";
+            resources.ApplyResources(this.tsmiSep1, "tsmiSep1");
+            // 
             // tsmiSaveState
             // 
             this.tsmiSaveState.Name = "tsmiSaveState";
             resources.ApplyResources(this.tsmiSaveState, "tsmiSaveState");
             this.tsmiSaveState.Click += new System.EventHandler(this.tsmiSaveState_Click);
             // 
-            // tsmiSep0
+            // tsmiSep2
             // 
-            this.tsmiSep0.Name = "tsmiSep0";
-            resources.ApplyResources(this.tsmiSep0, "tsmiSep0");
+            this.tsmiSep2.Name = "tsmiSep2";
+            resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
+            // 
+            // tsmiExit
+            // 
+            this.tsmiExit.Name = "tsmiExit";
+            resources.ApplyResources(this.tsmiExit, "tsmiExit");
+            this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
+            // tsmiOpacity
+            // 
+            this.tsmiOpacity.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiOpacity100,
+            this.tsmiOpacity90,
+            this.tsmiOpacity80,
+            this.tsmiOpacity70,
+            this.tsmiOpacity60,
+            this.tsmiOpacity50,
+            this.tsmiOpacity40,
+            this.tsmiOpacity30,
+            this.tsmiOpacity20,
+            this.tsmiOpacity10});
+            this.tsmiOpacity.Name = "tsmiOpacity";
+            resources.ApplyResources(this.tsmiOpacity, "tsmiOpacity");
+            // 
+            // tsmiOpacity100
+            // 
+            this.tsmiOpacity100.Checked = true;
+            this.tsmiOpacity100.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiOpacity100.Name = "tsmiOpacity100";
+            resources.ApplyResources(this.tsmiOpacity100, "tsmiOpacity100");
+            this.tsmiOpacity100.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity90
+            // 
+            this.tsmiOpacity90.Name = "tsmiOpacity90";
+            resources.ApplyResources(this.tsmiOpacity90, "tsmiOpacity90");
+            this.tsmiOpacity90.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity80
+            // 
+            this.tsmiOpacity80.Name = "tsmiOpacity80";
+            resources.ApplyResources(this.tsmiOpacity80, "tsmiOpacity80");
+            this.tsmiOpacity80.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity70
+            // 
+            this.tsmiOpacity70.Name = "tsmiOpacity70";
+            resources.ApplyResources(this.tsmiOpacity70, "tsmiOpacity70");
+            this.tsmiOpacity70.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity60
+            // 
+            this.tsmiOpacity60.Name = "tsmiOpacity60";
+            resources.ApplyResources(this.tsmiOpacity60, "tsmiOpacity60");
+            this.tsmiOpacity60.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity50
+            // 
+            this.tsmiOpacity50.Name = "tsmiOpacity50";
+            resources.ApplyResources(this.tsmiOpacity50, "tsmiOpacity50");
+            this.tsmiOpacity50.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity40
+            // 
+            this.tsmiOpacity40.Name = "tsmiOpacity40";
+            resources.ApplyResources(this.tsmiOpacity40, "tsmiOpacity40");
+            this.tsmiOpacity40.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity30
+            // 
+            this.tsmiOpacity30.Name = "tsmiOpacity30";
+            resources.ApplyResources(this.tsmiOpacity30, "tsmiOpacity30");
+            this.tsmiOpacity30.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity20
+            // 
+            this.tsmiOpacity20.Name = "tsmiOpacity20";
+            resources.ApplyResources(this.tsmiOpacity20, "tsmiOpacity20");
+            this.tsmiOpacity20.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiOpacity10
+            // 
+            this.tsmiOpacity10.Name = "tsmiOpacity10";
+            resources.ApplyResources(this.tsmiOpacity10, "tsmiOpacity10");
+            this.tsmiOpacity10.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
             // 
             // MainForm
             // 
@@ -247,6 +337,17 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiWatchClipboard;
         private System.Windows.Forms.ToolStripSeparator tsmiSep0;
         private System.Windows.Forms.ToolStripMenuItem tsmiSaveState;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity100;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity90;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity80;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity70;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity60;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity50;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity40;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity30;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity20;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOpacity10;
     }
 }
 
