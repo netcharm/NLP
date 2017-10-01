@@ -203,11 +203,11 @@ namespace HanLP_Utils
             return null;
         }
 
-        internal string ocr_ms( Bitmap src )
+        internal string ocr_ms( Bitmap src, string lang="unk", string apikey="" )
         {
             string result = "";
 
-            var uri = @"https://westus.api.cognitive.microsoft.com/vision/v1.0/ocr?language=unk&detectOrientation=true";
+            var uri = @"https://westus.api.cognitive.microsoft.com/vision/v1.0/ocr?language="+ lang +"&detectOrientation=true";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "POST";
@@ -215,7 +215,7 @@ namespace HanLP_Utils
             request.UserAgent = @"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20190101 Firefox/87.0";
             request.Referer = @"https://westus.api.cognitive.microsoft.com";
             request.ContentType = "application/octet-stream";
-            request.Headers["Ocp-Apim-Subscription-Key"] = "cd959382432345968384df3cd4663129";
+            request.Headers["Ocp-Apim-Subscription-Key"] = apikey;
 
             using ( Stream png = new MemoryStream() )
             {
