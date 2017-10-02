@@ -45,11 +45,6 @@
             this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTopMost = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity100 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity90 = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,6 +56,11 @@
             this.tsmiOpacity30 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity20 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity10 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -181,37 +181,6 @@
             resources.ApplyResources(this.tsmiTopMost, "tsmiTopMost");
             this.tsmiTopMost.Click += new System.EventHandler(this.tsmiTopMost_Click);
             // 
-            // tsmiWatchClipboard
-            // 
-            this.tsmiWatchClipboard.Checked = true;
-            this.tsmiWatchClipboard.CheckOnClick = true;
-            this.tsmiWatchClipboard.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.tsmiWatchClipboard.Name = "tsmiWatchClipboard";
-            resources.ApplyResources(this.tsmiWatchClipboard, "tsmiWatchClipboard");
-            this.tsmiWatchClipboard.Click += new System.EventHandler(this.tsmiWatchClipboard_Click);
-            // 
-            // tsmiSep1
-            // 
-            this.tsmiSep1.Name = "tsmiSep1";
-            resources.ApplyResources(this.tsmiSep1, "tsmiSep1");
-            // 
-            // tsmiSaveState
-            // 
-            this.tsmiSaveState.Name = "tsmiSaveState";
-            resources.ApplyResources(this.tsmiSaveState, "tsmiSaveState");
-            this.tsmiSaveState.Click += new System.EventHandler(this.tsmiSaveState_Click);
-            // 
-            // tsmiSep2
-            // 
-            this.tsmiSep2.Name = "tsmiSep2";
-            resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
-            // 
-            // tsmiExit
-            // 
-            this.tsmiExit.Name = "tsmiExit";
-            resources.ApplyResources(this.tsmiExit, "tsmiExit");
-            this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
-            // 
             // tsmiOpacity
             // 
             this.tsmiOpacity.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -289,6 +258,37 @@
             this.tsmiOpacity10.Name = "tsmiOpacity10";
             resources.ApplyResources(this.tsmiOpacity10, "tsmiOpacity10");
             this.tsmiOpacity10.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
+            // 
+            // tsmiWatchClipboard
+            // 
+            this.tsmiWatchClipboard.Checked = true;
+            this.tsmiWatchClipboard.CheckOnClick = true;
+            this.tsmiWatchClipboard.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiWatchClipboard.Name = "tsmiWatchClipboard";
+            resources.ApplyResources(this.tsmiWatchClipboard, "tsmiWatchClipboard");
+            this.tsmiWatchClipboard.Click += new System.EventHandler(this.tsmiWatchClipboard_Click);
+            // 
+            // tsmiSep1
+            // 
+            this.tsmiSep1.Name = "tsmiSep1";
+            resources.ApplyResources(this.tsmiSep1, "tsmiSep1");
+            // 
+            // tsmiSaveState
+            // 
+            this.tsmiSaveState.Name = "tsmiSaveState";
+            resources.ApplyResources(this.tsmiSaveState, "tsmiSaveState");
+            this.tsmiSaveState.Click += new System.EventHandler(this.tsmiSaveState_Click);
+            // 
+            // tsmiSep2
+            // 
+            this.tsmiSep2.Name = "tsmiSep2";
+            resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
+            // 
+            // tsmiExit
+            // 
+            this.tsmiExit.Name = "tsmiExit";
+            resources.ApplyResources(this.tsmiExit, "tsmiExit");
+            this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
             // MainForm
             // 

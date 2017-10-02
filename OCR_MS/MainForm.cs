@@ -58,7 +58,7 @@ namespace OCR_MS
             {"el","Greek"},
             {"hu","Hungarian"},
             {"it","Italian"},
-            {"Ja","Japanese"},
+            {"ja","Japanese"},
             {"ko","Korean"},
             {"nb","Norwegian"},
             {"pl","Polish"},
@@ -250,6 +250,9 @@ namespace OCR_MS
             InitializeComponent();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void LoadConfig()
         {
             var cfg = Path.Combine(AppPath, AppName + ".json");
@@ -258,6 +261,7 @@ namespace OCR_MS
                 var json = File.ReadAllText(cfg);
                 JToken token = JObject.Parse( json );
 
+                #region API Key
                 IEnumerable<JToken> apis = token.SelectTokens("$..api", false);
                 foreach ( var api in apis )
                 {
@@ -268,7 +272,9 @@ namespace OCR_MS
                         ApiKey[apiname] = apikey;
                     }
                 }
+                #endregion
 
+                #region Form Position
                 JToken pos = token.SelectToken("$..pos", false);
                 if ( pos != null )
                 {
@@ -287,7 +293,9 @@ namespace OCR_MS
                         }
                     }
                 }
+                #endregion
 
+                #region Form Size
                 JToken size = token.SelectToken("$..size", false);
                 if(size != null)
                 {
@@ -306,16 +314,37 @@ namespace OCR_MS
                         }
                     }
                 }
+                #endregion
+
+                #region Form Opacity
+                JToken opacity = token.SelectToken("$..opacity", false);
+                if(opacity != null)
+                {
+                    this.Opacity = Convert.ToDouble( opacity.ToString() );
+                    string os = $"{Math.Round(this.Opacity * 100, 0)}%";
+                    foreach ( ToolStripMenuItem mi in tsmiOpacity.DropDownItems )
+                    {
+                        if ( mi.Text == os )
+                            mi.Checked = true;
+                        else
+                            mi.Checked = false;
+                    }
+                }
+                #endregion
             }
             CFGLOADED = true;
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
         private void SaveConfig()
         {
             var cfg = Path.Combine(AppPath, AppName + ".json");
 
             Dictionary<string, object> json = new Dictionary<string, object>()
             {
+                { "opacity", this.Opacity },
                 { "pos", new Dictionary<string, int>()
                     {
                         { "x", this.Left },
@@ -331,7 +360,6 @@ namespace OCR_MS
                 { "api", ApiKey.Select( o => new Dictionary<string, string>() { { "name", o.Key }, { "key", o.Value } } ).ToList() }
             };
             
-
             File.WriteAllText( cfg, JsonConvert.SerializeObject( json, Formatting.Indented ) );
         }
 
@@ -449,7 +477,8 @@ namespace OCR_MS
         private void btnShowJSON_Click( object sender, EventArgs e )
         {
             if ( string.IsNullOrEmpty( Result_JSON.Trim() ) ) return;
-            if ( DialogResult.Yes == MessageBox.Show( Result_JSON.Substring(0, 512), "Copy OCR Result?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification ))
+            int len = Result_JSON.Length > 512 ? 512 : Result_JSON.Length;
+            if ( DialogResult.Yes == MessageBox.Show( Result_JSON.Substring( 0, len ), "Copy OCR Result?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification ) )
             {
                 Clipboard.SetText( Result_JSON );
             }
