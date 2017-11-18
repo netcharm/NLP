@@ -82,7 +82,7 @@ namespace OCR_MS
         internal void init_ocr_lang()
         {
             ocr_lang.Clear();
-            foreach (var k in ocr_languages.Keys)
+            foreach( var k in ocr_languages.Keys )
             {
                 ocr_lang[ocr_languages[k]] = k;
             }
@@ -91,9 +91,9 @@ namespace OCR_MS
         internal static ImageCodecInfo GetEncoder( ImageFormat format )
         {
             ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-            foreach ( ImageCodecInfo codec in codecs )
+            foreach( ImageCodecInfo codec in codecs )
             {
-                if ( codec.FormatID == format.Guid )
+                if( codec.FormatID == format.Guid )
                 {
                     return codec;
                 }
@@ -107,7 +107,7 @@ namespace OCR_MS
 
             var uri = @"https://westus.api.cognitive.microsoft.com/vision/v1.0/ocr?language=unk&detectOrientation=true";
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            HttpWebRequest request = (HttpWebRequest) WebRequest.Create( uri );
             request.Method = "POST";
             //request.Timeout = 10000;
             request.UserAgent = @"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20190101 Firefox/87.0";
@@ -115,10 +115,10 @@ namespace OCR_MS
             request.ContentType = "application/octet-stream";
             request.Headers["Ocp-Apim-Subscription-Key"] = "cd959382432345968384df3cd4663129";
 
-            using ( Stream png = new MemoryStream() )
+            using( Stream png = new MemoryStream() )
             {
                 src.Save( png, ImageFormat.Png );
-                byte[] buffer = ((MemoryStream)png).ToArray();
+                byte[] buffer = ( (MemoryStream) png ).ToArray();
                 string buf = "data:image/png;base64," + Convert.ToBase64String( buffer );
                 request.ContentLength = buf.Length;
                 Stream requestStream = request.GetRequestStream();
@@ -130,7 +130,7 @@ namespace OCR_MS
                 //    requestStream.Write( Encoding.ASCII.GetBytes( buf ), 0, buf.Length );
                 //    //requestStream.Flush();
                 //}
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                HttpWebResponse response = (HttpWebResponse) request.GetResponse();
             }
 
             return ( result );
@@ -141,10 +141,10 @@ namespace OCR_MS
             string result = "";
             string ApiKey_CV = ApiKey.ContainsKey( "Computer Vision API" ) ? ApiKey["Computer Vision API"] : string.Empty;
 
-            if ( string.IsNullOrEmpty( ApiKey_CV ) ) return ( result );
+            if( string.IsNullOrEmpty( ApiKey_CV ) ) return ( result );
 
             var client = new HttpClient();
-            var queryString = HttpUtility.ParseQueryString(string.Empty);
+            var queryString = HttpUtility.ParseQueryString( string.Empty );
 
             // Request headers
             client.DefaultRequestHeaders.Add( "Ocp-Apim-Subscription-Key", ApiKey_CV );
@@ -156,16 +156,16 @@ namespace OCR_MS
 
             HttpResponseMessage response;
 
-            using ( Stream png = new MemoryStream() )
+            using( Stream png = new MemoryStream() )
             {
                 src.Save( png, ImageFormat.Png );
-                byte[] buffer = ((MemoryStream)png).ToArray();
+                byte[] buffer = ( (MemoryStream) png ).ToArray();
                 string buf = "data:image/png;base64," + Convert.ToBase64String( buffer );
 
                 string W_SEP = "";
 
                 // Request body
-                using ( var content = new ByteArrayContent( buffer ) )
+                using( var content = new ByteArrayContent( buffer ) )
                 {
                     content.Headers.ContentType = new MediaTypeHeaderValue( "application/octet-stream" );
                     response = await client.PostAsync( uri, content );
@@ -176,28 +176,28 @@ namespace OCR_MS
                     Result_JSON = Result_JSON.Replace( "\\\"", "\"" );
 
                     JToken language = token.SelectToken( "$..language" );
-                    if( language != null)
+                    if( language != null )
                     {
                         Result_Lang = language.ToString().ToLower();
-                        if ( Result_Lang.StartsWith( "zh-" ) || Result_Lang.StartsWith( "ja" ) || Result_Lang.StartsWith( "ko" ) )
+                        if( Result_Lang.StartsWith( "zh-" ) || Result_Lang.StartsWith( "ja" ) || Result_Lang.StartsWith( "ko" ) )
                             W_SEP = "";
                         else W_SEP = " ";
                     }
 
                     StringBuilder sb = new StringBuilder();
-                    IEnumerable<JToken> regions = token.SelectTokens("$..regions", false);
-                    foreach ( var region in regions )
+                    IEnumerable<JToken> regions = token.SelectTokens( "$..regions", false );
+                    foreach( var region in regions )
                     {
                         List<string> ocr_line = new List<string>();
-                        IEnumerable<JToken> lines = region.SelectTokens("$..lines", false);
-                        foreach ( var line in lines )
+                        IEnumerable<JToken> lines = region.SelectTokens( "$..lines", false );
+                        foreach( var line in lines )
                         {
-                            IEnumerable<JToken> words = line.SelectTokens("$..words", false);
-                            foreach ( var word in words )
+                            IEnumerable<JToken> words = line.SelectTokens( "$..words", false );
+                            foreach( var word in words )
                             {
                                 List<string> ocr_word = new List<string>();
-                                IEnumerable<JToken> texts = word.SelectTokens("$..text", false);
-                                foreach ( var text in texts )
+                                IEnumerable<JToken> texts = word.SelectTokens( "$..text", false );
+                                foreach( var text in texts )
                                 {
                                     ocr_word.Add( text.ToString() );
                                     //sb.Append( W_SEP + text.ToString() );
@@ -216,7 +216,8 @@ namespace OCR_MS
         #endregion
 
         #region Speech
-        SpeechSynthesizer synth = new SpeechSynthesizer();
+        private SpeechSynthesizer synth = null;
+        private string voice_default = string.Empty;
         #endregion
 
         protected override void WndProc( ref Message m )
@@ -224,18 +225,18 @@ namespace OCR_MS
             base.WndProc( ref m );    // Process the message 
 
             //if ( m.Msg == WM_CLIPBOARDUPDATE )
-            if ( m.Msg == WM_DRAWCLIPBOARD )
+            if( m.Msg == WM_DRAWCLIPBOARD )
             {
                 ClipboardChanged = false;
 
                 // Clipboard's data
                 IDataObject iData = Clipboard.GetDataObject();
 
-                if ( iData.GetDataPresent( DataFormats.Bitmap ) )
+                if( iData.GetDataPresent( DataFormats.Bitmap ) )
                 {
                     // Clipboard image
                     ClipboardChanged = true;
-                    if ( chkAutoClipboard.Checked )
+                    if( chkAutoClipboard.Checked )
                     {
                         //tsmiShowWindow.PerformClick();
                         btnOCR.PerformClick();
@@ -254,19 +255,19 @@ namespace OCR_MS
         /// </summary>
         private void LoadConfig()
         {
-            var cfg = Path.Combine(AppPath, AppName + ".json");
-            if (File.Exists(cfg))
+            var cfg = Path.Combine( AppPath, AppName + ".json" );
+            if( File.Exists( cfg ) )
             {
-                var json = File.ReadAllText(cfg);
+                var json = File.ReadAllText( cfg );
                 JToken token = JObject.Parse( json );
 
                 #region API Key
-                IEnumerable<JToken> apis = token.SelectTokens("$..api", false);
-                foreach ( var api in apis )
+                IEnumerable<JToken> apis = token.SelectTokens( "$..api", false );
+                foreach( var api in apis )
                 {
                     var apikey = api.SelectToken( "$..key", false ).ToString();
                     var apiname = api.SelectToken( "$..name", false ).ToString();
-                    if(apikey != null && apiname != null )
+                    if( apikey != null && apiname != null )
                     {
                         ApiKey[apiname] = apikey;
                     }
@@ -274,19 +275,19 @@ namespace OCR_MS
                 #endregion
 
                 #region Form Position
-                JToken pos = token.SelectToken("$..pos", false);
-                if ( pos != null )
+                JToken pos = token.SelectToken( "$..pos", false );
+                if( pos != null )
                 {
                     var x = pos.SelectToken( "$..x", false ).ToString();
                     var y = pos.SelectToken( "$..y", false ).ToString();
-                    if(x != null && y != null)
+                    if( x != null && y != null )
                     {
                         try
                         {
                             this.Left = Convert.ToInt32( x );
                             this.Top = Convert.ToInt32( y );
                         }
-                        catch ( Exception )
+                        catch( Exception )
                         {
                             //throw;
                         }
@@ -295,19 +296,19 @@ namespace OCR_MS
                 #endregion
 
                 #region Form Size
-                JToken size = token.SelectToken("$..size", false);
-                if(size != null)
+                JToken size = token.SelectToken( "$..size", false );
+                if( size != null )
                 {
                     var w = size.SelectToken( "$..w", false ).ToString();
                     var h = size.SelectToken( "$..h", false ).ToString();
-                    if ( w != null && h != null )
+                    if( w != null && h != null )
                     {
                         try
                         {
-                            this.Width = Math.Max(this.MinimumSize.Width, Convert.ToInt32( w ));
-                            this.Height = Math.Max( this.MinimumSize.Height, Convert.ToInt32( h ));
+                            this.Width = Math.Max( this.MinimumSize.Width, Convert.ToInt32( w ) );
+                            this.Height = Math.Max( this.MinimumSize.Height, Convert.ToInt32( h ) );
                         }
-                        catch ( Exception )
+                        catch( Exception )
                         {
                             //throw;
                         }
@@ -316,14 +317,14 @@ namespace OCR_MS
                 #endregion
 
                 #region Form Opacity
-                JToken opacity = token.SelectToken("$..opacity", false);
-                if(opacity != null)
+                JToken opacity = token.SelectToken( "$..opacity", false );
+                if( opacity != null )
                 {
                     this.Opacity = Convert.ToDouble( opacity.ToString() );
-                    string os = $"{Math.Round(this.Opacity * 100, 0)}%";
-                    foreach ( ToolStripMenuItem mi in tsmiOpacity.DropDownItems )
+                    string os = $"{Math.Round( this.Opacity * 100, 0 )}%";
+                    foreach( ToolStripMenuItem mi in tsmiOpacity.DropDownItems )
                     {
-                        if ( mi.Text == os )
+                        if( mi.Text == os )
                             mi.Checked = true;
                         else
                             mi.Checked = false;
@@ -333,13 +334,13 @@ namespace OCR_MS
             }
             CFGLOADED = true;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
         private void SaveConfig()
         {
-            var cfg = Path.Combine(AppPath, AppName + ".json");
+            var cfg = Path.Combine( AppPath, AppName + ".json" );
 
             Dictionary<string, object> json = new Dictionary<string, object>()
             {
@@ -358,13 +359,16 @@ namespace OCR_MS
                 },
                 { "api", ApiKey.Select( o => new Dictionary<string, string>() { { "name", o.Key }, { "key", o.Value } } ).ToList() }
             };
-            
+
             File.WriteAllText( cfg, JsonConvert.SerializeObject( json, Formatting.Indented ) );
         }
 
         private void MainForm_Load( object sender, EventArgs e )
         {
             Icon = Icon.ExtractAssociatedIcon( Application.ExecutablePath );
+
+            synth = new SpeechSynthesizer();
+            voice_default = synth.Voice.Name;
 
             notify.Icon = Icon;
             notify.BalloonTipTitle = this.Text;
@@ -387,7 +391,7 @@ namespace OCR_MS
 
         private void MainForm_FormClosing( object sender, FormClosingEventArgs e )
         {
-            if ( e.CloseReason == CloseReason.UserClosing )
+            if( e.CloseReason == CloseReason.UserClosing )
             {
                 e.Cancel = true;
                 Hide();
@@ -396,11 +400,11 @@ namespace OCR_MS
 
         private void MainForm_KeyUp( object sender, KeyEventArgs e )
         {
-            if ( e.Control && e.KeyCode == Keys.S )
+            if( e.Control && e.KeyCode == Keys.S )
             {
                 tsmiSaveState.PerformClick();
             }
-            else if ( e.KeyCode == Keys.Escape )
+            else if( e.KeyCode == Keys.Escape )
             {
                 this.WindowState = FormWindowState.Minimized;
             }
@@ -411,7 +415,7 @@ namespace OCR_MS
             // Show() method can not autoclosed like system contextmenu's behaving
             //notifyMenu.Show( this, Control.MousePosition );
 
-            MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo mi = typeof( NotifyIcon ).GetMethod( "ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic );
             mi.Invoke( notify, null );
         }
 
@@ -427,7 +431,7 @@ namespace OCR_MS
 
         private void timer_Tick( object sender, EventArgs e )
         {
-            if(chkAutoClipboard.Checked && ClipboardChanged)
+            if( chkAutoClipboard.Checked && ClipboardChanged )
             {
                 btnOCR.PerformClick();
             }
@@ -435,7 +439,7 @@ namespace OCR_MS
 
         private void edResult_KeyUp( object sender, KeyEventArgs e )
         {
-            if ( e.Control && e.KeyCode == Keys.A )
+            if( e.Control && e.KeyCode == Keys.A )
             {
                 edResult.SelectAll();
             }
@@ -443,19 +447,19 @@ namespace OCR_MS
 
         private async void btnOCR_Click( object sender, EventArgs e )
         {
-            if ( ApiKey.ContainsKey( "Computer Vision API" ) && btnOCR.Enabled )
+            if( ApiKey.ContainsKey( "Computer Vision API" ) && btnOCR.Enabled )
             {
                 IDataObject iData = Clipboard.GetDataObject();
-                if ( iData.GetDataPresent( DataFormats.Bitmap ) )
+                if( iData.GetDataPresent( DataFormats.Bitmap ) )
                 {
                     btnOCR.Enabled = false;
                     pbar.Style = ProgressBarStyle.Marquee;
 
                     //(Bitmap) iData.GetData( DataFormats.Bitmap );
-                    Bitmap src = (Bitmap)Clipboard.GetImage();
+                    Bitmap src = (Bitmap) Clipboard.GetImage();
                     string lang = cbLanguage.SelectedValue.ToString();
                     edResult.Text = await MakeRequest_OCR( src, lang );
-                    if ( !string.IsNullOrEmpty( edResult.Text ) )
+                    if( !string.IsNullOrEmpty( edResult.Text ) )
                     {
                         tsmiShowWindow.PerformClick();
                     }
@@ -467,7 +471,7 @@ namespace OCR_MS
                 }
             }
 
-            if ( CFGLOADED && !ApiKey.ContainsKey( "Computer Vision API" ) )
+            if( CFGLOADED && !ApiKey.ContainsKey( "Computer Vision API" ) )
             {
                 MessageBox.Show( "Microsoft Azure Cognitive Servise Computer Vision API key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning );
             }
@@ -475,9 +479,9 @@ namespace OCR_MS
 
         private void btnShowJSON_Click( object sender, EventArgs e )
         {
-            if ( string.IsNullOrEmpty( Result_JSON.Trim() ) ) return;
+            if( string.IsNullOrEmpty( Result_JSON.Trim() ) ) return;
             int len = Result_JSON.Length > 512 ? 512 : Result_JSON.Length;
-            if ( DialogResult.Yes == MessageBox.Show( Result_JSON.Substring( 0, len ), "Copy OCR Result?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification ) )
+            if( DialogResult.Yes == MessageBox.Show( Result_JSON.Substring( 0, len ), "Copy OCR Result?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification ) )
             {
                 Clipboard.SetText( Result_JSON );
             }
@@ -492,30 +496,32 @@ namespace OCR_MS
 
             try
             {
+                synth.SelectVoice( voice_default );
+                string lang = cbLanguage.SelectedValue.ToString();
+                if( lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ) lang = Result_Lang;
 
                 // Initialize a new instance of the SpeechSynthesizer.
                 foreach( InstalledVoice voice in synth.GetInstalledVoices() )
                 {
-
                     VoiceInfo info = voice.VoiceInfo;
                     var vl = info.Culture.IetfLanguageTag;
 
                     if( lang_cn.Contains( vl.ToLower() ) &&
-                        Result_Lang.Equals( "zh", StringComparison.CurrentCultureIgnoreCase ) &&
+                        lang.StartsWith( "zh", StringComparison.CurrentCultureIgnoreCase ) &&
                         voice.VoiceInfo.Name.ToLower().Contains( "huihui" ) )
                     {
                         synth.SelectVoice( voice.VoiceInfo.Name );
                         break;
                     }
                     else if( lang_jp.Contains( vl.ToLower() ) &&
-                        Result_Lang.Equals( "ja", StringComparison.CurrentCultureIgnoreCase ) &&
+                        lang.StartsWith( "ja", StringComparison.CurrentCultureIgnoreCase ) &&
                         voice.VoiceInfo.Name.ToLower().Contains( "haruka" ) )
                     {
                         synth.SelectVoice( voice.VoiceInfo.Name );
                         break;
                     }
-                    else if( lang_jp.Contains( vl.ToLower() ) &&
-                        Result_Lang.StartsWith( "en", StringComparison.CurrentCultureIgnoreCase ) &&
+                    else if( lang_en.Contains( vl.ToLower() ) &&
+                        lang.StartsWith( "en", StringComparison.CurrentCultureIgnoreCase ) &&
                         voice.VoiceInfo.Name.ToLower().Contains( "zira" ) )
                     {
                         synth.SelectVoice( voice.VoiceInfo.Name );
@@ -528,7 +534,6 @@ namespace OCR_MS
 
                 // Synchronous
                 //synth.Speak( edResult.Text );
-
                 // Asynchronous
                 synth.SpeakAsync( edResult.Text );
             }
