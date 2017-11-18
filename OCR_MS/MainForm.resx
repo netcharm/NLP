@@ -376,7 +376,7 @@
     <value>6</value>
   </data>
   <data name="btnSpeech.ToolTip" xml:space="preserve">
-    <value>Show Result JSON Contents</value>
+    <value>OCR Result To Speech.</value>
   </data>
   <data name="&gt;&gt;btnSpeech.Name" xml:space="preserve">
     <value>btnSpeech</value>
