@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
+using System.Speech.Synthesis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -76,6 +77,7 @@ namespace OCR_MS
         internal Dictionary<string, string> ocr_lang = new Dictionary<string, string>();
 
         internal string Result_JSON = string.Empty;
+        internal string Result_Lang = string.Empty;
 
         internal void init_ocr_lang()
         {
@@ -176,8 +178,8 @@ namespace OCR_MS
                     JToken language = token.SelectToken( "$..language" );
                     if( language != null)
                     {
-                        var ls = language.ToString().ToLower();
-                        if ( ls.StartsWith( "zh-" ) || ls.StartsWith( "ja" ) || ls.StartsWith( "ko" ) )
+                        Result_Lang = language.ToString().ToLower();
+                        if ( Result_Lang.StartsWith( "zh-" ) || Result_Lang.StartsWith( "ja" ) || Result_Lang.StartsWith( "ko" ) )
                             W_SEP = "";
                         else W_SEP = " ";
                     }
@@ -213,6 +215,10 @@ namespace OCR_MS
         }
         #endregion
 
+        #region Speech
+        SpeechSynthesizer synth = new SpeechSynthesizer();
+        #endregion
+
         protected override void WndProc( ref Message m )
         {
             base.WndProc( ref m );    // Process the message 
@@ -225,15 +231,8 @@ namespace OCR_MS
                 // Clipboard's data
                 IDataObject iData = Clipboard.GetDataObject();
 
-                if ( iData.GetDataPresent( DataFormats.Text ) )
+                if ( iData.GetDataPresent( DataFormats.Bitmap ) )
                 {
-                    // Clipboard text
-                    string text = (string)iData.GetData(DataFormats.Text);
-                }
-                else if ( iData.GetDataPresent( DataFormats.Bitmap ) )
-                {
-                    //MessageBox.Show( "Refresh Clipboard" );
-
                     // Clipboard image
                     ClipboardChanged = true;
                     if ( chkAutoClipboard.Checked )
@@ -305,8 +304,8 @@ namespace OCR_MS
                     {
                         try
                         {
-                            this.Width = Convert.ToInt32( w );
-                            this.Height = Convert.ToInt32( h );
+                            this.Width = Math.Max(this.MinimumSize.Width, Convert.ToInt32( w ));
+                            this.Height = Math.Min( this.MinimumSize.Height, Convert.ToInt32( h ));
                         }
                         catch ( Exception )
                         {
@@ -391,7 +390,7 @@ namespace OCR_MS
             if ( e.CloseReason == CloseReason.UserClosing )
             {
                 e.Cancel = true;
-                this.Hide();
+                Hide();
             }
         }
 
@@ -404,38 +403,6 @@ namespace OCR_MS
             else if ( e.KeyCode == Keys.Escape )
             {
                 this.WindowState = FormWindowState.Minimized;
-            }
-        }
-
-        private async void btnOCR_Click( object sender, EventArgs e )
-        {
-            if ( ApiKey.ContainsKey( "Computer Vision API" ) && btnOCR.Enabled && Clipboard.ContainsImage() )
-            {
-                IDataObject iData = Clipboard.GetDataObject();
-                if( iData.GetDataPresent( DataFormats.Bitmap ) )
-                {
-                    btnOCR.Enabled = false;
-                    pbar.Style = ProgressBarStyle.Marquee;
-
-                    //(Bitmap) iData.GetData( DataFormats.Bitmap );
-                    Bitmap src = (Bitmap)Clipboard.GetImage();
-                    string lang = cbLanguage.SelectedValue.ToString();
-                    edResult.Text = await MakeRequest_OCR( src, lang );
-                    if ( !string.IsNullOrEmpty( edResult.Text ) )
-                    {
-                        tsmiShowWindow.PerformClick();
-                    }
-                    Clipboard.Clear();
-
-                    pbar.Style = ProgressBarStyle.Blocks;
-                    ClipboardChanged = false;
-                    btnOCR.Enabled = true;
-                }
-            }
-
-            if ( CFGLOADED && !ApiKey.ContainsKey( "Computer Vision API" ) )
-            {
-                MessageBox.Show( "Microsoft Azure Cognitive Servise Computer Vision API key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning );
             }
         }
 
@@ -474,6 +441,38 @@ namespace OCR_MS
             }
         }
 
+        private async void btnOCR_Click( object sender, EventArgs e )
+        {
+            if ( ApiKey.ContainsKey( "Computer Vision API" ) && btnOCR.Enabled )
+            {
+                IDataObject iData = Clipboard.GetDataObject();
+                if ( iData.GetDataPresent( DataFormats.Bitmap ) )
+                {
+                    btnOCR.Enabled = false;
+                    pbar.Style = ProgressBarStyle.Marquee;
+
+                    //(Bitmap) iData.GetData( DataFormats.Bitmap );
+                    Bitmap src = (Bitmap)Clipboard.GetImage();
+                    string lang = cbLanguage.SelectedValue.ToString();
+                    edResult.Text = await MakeRequest_OCR( src, lang );
+                    if ( !string.IsNullOrEmpty( edResult.Text ) )
+                    {
+                        tsmiShowWindow.PerformClick();
+                    }
+                    Clipboard.Clear();
+
+                    pbar.Style = ProgressBarStyle.Blocks;
+                    ClipboardChanged = false;
+                    btnOCR.Enabled = true;
+                }
+            }
+
+            if ( CFGLOADED && !ApiKey.ContainsKey( "Computer Vision API" ) )
+            {
+                MessageBox.Show( "Microsoft Azure Cognitive Servise Computer Vision API key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning );
+            }
+        }
+
         private void btnShowJSON_Click( object sender, EventArgs e )
         {
             if ( string.IsNullOrEmpty( Result_JSON.Trim() ) ) return;
@@ -481,6 +480,61 @@ namespace OCR_MS
             if ( DialogResult.Yes == MessageBox.Show( Result_JSON.Substring( 0, len ), "Copy OCR Result?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification ) )
             {
                 Clipboard.SetText( Result_JSON );
+            }
+        }
+
+        private void btnSpeech_Click( object sender, EventArgs e )
+        {
+            List<string> lang_cn = new List<string>() { "zh-hans", "zh-cn", "zh" };
+            List<string> lang_tw = new List<string>() { "zh-hant", "zh-tw" };
+            List<string> lang_jp = new List<string>() { "ja-jp", "ja", "jp" };
+            List<string> lang_en = new List<string>() { "en-us", "us", "en" };
+
+            try
+            {
+
+                // Initialize a new instance of the SpeechSynthesizer.
+                foreach( InstalledVoice voice in synth.GetInstalledVoices() )
+                {
+
+                    VoiceInfo info = voice.VoiceInfo;
+                    var vl = info.Culture.IetfLanguageTag;
+
+                    if( lang_cn.Contains( vl.ToLower() ) &&
+                        Result_Lang.Equals( "zh", StringComparison.CurrentCultureIgnoreCase ) &&
+                        voice.VoiceInfo.Name.ToLower().Contains( "huihui" ) )
+                    {
+                        synth.SelectVoice( voice.VoiceInfo.Name );
+                        break;
+                    }
+                    else if( lang_jp.Contains( vl.ToLower() ) &&
+                        Result_Lang.Equals( "ja", StringComparison.CurrentCultureIgnoreCase ) &&
+                        voice.VoiceInfo.Name.ToLower().Contains( "haruka" ) )
+                    {
+                        synth.SelectVoice( voice.VoiceInfo.Name );
+                        break;
+                    }
+                    else if( lang_jp.Contains( vl.ToLower() ) &&
+                        Result_Lang.StartsWith( "en", StringComparison.CurrentCultureIgnoreCase ) &&
+                        voice.VoiceInfo.Name.ToLower().Contains( "zira" ) )
+                    {
+                        synth.SelectVoice( voice.VoiceInfo.Name );
+                        break;
+                    }
+                }
+
+                //synth.Volume = 100;  // 0...100
+                //synth.Rate = 0;     // -10...10
+
+                // Synchronous
+                //synth.Speak( edResult.Text );
+
+                // Asynchronous
+                synth.SpeakAsync( edResult.Text );
+            }
+            catch( Exception ex )
+            {
+                MessageBox.Show( this, ex.Data.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification );
             }
         }
 
@@ -555,5 +609,6 @@ namespace OCR_MS
             {
             }
         }
+
     }
 }

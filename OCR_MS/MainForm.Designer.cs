@@ -61,6 +61,7 @@
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnSpeech = new System.Windows.Forms.Button();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -290,12 +291,23 @@
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
+            // btnSpeech
+            // 
+            resources.ApplyResources(this.btnSpeech, "btnSpeech");
+            this.btnSpeech.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnSpeech.Image = global::OCR_MS.Properties.Resources.JSON_32x;
+            this.btnSpeech.Name = "btnSpeech";
+            this.hint.SetToolTip(this.btnSpeech, resources.GetString("btnSpeech.ToolTip"));
+            this.btnSpeech.UseVisualStyleBackColor = true;
+            this.btnSpeech.Click += new System.EventHandler(this.btnSpeech_Click);
+            // 
             // MainForm
             // 
             this.AcceptButton = this.btnOCR;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ContextMenuStrip = this.notifyMenu;
+            this.Controls.Add(this.btnSpeech);
             this.Controls.Add(this.btnShowJSON);
             this.Controls.Add(this.pbar);
             this.Controls.Add(this.lblLanguage);
@@ -348,6 +360,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity30;
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity20;
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity10;
+        private System.Windows.Forms.Button btnSpeech;
     }
 }
 

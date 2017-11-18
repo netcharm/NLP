@@ -133,7 +133,7 @@
     <value>Both</value>
   </data>
   <data name="edResult.Size" type="System.Drawing.Size, System.Drawing">
-    <value>257, 47</value>
+    <value>297, 48</value>
   </data>
   <data name="edResult.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -148,7 +148,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;edResult.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>7</value>
   </data>
   <data name="cbLanguage.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -157,7 +157,7 @@
     <value>Flat</value>
   </data>
   <data name="cbLanguage.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 82</value>
+    <value>4, 83</value>
   </data>
   <data name="cbLanguage.Size" type="System.Drawing.Size, System.Drawing">
     <value>90, 20</value>
@@ -181,7 +181,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;cbLanguage.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="lblLanguage.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -190,7 +190,7 @@
     <value>NoControl</value>
   </data>
   <data name="lblLanguage.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 61</value>
+    <value>4, 62</value>
   </data>
   <data name="lblLanguage.Size" type="System.Drawing.Size, System.Drawing">
     <value>90, 20</value>
@@ -214,7 +214,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;lblLanguage.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <metadata name="timer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>93, 17</value>
@@ -226,10 +226,10 @@
     <value>NoControl</value>
   </data>
   <data name="pbar.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 58</value>
+    <value>4, 59</value>
   </data>
   <data name="pbar.Size" type="System.Drawing.Size, System.Drawing">
-    <value>257, 4</value>
+    <value>297, 4</value>
   </data>
   <data name="pbar.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -244,7 +244,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;pbar.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="btnShowJSON.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -256,7 +256,7 @@
     <value>NoControl</value>
   </data>
   <data name="btnShowJSON.Location" type="System.Drawing.Point, System.Drawing">
-    <value>143, 66</value>
+    <value>143, 67</value>
   </data>
   <data name="btnShowJSON.Size" type="System.Drawing.Size, System.Drawing">
     <value>36, 36</value>
@@ -277,7 +277,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnShowJSON.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="chkAutoClipboard.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -292,7 +292,7 @@
     <value>NoControl</value>
   </data>
   <data name="chkAutoClipboard.Location" type="System.Drawing.Point, System.Drawing">
-    <value>101, 66</value>
+    <value>101, 67</value>
   </data>
   <data name="chkAutoClipboard.Size" type="System.Drawing.Size, System.Drawing">
     <value>36, 36</value>
@@ -316,7 +316,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;chkAutoClipboard.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>6</value>
   </data>
   <data name="btnOCR.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
@@ -328,7 +328,7 @@
     <value>NoControl</value>
   </data>
   <data name="btnOCR.Location" type="System.Drawing.Point, System.Drawing">
-    <value>197, 66</value>
+    <value>237, 67</value>
   </data>
   <data name="btnOCR.Size" type="System.Drawing.Size, System.Drawing">
     <value>64, 36</value>
@@ -355,7 +355,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnOCR.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>8</value>
   </data>
   <metadata name="notify.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>175, 17</value>
@@ -364,118 +364,118 @@
     <value>264, 17</value>
   </metadata>
   <data name="tsmiShowWindow.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
+    <value>239, 22</value>
   </data>
   <data name="tsmiShowWindow.Text" xml:space="preserve">
     <value>Show Window</value>
   </data>
   <data name="tsmiShowOCRResult.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
+    <value>239, 22</value>
   </data>
   <data name="tsmiShowOCRResult.Text" xml:space="preserve">
     <value>Show Last OCR Result JSON</value>
   </data>
   <data name="tsmiSep0.Size" type="System.Drawing.Size, System.Drawing">
-    <value>217, 6</value>
+    <value>236, 6</value>
   </data>
   <data name="tsmiTopMost.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
+    <value>239, 22</value>
   </data>
   <data name="tsmiTopMost.Text" xml:space="preserve">
     <value>Always On Top</value>
   </data>
   <data name="tsmiOpacity100.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity100.Text" xml:space="preserve">
     <value>100%</value>
   </data>
   <data name="tsmiOpacity90.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity90.Text" xml:space="preserve">
     <value>90%</value>
   </data>
   <data name="tsmiOpacity80.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity80.Text" xml:space="preserve">
     <value>80%</value>
   </data>
   <data name="tsmiOpacity70.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity70.Text" xml:space="preserve">
     <value>70%</value>
   </data>
   <data name="tsmiOpacity60.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity60.Text" xml:space="preserve">
     <value>60%</value>
   </data>
   <data name="tsmiOpacity50.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity50.Text" xml:space="preserve">
     <value>50%</value>
   </data>
   <data name="tsmiOpacity40.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity40.Text" xml:space="preserve">
     <value>40%</value>
   </data>
   <data name="tsmiOpacity30.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity30.Text" xml:space="preserve">
     <value>30%</value>
   </data>
   <data name="tsmiOpacity20.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity20.Text" xml:space="preserve">
     <value>20%</value>
   </data>
   <data name="tsmiOpacity10.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 22</value>
+    <value>108, 22</value>
   </data>
   <data name="tsmiOpacity10.Text" xml:space="preserve">
     <value>10%</value>
   </data>
   <data name="tsmiOpacity.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
+    <value>239, 22</value>
   </data>
   <data name="tsmiOpacity.Text" xml:space="preserve">
     <value>Opacity</value>
   </data>
   <data name="tsmiWatchClipboard.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
+    <value>239, 22</value>
   </data>
   <data name="tsmiWatchClipboard.Text" xml:space="preserve">
     <value>Monitor Clipboard</value>
   </data>
   <data name="tsmiSep1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>217, 6</value>
+    <value>236, 6</value>
   </data>
   <data name="tsmiSaveState.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
+    <value>239, 22</value>
   </data>
   <data name="tsmiSaveState.Text" xml:space="preserve">
     <value>Save Current State/APIKEY</value>
   </data>
   <data name="tsmiSep2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>217, 6</value>
+    <value>236, 6</value>
   </data>
   <data name="tsmiExit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>220, 22</value>
+    <value>239, 22</value>
   </data>
   <data name="tsmiExit.Text" xml:space="preserve">
     <value>Exit</value>
   </data>
   <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>221, 198</value>
+    <value>240, 176</value>
   </data>
   <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
     <value>notifyMenu</value>
@@ -486,6 +486,39 @@
   <data name="notify.Visible" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="btnSpeech.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="btnSpeech.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="btnSpeech.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btnSpeech.Location" type="System.Drawing.Point, System.Drawing">
+    <value>185, 67</value>
+  </data>
+  <data name="btnSpeech.Size" type="System.Drawing.Size, System.Drawing">
+    <value>36, 36</value>
+  </data>
+  <data name="btnSpeech.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="btnSpeech.ToolTip" xml:space="preserve">
+    <value>Show Result JSON Contents</value>
+  </data>
+  <data name="&gt;&gt;btnSpeech.Name" xml:space="preserve">
+    <value>btnSpeech</value>
+  </data>
+  <data name="&gt;&gt;btnSpeech.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnSpeech.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;btnSpeech.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -493,7 +526,7 @@
     <value>6, 12</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>264, 108</value>
+    <value>304, 109</value>
   </data>
   <data name="$this.MaximumSize" type="System.Drawing.Size, System.Drawing">
     <value>800, 600</value>
