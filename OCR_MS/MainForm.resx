@@ -357,6 +357,39 @@
   <data name="&gt;&gt;btnOCR.ZOrder" xml:space="preserve">
     <value>8</value>
   </data>
+  <data name="btnSpeech.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="btnSpeech.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="btnSpeech.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btnSpeech.Location" type="System.Drawing.Point, System.Drawing">
+    <value>185, 67</value>
+  </data>
+  <data name="btnSpeech.Size" type="System.Drawing.Size, System.Drawing">
+    <value>36, 36</value>
+  </data>
+  <data name="btnSpeech.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="btnSpeech.ToolTip" xml:space="preserve">
+    <value>Show Result JSON Contents</value>
+  </data>
+  <data name="&gt;&gt;btnSpeech.Name" xml:space="preserve">
+    <value>btnSpeech</value>
+  </data>
+  <data name="&gt;&gt;btnSpeech.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnSpeech.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;btnSpeech.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <metadata name="notify.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>175, 17</value>
   </metadata>
@@ -485,39 +518,6 @@
   </data>
   <data name="notify.Visible" type="System.Boolean, mscorlib">
     <value>True</value>
-  </data>
-  <data name="btnSpeech.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Left</value>
-  </data>
-  <data name="btnSpeech.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
-    <value>Flat</value>
-  </data>
-  <data name="btnSpeech.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="btnSpeech.Location" type="System.Drawing.Point, System.Drawing">
-    <value>185, 67</value>
-  </data>
-  <data name="btnSpeech.Size" type="System.Drawing.Size, System.Drawing">
-    <value>36, 36</value>
-  </data>
-  <data name="btnSpeech.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="btnSpeech.ToolTip" xml:space="preserve">
-    <value>Show Result JSON Contents</value>
-  </data>
-  <data name="&gt;&gt;btnSpeech.Name" xml:space="preserve">
-    <value>btnSpeech</value>
-  </data>
-  <data name="&gt;&gt;btnSpeech.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnSpeech.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;btnSpeech.ZOrder" xml:space="preserve">
-    <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

@@ -39,6 +39,7 @@
             this.btnShowJSON = new System.Windows.Forms.Button();
             this.chkAutoClipboard = new System.Windows.Forms.CheckBox();
             this.btnOCR = new System.Windows.Forms.Button();
+            this.btnSpeech = new System.Windows.Forms.Button();
             this.notify = new System.Windows.Forms.NotifyIcon(this.components);
             this.notifyMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsmiShowWindow = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,7 +62,6 @@
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnSpeech = new System.Windows.Forms.Button();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -132,6 +132,16 @@
             this.hint.SetToolTip(this.btnOCR, resources.GetString("btnOCR.ToolTip"));
             this.btnOCR.UseVisualStyleBackColor = true;
             this.btnOCR.Click += new System.EventHandler(this.btnOCR_Click);
+            // 
+            // btnSpeech
+            // 
+            resources.ApplyResources(this.btnSpeech, "btnSpeech");
+            this.btnSpeech.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnSpeech.Image = global::OCR_MS.Properties.Resources.Speech_32x;
+            this.btnSpeech.Name = "btnSpeech";
+            this.hint.SetToolTip(this.btnSpeech, resources.GetString("btnSpeech.ToolTip"));
+            this.btnSpeech.UseVisualStyleBackColor = true;
+            this.btnSpeech.Click += new System.EventHandler(this.btnSpeech_Click);
             // 
             // notify
             // 
@@ -290,16 +300,6 @@
             this.tsmiExit.Name = "tsmiExit";
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
-            // 
-            // btnSpeech
-            // 
-            resources.ApplyResources(this.btnSpeech, "btnSpeech");
-            this.btnSpeech.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnSpeech.Image = global::OCR_MS.Properties.Resources.JSON_32x;
-            this.btnSpeech.Name = "btnSpeech";
-            this.hint.SetToolTip(this.btnSpeech, resources.GetString("btnSpeech.ToolTip"));
-            this.btnSpeech.UseVisualStyleBackColor = true;
-            this.btnSpeech.Click += new System.EventHandler(this.btnSpeech_Click);
             // 
             // MainForm
             // 

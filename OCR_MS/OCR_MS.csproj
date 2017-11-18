@@ -112,6 +112,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="general-ocr.ico" />
+    <None Include="Resources\Speech_32x.png" />
+    <None Include="Resources\speaker_32x.png" />
     <None Include="Resources\OCR_32x.png" />
     <None Include="Resources\JSON_32x.png" />
     <None Include="Resources\Watch_32x.png" />

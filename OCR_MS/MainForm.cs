@@ -305,7 +305,7 @@ namespace OCR_MS
                         try
                         {
                             this.Width = Math.Max(this.MinimumSize.Width, Convert.ToInt32( w ));
-                            this.Height = Math.Min( this.MinimumSize.Height, Convert.ToInt32( h ));
+                            this.Height = Math.Max( this.MinimumSize.Height, Convert.ToInt32( h ));
                         }
                         catch ( Exception )
                         {
