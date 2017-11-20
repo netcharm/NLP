@@ -44,6 +44,8 @@
             this.notifyMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsmiShowWindow = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTopMost = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity = new System.Windows.Forms.ToolStripMenuItem();
@@ -157,6 +159,8 @@
             this.notifyMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmiShowWindow,
             this.tsmiShowOCRResult,
+            this.tsmiSep3,
+            this.tsmiHistory,
             this.tsmiSep0,
             this.tsmiTopMost,
             this.tsmiOpacity,
@@ -179,6 +183,17 @@
             this.tsmiShowOCRResult.Name = "tsmiShowOCRResult";
             resources.ApplyResources(this.tsmiShowOCRResult, "tsmiShowOCRResult");
             this.tsmiShowOCRResult.Click += new System.EventHandler(this.tsmiShowLastOCRResultJSON_Click);
+            // 
+            // tsmiSep3
+            // 
+            this.tsmiSep3.Name = "tsmiSep3";
+            resources.ApplyResources(this.tsmiSep3, "tsmiSep3");
+            // 
+            // tsmiHistory
+            // 
+            this.tsmiHistory.Name = "tsmiHistory";
+            resources.ApplyResources(this.tsmiHistory, "tsmiHistory");
+            this.tsmiHistory.DropDownOpening += new System.EventHandler(this.tsmiHistory_DropDownOpening);
             // 
             // tsmiSep0
             // 
@@ -361,6 +376,8 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity20;
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity10;
         private System.Windows.Forms.Button btnSpeech;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep3;
+        private System.Windows.Forms.ToolStripMenuItem tsmiHistory;
     }
 }
 

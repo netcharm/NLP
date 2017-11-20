@@ -78,6 +78,8 @@ namespace OCR_MS
 
         internal string Result_JSON = string.Empty;
         internal string Result_Lang = string.Empty;
+        internal static int ResultHistoryLimit = 100;
+        internal List<KeyValuePair<string, string>> ResultHistory = new List<KeyValuePair<string, string>>(ResultHistoryLimit);
 
         internal void init_ocr_lang()
         {
@@ -439,9 +441,18 @@ namespace OCR_MS
 
         private void edResult_KeyUp( object sender, KeyEventArgs e )
         {
-            if( e.Control && e.KeyCode == Keys.A )
+            if (e.Control && e.KeyCode == Keys.A)
             {
                 edResult.SelectAll();
+            }
+            else if (e.Control && e.KeyCode == Keys.Z)
+            {
+                //if (ResultHistory.Count > 0)
+                //{
+                //    edResult.Text = ResultHistory.Last().Key;
+                //    Result_Lang = ResultHistory.Last().Value;
+                //    edResult.Tag = 
+                //}
             }
         }
 
@@ -462,6 +473,8 @@ namespace OCR_MS
                     if( !string.IsNullOrEmpty( edResult.Text ) )
                     {
                         tsmiShowWindow.PerformClick();
+                        if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
+                        ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
                     }
                     Clipboard.Clear();
 
@@ -535,6 +548,7 @@ namespace OCR_MS
                 // Synchronous
                 //synth.Speak( edResult.Text );
                 // Asynchronous
+                synth.SpeakAsyncCancelAll();
                 synth.SpeakAsync( edResult.Text );
             }
             catch( Exception ex )
@@ -615,5 +629,35 @@ namespace OCR_MS
             }
         }
 
+        private void tsmiHistory_Click(object sender, EventArgs e)
+        {
+            foreach(ToolStripMenuItem mi in tsmiHistory.DropDownItems)
+            {
+                if (sender == mi)
+                {
+                    mi.Checked = true;
+                    edResult.Text = mi.Text;
+                    Result_Lang = (string)mi.Tag;
+                    tsmiHistory.Tag = mi.Name;
+                }
+                else mi.Checked = false;
+            }
+        }
+
+        private void tsmiHistory_DropDownOpening(object sender, EventArgs e)
+        {
+            tsmiHistory.DropDownItems.Clear();
+            foreach (var item in ResultHistory)
+            {
+                ToolStripMenuItem mi = new ToolStripMenuItem(item.Key);
+                mi.Name = $"ResultHistory_{ResultHistory.IndexOf(item)}";
+                mi.Text = item.Key;
+                mi.Tag = item.Value;
+                mi.Click += tsmiHistory_Click;
+                tsmiHistory.DropDownItems.Insert(0, mi);
+                if ((string)tsmiHistory.Tag == mi.Name) mi.Checked = true;
+                if (tsmiHistory.DropDownItems.Count > 25) break;
+            }
+        }
     }
 }
