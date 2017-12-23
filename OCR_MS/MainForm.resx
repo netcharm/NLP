@@ -420,6 +420,27 @@
   <data name="tsmiHistory.Text" xml:space="preserve">
     <value>History</value>
   </data>
+  <data name="tsmiSep4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>236, 6</value>
+  </data>
+  <data name="tsmiTextPlay.Size" type="System.Drawing.Size, System.Drawing">
+    <value>239, 22</value>
+  </data>
+  <data name="tsmiTextPlay.Text" xml:space="preserve">
+    <value>Text Play</value>
+  </data>
+  <data name="tsmiTextPause.Size" type="System.Drawing.Size, System.Drawing">
+    <value>239, 22</value>
+  </data>
+  <data name="tsmiTextPause.Text" xml:space="preserve">
+    <value>Text Pause</value>
+  </data>
+  <data name="tsmiTextStop.Size" type="System.Drawing.Size, System.Drawing">
+    <value>239, 22</value>
+  </data>
+  <data name="tsmiTextStop.Text" xml:space="preserve">
+    <value>Text Stop</value>
+  </data>
   <data name="tsmiSep0.Size" type="System.Drawing.Size, System.Drawing">
     <value>236, 6</value>
   </data>
@@ -460,7 +481,7 @@
     <value>Exit</value>
   </data>
   <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 226</value>
+    <value>240, 298</value>
   </data>
   <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
     <value>notifyMenu</value>
@@ -589,6 +610,30 @@
     <value>tsmiHistory</value>
   </data>
   <data name="&gt;&gt;tsmiHistory.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep4.Name" xml:space="preserve">
+    <value>tsmiSep4</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep4.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextPlay.Name" xml:space="preserve">
+    <value>tsmiTextPlay</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextPlay.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextPause.Name" xml:space="preserve">
+    <value>tsmiTextPause</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextPause.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextStop.Name" xml:space="preserve">
+    <value>tsmiTextStop</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextStop.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tsmiSep0.Name" xml:space="preserve">

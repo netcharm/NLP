@@ -371,6 +371,10 @@ namespace OCR_MS
 
             synth = new SpeechSynthesizer();
             voice_default = synth.Voice.Name;
+            synth.SpeakStarted += Synth_SpeakStarted;
+            synth.SpeakProgress += Synth_SpeakProgress;
+            synth.StateChanged += Synth_StateChanged;
+            synth.SpeakCompleted += Synth_SpeakCompleted;
 
             notify.Icon = Icon;
             notify.BalloonTipTitle = this.Text;
@@ -389,6 +393,49 @@ namespace OCR_MS
             cbLanguage.ValueMember = "Key";
 
             LoadConfig();
+        }
+
+        private void Synth_StateChanged(object sender, StateChangedEventArgs e)
+        {
+            if (synth == null) return;
+
+            if(synth.State == SynthesizerState.Paused)
+            {
+                tsmiTextPlay.Checked = true;
+                tsmiTextPause.Checked = true;
+                tsmiTextStop.Checked = false;
+            }
+            else if (synth.State == SynthesizerState.Speaking)
+            {
+                tsmiTextPlay.Checked = true;
+                tsmiTextPause.Checked = false;
+                tsmiTextStop.Checked = false;
+            }
+            else if (synth.State == SynthesizerState.Ready)
+            {
+                tsmiTextPlay.Checked = false;
+                tsmiTextPause.Checked = false;
+                tsmiTextStop.Checked = true;
+            }
+        }
+
+        private void Synth_SpeakStarted(object sender, SpeakStartedEventArgs e)
+        {
+            tsmiTextPlay.Checked = true;
+            tsmiTextPause.Checked = false;
+            tsmiTextStop.Checked = false;
+        }
+
+        private void Synth_SpeakProgress(object sender, SpeakProgressEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void Synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
+        {
+            tsmiTextPlay.Checked = false;
+            tsmiTextPause.Checked = false;
+            tsmiTextStop.Checked = true;
         }
 
         private void MainForm_FormClosing( object sender, FormClosingEventArgs e )
@@ -549,6 +596,7 @@ namespace OCR_MS
                 //synth.Speak( edResult.Text );
                 // Asynchronous
                 synth.SpeakAsyncCancelAll();
+                synth.Resume();
                 synth.SpeakAsync( edResult.Text );
             }
             catch( Exception ex )
@@ -559,6 +607,12 @@ namespace OCR_MS
 
         private void tsmiExit_Click( object sender, EventArgs e )
         {
+            if(synth != null)
+            {
+                synth.Resume();
+                synth.SpeakAsyncCancelAll();
+            }
+
             Application.Exit();
         }
 
@@ -657,6 +711,28 @@ namespace OCR_MS
                 tsmiHistory.DropDownItems.Insert(0, mi);
                 if ((string)tsmiHistory.Tag == mi.Name) mi.Checked = true;
                 if (tsmiHistory.DropDownItems.Count > 25) break;
+            }
+        }
+
+        private void tsmiTextSpeech_Click(object sender, EventArgs e)
+        {
+            if (synth == null) return;
+
+            if (sender == tsmiTextPlay)
+            {
+                btnSpeech.PerformClick();
+            }
+            else if (sender == tsmiTextPause)
+            {
+                if (synth.State == SynthesizerState.Paused)
+                    synth.Resume();
+                else if (synth.State == SynthesizerState.Speaking)
+                    synth.Pause();
+            }
+            else if (sender == tsmiTextStop)
+            {
+                synth.SpeakAsyncCancelAll();
+                synth.Resume();
             }
         }
     }

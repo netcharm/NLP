@@ -46,6 +46,10 @@
             this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiHistory = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep4 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiTextPlay = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextPause = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextStop = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTopMost = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity = new System.Windows.Forms.ToolStripMenuItem();
@@ -161,6 +165,10 @@
             this.tsmiShowOCRResult,
             this.tsmiSep3,
             this.tsmiHistory,
+            this.tsmiSep4,
+            this.tsmiTextPlay,
+            this.tsmiTextPause,
+            this.tsmiTextStop,
             this.tsmiSep0,
             this.tsmiTopMost,
             this.tsmiOpacity,
@@ -194,6 +202,31 @@
             this.tsmiHistory.Name = "tsmiHistory";
             resources.ApplyResources(this.tsmiHistory, "tsmiHistory");
             this.tsmiHistory.DropDownOpening += new System.EventHandler(this.tsmiHistory_DropDownOpening);
+            // 
+            // tsmiSep4
+            // 
+            this.tsmiSep4.Name = "tsmiSep4";
+            resources.ApplyResources(this.tsmiSep4, "tsmiSep4");
+            // 
+            // tsmiTextPlay
+            // 
+            this.tsmiTextPlay.Name = "tsmiTextPlay";
+            resources.ApplyResources(this.tsmiTextPlay, "tsmiTextPlay");
+            this.tsmiTextPlay.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
+            // 
+            // tsmiTextPause
+            // 
+            this.tsmiTextPause.Name = "tsmiTextPause";
+            resources.ApplyResources(this.tsmiTextPause, "tsmiTextPause");
+            this.tsmiTextPause.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
+            // 
+            // tsmiTextStop
+            // 
+            this.tsmiTextStop.Checked = true;
+            this.tsmiTextStop.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiTextStop.Name = "tsmiTextStop";
+            resources.ApplyResources(this.tsmiTextStop, "tsmiTextStop");
+            this.tsmiTextStop.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
             // 
             // tsmiSep0
             // 
@@ -378,6 +411,10 @@
         private System.Windows.Forms.Button btnSpeech;
         private System.Windows.Forms.ToolStripSeparator tsmiSep3;
         private System.Windows.Forms.ToolStripMenuItem tsmiHistory;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep4;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextPlay;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextPause;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextStop;
     }
 }
 
