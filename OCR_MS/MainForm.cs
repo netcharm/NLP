@@ -28,6 +28,9 @@ namespace OCR_MS
         private static Dictionary<string, string> ApiKey = new Dictionary<string, string>();
 
         private bool CFGLOADED = false;
+        private bool CLOSE_TO_TRAY = false;
+        private bool CLIPBOARD_CLEAR = false;
+        private bool CLIPBOARD_WATCH = true;
 
         #region Monitor Clipboard
         [DllImport( "User32.dll", CharSet = CharSet.Auto )]
@@ -226,6 +229,8 @@ namespace OCR_MS
         {
             base.WndProc( ref m );    // Process the message 
 
+            if (!CLIPBOARD_WATCH) return;
+
             //if ( m.Msg == WM_CLIPBOARDUPDATE )
             if( m.Msg == WM_DRAWCLIPBOARD )
             {
@@ -238,7 +243,7 @@ namespace OCR_MS
                 {
                     // Clipboard image
                     ClipboardChanged = true;
-                    if( chkAutoClipboard.Checked )
+                    if(CLIPBOARD_WATCH)
                     {
                         //tsmiShowWindow.PerformClick();
                         btnOCR.PerformClick();
@@ -258,18 +263,18 @@ namespace OCR_MS
         private void LoadConfig()
         {
             var cfg = Path.Combine( AppPath, AppName + ".json" );
-            if( File.Exists( cfg ) )
+            if (File.Exists(cfg))
             {
-                var json = File.ReadAllText( cfg );
-                JToken token = JObject.Parse( json );
+                var json = File.ReadAllText(cfg);
+                JToken token = JObject.Parse(json);
 
                 #region API Key
-                IEnumerable<JToken> apis = token.SelectTokens( "$..api", false );
-                foreach( var api in apis )
+                IEnumerable<JToken> apis = token.SelectTokens("$..api", false);
+                foreach (var api in apis)
                 {
-                    var apikey = api.SelectToken( "$..key", false ).ToString();
-                    var apiname = api.SelectToken( "$..name", false ).ToString();
-                    if( apikey != null && apiname != null )
+                    var apikey = api.SelectToken("$..key", false).ToString();
+                    var apiname = api.SelectToken("$..name", false).ToString();
+                    if (apikey != null && apiname != null)
                     {
                         ApiKey[apiname] = apikey;
                     }
@@ -277,19 +282,19 @@ namespace OCR_MS
                 #endregion
 
                 #region Form Position
-                JToken pos = token.SelectToken( "$..pos", false );
-                if( pos != null )
+                JToken pos = token.SelectToken("$..pos", false);
+                if (pos != null)
                 {
-                    var x = pos.SelectToken( "$..x", false ).ToString();
-                    var y = pos.SelectToken( "$..y", false ).ToString();
-                    if( x != null && y != null )
+                    var x = pos.SelectToken("$..x", false).ToString();
+                    var y = pos.SelectToken("$..y", false).ToString();
+                    if (x != null && y != null)
                     {
                         try
                         {
-                            this.Left = Convert.ToInt32( x );
-                            this.Top = Convert.ToInt32( y );
+                            this.Left = Convert.ToInt32(x);
+                            this.Top = Convert.ToInt32(y);
                         }
-                        catch( Exception )
+                        catch (Exception)
                         {
                             //throw;
                         }
@@ -298,19 +303,19 @@ namespace OCR_MS
                 #endregion
 
                 #region Form Size
-                JToken size = token.SelectToken( "$..size", false );
-                if( size != null )
+                JToken size = token.SelectToken("$..size", false);
+                if (size != null)
                 {
-                    var w = size.SelectToken( "$..w", false ).ToString();
-                    var h = size.SelectToken( "$..h", false ).ToString();
-                    if( w != null && h != null )
+                    var w = size.SelectToken("$..w", false).ToString();
+                    var h = size.SelectToken("$..h", false).ToString();
+                    if (w != null && h != null)
                     {
                         try
                         {
-                            this.Width = Math.Max( this.MinimumSize.Width, Convert.ToInt32( w ) );
-                            this.Height = Math.Max( this.MinimumSize.Height, Convert.ToInt32( h ) );
+                            this.Width = Math.Max(this.MinimumSize.Width, Convert.ToInt32(w));
+                            this.Height = Math.Max(this.MinimumSize.Height, Convert.ToInt32(h));
                         }
-                        catch( Exception )
+                        catch (Exception)
                         {
                             //throw;
                         }
@@ -319,17 +324,58 @@ namespace OCR_MS
                 #endregion
 
                 #region Form Opacity
-                JToken opacity = token.SelectToken( "$..opacity", false );
-                if( opacity != null )
+                JToken opacity = token.SelectToken("$..opacity", false);
+                if (opacity != null)
                 {
-                    this.Opacity = Convert.ToDouble( opacity.ToString() );
-                    string os = $"{Math.Round( this.Opacity * 100, 0 )}%";
-                    foreach( ToolStripMenuItem mi in tsmiOpacity.DropDownItems )
+                    this.Opacity = Convert.ToDouble(opacity.ToString());
+                    string os = $"{Math.Round(this.Opacity * 100, 0)}%";
+                    foreach (ToolStripMenuItem mi in tsmiOpacity.DropDownItems)
                     {
-                        if( mi.Text == os )
+                        if (mi.Text == os)
                             mi.Checked = true;
                         else
                             mi.Checked = false;
+                    }
+                }
+                #endregion
+
+                #region Close Form to Notify Tray Area
+                JToken tray = token.SelectToken("$..close_to_tray", false);
+                if (tray != null)
+                {
+                    try
+                    {
+                        CLOSE_TO_TRAY = Convert.ToBoolean(tray);
+                        tsmiCloseToTray.Checked = CLOSE_TO_TRAY;
+                    }
+                    catch (Exception) { }
+                }
+                #endregion
+
+                #region Clipboard Option
+                JToken clipboard = token.SelectToken("$..clipboard", false);
+                if (clipboard != null)
+                {
+                    var clear = clipboard.SelectToken("$..clear", false).ToString();
+                    if (clear != null)
+                    {
+                        try
+                        {
+                            CLIPBOARD_CLEAR = Convert.ToBoolean(clear);
+                            tsmiClearClipboard.Checked = CLIPBOARD_CLEAR;
+                        }
+                        catch (Exception) { }
+                    }
+                    var watch = clipboard.SelectToken("$..watch", false).ToString();
+                    if (watch != null)
+                    {
+                        try
+                        {
+                            CLIPBOARD_WATCH = Convert.ToBoolean(watch);
+                            tsmiWatchClipboard.Checked = CLIPBOARD_WATCH;
+                            chkAutoClipboard.Checked = CLIPBOARD_WATCH;
+                        }
+                        catch (Exception) { }
                     }
                 }
                 #endregion
@@ -346,6 +392,13 @@ namespace OCR_MS
 
             Dictionary<string, object> json = new Dictionary<string, object>()
             {
+                { "clipboard", new Dictionary<string, bool>()
+                    {
+                        { "clear", CLIPBOARD_CLEAR },
+                        { "watch", CLIPBOARD_WATCH }
+                    }
+                },
+                { "close_to_tray", CLOSE_TO_TRAY },
                 { "opacity", this.Opacity },
                 { "pos", new Dictionary<string, int>()
                     {
@@ -440,7 +493,7 @@ namespace OCR_MS
 
         private void MainForm_FormClosing( object sender, FormClosingEventArgs e )
         {
-            if( e.CloseReason == CloseReason.UserClosing )
+            if( e.CloseReason == CloseReason.UserClosing && CLOSE_TO_TRAY)
             {
                 e.Cancel = true;
                 Hide();
@@ -523,10 +576,10 @@ namespace OCR_MS
                         if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
                         ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
                     }
-                    Clipboard.Clear();
+                    if (CLIPBOARD_CLEAR && !string.IsNullOrEmpty(edResult.Text) ) Clipboard.Clear();
 
-                    pbar.Style = ProgressBarStyle.Blocks;
                     ClipboardChanged = false;
+                    pbar.Style = ProgressBarStyle.Blocks;
                     btnOCR.Enabled = true;
                 }
             }
@@ -605,6 +658,22 @@ namespace OCR_MS
             }
         }
 
+        private void chkAutoClipboard_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender == tsmiWatchClipboard)
+            {
+                CLIPBOARD_WATCH = (sender as ToolStripMenuItem).Checked;
+                chkAutoClipboard.Checked = CLIPBOARD_WATCH;
+            }
+            else if (sender == chkAutoClipboard)
+            {
+                CLIPBOARD_WATCH = (sender as CheckBox).Checked;
+                tsmiWatchClipboard.Checked = CLIPBOARD_WATCH;
+            }
+            else if (sender == tsmiClearClipboard)
+                CLIPBOARD_CLEAR = (sender as ToolStripMenuItem).Checked;           
+        }
+
         private void tsmiExit_Click( object sender, EventArgs e )
         {
             if(synth != null)
@@ -638,9 +707,9 @@ namespace OCR_MS
             btnShowJSON.PerformClick();
         }
 
-        private void tsmiWatchClipboard_Click( object sender, EventArgs e )
+        private void tsmiClearClipboard_Click(object sender, EventArgs e)
         {
-            chkAutoClipboard.Checked = tsmiWatchClipboard.Checked;
+            CLIPBOARD_CLEAR = tsmiClearClipboard.Checked;
         }
 
         private void tsmiSaveState_Click( object sender, EventArgs e )
@@ -714,6 +783,11 @@ namespace OCR_MS
             }
         }
 
+        private void tsmiCloseToTray_CheckedChanged(object sender, EventArgs e)
+        {
+            CLOSE_TO_TRAY = tsmiCloseToTray.Checked;
+        }
+
         private void tsmiTextSpeech_Click(object sender, EventArgs e)
         {
             if (synth == null) return;
@@ -735,5 +809,6 @@ namespace OCR_MS
                 synth.Resume();
             }
         }
+
     }
 }

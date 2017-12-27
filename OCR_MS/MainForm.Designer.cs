@@ -64,10 +64,12 @@
             this.tsmiOpacity20 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity10 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiClearClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiCloseToTray = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -130,6 +132,7 @@
             this.chkAutoClipboard.Name = "chkAutoClipboard";
             this.hint.SetToolTip(this.chkAutoClipboard, resources.GetString("chkAutoClipboard.ToolTip"));
             this.chkAutoClipboard.UseVisualStyleBackColor = true;
+            this.chkAutoClipboard.CheckedChanged += new System.EventHandler(this.chkAutoClipboard_CheckedChanged);
             // 
             // btnOCR
             // 
@@ -171,8 +174,10 @@
             this.tsmiTextStop,
             this.tsmiSep0,
             this.tsmiTopMost,
+            this.tsmiCloseToTray,
             this.tsmiOpacity,
             this.tsmiWatchClipboard,
+            this.tsmiClearClipboard,
             this.tsmiSep1,
             this.tsmiSaveState,
             this.tsmiSep2,
@@ -325,7 +330,14 @@
             this.tsmiWatchClipboard.CheckState = System.Windows.Forms.CheckState.Checked;
             this.tsmiWatchClipboard.Name = "tsmiWatchClipboard";
             resources.ApplyResources(this.tsmiWatchClipboard, "tsmiWatchClipboard");
-            this.tsmiWatchClipboard.Click += new System.EventHandler(this.tsmiWatchClipboard_Click);
+            this.tsmiWatchClipboard.CheckedChanged += new System.EventHandler(this.chkAutoClipboard_CheckedChanged);
+            // 
+            // tsmiClearClipboard
+            // 
+            this.tsmiClearClipboard.CheckOnClick = true;
+            this.tsmiClearClipboard.Name = "tsmiClearClipboard";
+            resources.ApplyResources(this.tsmiClearClipboard, "tsmiClearClipboard");
+            this.tsmiClearClipboard.CheckedChanged += new System.EventHandler(this.chkAutoClipboard_CheckedChanged);
             // 
             // tsmiSep1
             // 
@@ -348,6 +360,15 @@
             this.tsmiExit.Name = "tsmiExit";
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
+            // tsmiCloseToTray
+            // 
+            this.tsmiCloseToTray.Checked = true;
+            this.tsmiCloseToTray.CheckOnClick = true;
+            this.tsmiCloseToTray.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiCloseToTray.Name = "tsmiCloseToTray";
+            resources.ApplyResources(this.tsmiCloseToTray, "tsmiCloseToTray");
+            this.tsmiCloseToTray.CheckedChanged += new System.EventHandler(this.tsmiCloseToTray_CheckedChanged);
             // 
             // MainForm
             // 
@@ -415,6 +436,8 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiTextPlay;
         private System.Windows.Forms.ToolStripMenuItem tsmiTextPause;
         private System.Windows.Forms.ToolStripMenuItem tsmiTextStop;
+        private System.Windows.Forms.ToolStripMenuItem tsmiClearClipboard;
+        private System.Windows.Forms.ToolStripMenuItem tsmiCloseToTray;
     }
 }
 
