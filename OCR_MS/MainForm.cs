@@ -563,24 +563,30 @@ namespace OCR_MS
                 IDataObject iData = Clipboard.GetDataObject();
                 if( iData.GetDataPresent( DataFormats.Bitmap ) )
                 {
-                    btnOCR.Enabled = false;
-                    pbar.Style = ProgressBarStyle.Marquee;
-
-                    //(Bitmap) iData.GetData( DataFormats.Bitmap );
-                    Bitmap src = (Bitmap) Clipboard.GetImage();
-                    string lang = cbLanguage.SelectedValue.ToString();
-                    edResult.Text = await MakeRequest_OCR( src, lang );
-                    if( !string.IsNullOrEmpty( edResult.Text ) )
+                    try
                     {
-                        tsmiShowWindow.PerformClick();
-                        if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
-                        ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
-                    }
-                    if (CLIPBOARD_CLEAR && !string.IsNullOrEmpty(edResult.Text) ) Clipboard.Clear();
+                        btnOCR.Enabled = false;
+                        pbar.Style = ProgressBarStyle.Marquee;
 
-                    ClipboardChanged = false;
-                    pbar.Style = ProgressBarStyle.Blocks;
-                    btnOCR.Enabled = true;
+                        //(Bitmap) iData.GetData( DataFormats.Bitmap );
+                        Bitmap src = (Bitmap)Clipboard.GetImage();
+                        string lang = cbLanguage.SelectedValue.ToString();
+                        edResult.Text = await MakeRequest_OCR(src, lang);
+                        if (!string.IsNullOrEmpty(edResult.Text))
+                        {
+                            tsmiShowWindow.PerformClick();
+                            if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
+                            ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
+                        }
+                        if (CLIPBOARD_CLEAR && !string.IsNullOrEmpty(edResult.Text)) Clipboard.Clear();
+                    }
+                    catch (Exception) { }
+                    finally
+                    {
+                        ClipboardChanged = false;
+                        pbar.Style = ProgressBarStyle.Blocks;
+                        btnOCR.Enabled = true;
+                    }
                 }
             }
 
