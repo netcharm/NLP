@@ -10,11 +10,12 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Speech.Synthesis;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
-using System.Speech.Synthesis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -619,8 +620,28 @@ namespace OCR_MS
                 string lang = cbLanguage.SelectedValue.ToString();
                 if( lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ) lang = Result_Lang;
 
+                string text = edResult.Text;
+                if (edResult.SelectionLength > 0) text = edResult.SelectedText;
+
+                //
+                // 中文：[\u4e00-\u9fa5]
+                // 日文：[\u0800-\u4e00]
+                // 韩文：[\uac00-\ud7ff]
+                //
+                //var m_jp = Regex.Matches(text, @"([\u0800-\u4e00])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+                //var m_zh = Regex.Matches(text, @"([\u4e00-\u9fbb])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+                if (Regex.Matches(text, @"[\u0800-\u4e00]", RegexOptions.Multiline).Count > 0)
+                {
+                    lang = "ja";
+                }
+                else if (Regex.Matches(text, @"[\u4e00-\u9fbb]", RegexOptions.Multiline).Count > 0)
+                {
+                    lang = "zh";
+                }
+
                 // Initialize a new instance of the SpeechSynthesizer.
-                foreach( InstalledVoice voice in synth.GetInstalledVoices() )
+                foreach ( InstalledVoice voice in synth.GetInstalledVoices() )
                 {
                     VoiceInfo info = voice.VoiceInfo;
                     var vl = info.Culture.IetfLanguageTag;
@@ -652,11 +673,11 @@ namespace OCR_MS
                 //synth.Rate = 0;     // -10...10
 
                 // Synchronous
-                //synth.Speak( edResult.Text );
+                //synth.Speak( text );
                 // Asynchronous
                 synth.SpeakAsyncCancelAll();
                 synth.Resume();
-                synth.SpeakAsync( edResult.Text );
+                synth.SpeakAsync( text );
             }
             catch( Exception ex )
             {
