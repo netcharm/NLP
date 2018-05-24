@@ -624,14 +624,14 @@ namespace OCR_MS
                 if (edResult.SelectionLength > 0) text = edResult.SelectedText;
 
                 //
-                // 中文：[\u4e00-\u9fa5]
-                // 日文：[\u0800-\u4e00]
+                // 中文：[\u4e00-\u9fcc, \u3400-\u4db5, \u20000-\u2a6d6, \u2a700-\u2b734, \u2b740-\u2b81d, \uf900-\ufad9, \u2f800-\u2fa1d]
+                // 日文：[\u0800-\u4e00] [\u3041-\u31ff]
                 // 韩文：[\uac00-\ud7ff]
                 //
                 //var m_jp = Regex.Matches(text, @"([\u0800-\u4e00])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
                 //var m_zh = Regex.Matches(text, @"([\u4e00-\u9fbb])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
-                if (Regex.Matches(text, @"[\u0800-\u4e00]", RegexOptions.Multiline).Count > 0)
+                if (Regex.Matches(text, @"[\u3041-\u31ff]", RegexOptions.Multiline).Count > 0)
                 {
                     lang = "ja";
                 }
