@@ -33,6 +33,9 @@ namespace OCR_MS
         private bool CLIPBOARD_CLEAR = false;
         private bool CLIPBOARD_WATCH = true;
 
+        private bool SPEECH_SLOW = false;
+        private string SPEECH_TEXT = string.Empty;
+
         #region Monitor Clipboard
         [DllImport( "User32.dll", CharSet = CharSet.Auto )]
         public static extern IntPtr SetClipboardViewer( IntPtr hWndNewViewer );
@@ -671,6 +674,14 @@ namespace OCR_MS
 
                 //synth.Volume = 100;  // 0...100
                 //synth.Rate = 0;     // -10...10
+                if (text.Equals(SPEECH_TEXT, StringComparison.CurrentCultureIgnoreCase))
+                    SPEECH_SLOW = !SPEECH_SLOW;
+                else
+                    SPEECH_SLOW = false;
+
+                if (SPEECH_SLOW) synth.Rate = -5;
+                else synth.Rate = 0;
+
 
                 // Synchronous
                 //synth.Speak( text );
@@ -678,6 +689,7 @@ namespace OCR_MS
                 synth.SpeakAsyncCancelAll();
                 synth.Resume();
                 synth.SpeakAsync( text );
+                SPEECH_TEXT = text;
             }
             catch( Exception ex )
             {
