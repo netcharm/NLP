@@ -243,22 +243,13 @@ namespace OCR_MS
                 // Clipboard's data
                 IDataObject iData = Clipboard.GetDataObject();
 
-                if( iData.GetDataPresent( DataFormats.Bitmap ) )
+                if ( iData.GetDataPresent( DataFormats.Bitmap ) )
                 {
                     // Clipboard image
                     ClipboardChanged = true;
-                    if(CLIPBOARD_WATCH)
-                    {
-                        //tsmiShowWindow.PerformClick();
-                        btnOCR.PerformClick();
-                    }
+                    btnOCR.PerformClick();
                 }
             }
-        }
-
-        public MainForm()
-        {
-            InitializeComponent();
         }
 
         /// <summary>
@@ -422,41 +413,11 @@ namespace OCR_MS
             File.WriteAllText( cfg, JsonConvert.SerializeObject( json, Formatting.Indented ) );
         }
 
-        private void MainForm_Load( object sender, EventArgs e )
-        {
-            Icon = Icon.ExtractAssociatedIcon( Application.ExecutablePath );
-
-            synth = new SpeechSynthesizer();
-            voice_default = synth.Voice.Name;
-            synth.SpeakStarted += Synth_SpeakStarted;
-            synth.SpeakProgress += Synth_SpeakProgress;
-            synth.StateChanged += Synth_StateChanged;
-            synth.SpeakCompleted += Synth_SpeakCompleted;
-
-            notify.Icon = Icon;
-            notify.BalloonTipTitle = this.Text;
-            notify.BalloonTipText = "Using \"Computer Vision API\" OCR feature.";
-            notify.Text = this.Text;
-
-            hint.ToolTipTitle = this.Text;
-
-            // Adds our form to the chain of clipboard viewers.
-            _clipboardViewerNext = SetClipboardViewer( this.Handle );
-
-            ////init_ocr_lang();
-            cbLanguage.Items.Clear();
-            cbLanguage.DataSource = new BindingSource( ocr_languages, null );
-            cbLanguage.DisplayMember = "Value";
-            cbLanguage.ValueMember = "Key";
-
-            LoadConfig();
-        }
-
         private void Synth_StateChanged(object sender, StateChangedEventArgs e)
         {
             if (synth == null) return;
 
-            if(synth.State == SynthesizerState.Paused)
+            if (synth.State == SynthesizerState.Paused)
             {
                 tsmiTextPlay.Checked = true;
                 tsmiTextPause.Checked = true;
@@ -493,6 +454,41 @@ namespace OCR_MS
             tsmiTextPlay.Checked = false;
             tsmiTextPause.Checked = false;
             tsmiTextStop.Checked = true;
+        }
+
+        public MainForm()
+        {
+            InitializeComponent();
+        }
+
+        private void MainForm_Load( object sender, EventArgs e )
+        {
+            Icon = Icon.ExtractAssociatedIcon( Application.ExecutablePath );
+
+            synth = new SpeechSynthesizer();
+            voice_default = synth.Voice.Name;
+            synth.SpeakStarted += Synth_SpeakStarted;
+            synth.SpeakProgress += Synth_SpeakProgress;
+            synth.StateChanged += Synth_StateChanged;
+            synth.SpeakCompleted += Synth_SpeakCompleted;
+
+            notify.Icon = Icon;
+            notify.BalloonTipTitle = this.Text;
+            notify.BalloonTipText = "Using \"Computer Vision API\" OCR feature.";
+            notify.Text = this.Text;
+
+            hint.ToolTipTitle = this.Text;
+
+            // Adds our form to the chain of clipboard viewers.
+            _clipboardViewerNext = SetClipboardViewer( this.Handle );
+
+            ////init_ocr_lang();
+            cbLanguage.Items.Clear();
+            cbLanguage.DataSource = new BindingSource( ocr_languages, null );
+            cbLanguage.DisplayMember = "Value";
+            cbLanguage.ValueMember = "Key";
+
+            LoadConfig();
         }
 
         private void MainForm_FormClosing( object sender, FormClosingEventArgs e )
@@ -710,7 +706,11 @@ namespace OCR_MS
                 tsmiWatchClipboard.Checked = CLIPBOARD_WATCH;
             }
             else if (sender == tsmiClearClipboard)
-                CLIPBOARD_CLEAR = (sender as ToolStripMenuItem).Checked;           
+            {
+                CLIPBOARD_CLEAR = (sender as ToolStripMenuItem).Checked;
+                //tsmiClearClipboard.Checked = CLIPBOARD_CLEAR;
+            }
+                
         }
 
         private void tsmiExit_Click( object sender, EventArgs e )

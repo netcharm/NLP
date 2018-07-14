@@ -52,6 +52,7 @@
             this.tsmiTextStop = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTopMost = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiCloseToTray = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity100 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity90 = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,7 +70,6 @@
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiCloseToTray = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -245,6 +245,15 @@
             resources.ApplyResources(this.tsmiTopMost, "tsmiTopMost");
             this.tsmiTopMost.Click += new System.EventHandler(this.tsmiTopMost_Click);
             // 
+            // tsmiCloseToTray
+            // 
+            this.tsmiCloseToTray.Checked = true;
+            this.tsmiCloseToTray.CheckOnClick = true;
+            this.tsmiCloseToTray.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiCloseToTray.Name = "tsmiCloseToTray";
+            resources.ApplyResources(this.tsmiCloseToTray, "tsmiCloseToTray");
+            this.tsmiCloseToTray.CheckedChanged += new System.EventHandler(this.tsmiCloseToTray_CheckedChanged);
+            // 
             // tsmiOpacity
             // 
             this.tsmiOpacity.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -360,15 +369,6 @@
             this.tsmiExit.Name = "tsmiExit";
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
-            // 
-            // tsmiCloseToTray
-            // 
-            this.tsmiCloseToTray.Checked = true;
-            this.tsmiCloseToTray.CheckOnClick = true;
-            this.tsmiCloseToTray.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.tsmiCloseToTray.Name = "tsmiCloseToTray";
-            resources.ApplyResources(this.tsmiCloseToTray, "tsmiCloseToTray");
-            this.tsmiCloseToTray.CheckedChanged += new System.EventHandler(this.tsmiCloseToTray_CheckedChanged);
             // 
             // MainForm
             // 
