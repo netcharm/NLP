@@ -36,23 +36,15 @@
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.pbar = new System.Windows.Forms.ProgressBar();
             this.hint = new System.Windows.Forms.ToolTip(this.components);
+            this.btnOCR = new System.Windows.Forms.Button();
+            this.btnTranslate = new System.Windows.Forms.Button();
+            this.btnSpeech = new System.Windows.Forms.Button();
             this.btnShowJSON = new System.Windows.Forms.Button();
             this.chkAutoClipboard = new System.Windows.Forms.CheckBox();
-            this.btnOCR = new System.Windows.Forms.Button();
-            this.btnSpeech = new System.Windows.Forms.Button();
             this.notify = new System.Windows.Forms.NotifyIcon(this.components);
             this.notifyMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsmiShowWindow = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiHistory = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep4 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiTextPlay = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiTextPause = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiTextStop = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTopMost = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiCloseToTray = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity100 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity90 = new System.Windows.Forms.ToolStripMenuItem();
@@ -64,11 +56,28 @@
             this.tsmiOpacity30 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity20 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpacity10 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiCloseToTray = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiHistory = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiHistoryClear = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiTextAutoSpeech = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextPlay = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextPause = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextStop = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiTranslateAuto = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTranslate = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTranslateSrc = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTranslateDst = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiClearClipboard = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiSep4 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
@@ -112,6 +121,34 @@
             this.hint.ShowAlways = true;
             this.hint.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             // 
+            // btnOCR
+            // 
+            resources.ApplyResources(this.btnOCR, "btnOCR");
+            this.btnOCR.Name = "btnOCR";
+            this.hint.SetToolTip(this.btnOCR, resources.GetString("btnOCR.ToolTip"));
+            this.btnOCR.UseVisualStyleBackColor = true;
+            this.btnOCR.Click += new System.EventHandler(this.btnOCR_Click);
+            // 
+            // btnTranslate
+            // 
+            resources.ApplyResources(this.btnTranslate, "btnTranslate");
+            this.btnTranslate.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnTranslate.Image = global::OCR_MS.Properties.Resources.Translate_32x;
+            this.btnTranslate.Name = "btnTranslate";
+            this.hint.SetToolTip(this.btnTranslate, resources.GetString("btnTranslate.ToolTip"));
+            this.btnTranslate.UseVisualStyleBackColor = true;
+            this.btnTranslate.Click += new System.EventHandler(this.btnTranslate_Click);
+            // 
+            // btnSpeech
+            // 
+            resources.ApplyResources(this.btnSpeech, "btnSpeech");
+            this.btnSpeech.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnSpeech.Image = global::OCR_MS.Properties.Resources.Speech_32x;
+            this.btnSpeech.Name = "btnSpeech";
+            this.hint.SetToolTip(this.btnSpeech, resources.GetString("btnSpeech.ToolTip"));
+            this.btnSpeech.UseVisualStyleBackColor = true;
+            this.btnSpeech.Click += new System.EventHandler(this.btnSpeech_Click);
+            // 
             // btnShowJSON
             // 
             resources.ApplyResources(this.btnShowJSON, "btnShowJSON");
@@ -134,24 +171,6 @@
             this.chkAutoClipboard.UseVisualStyleBackColor = true;
             this.chkAutoClipboard.CheckedChanged += new System.EventHandler(this.chkAutoClipboard_CheckedChanged);
             // 
-            // btnOCR
-            // 
-            resources.ApplyResources(this.btnOCR, "btnOCR");
-            this.btnOCR.Name = "btnOCR";
-            this.hint.SetToolTip(this.btnOCR, resources.GetString("btnOCR.ToolTip"));
-            this.btnOCR.UseVisualStyleBackColor = true;
-            this.btnOCR.Click += new System.EventHandler(this.btnOCR_Click);
-            // 
-            // btnSpeech
-            // 
-            resources.ApplyResources(this.btnSpeech, "btnSpeech");
-            this.btnSpeech.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnSpeech.Image = global::OCR_MS.Properties.Resources.Speech_32x;
-            this.btnSpeech.Name = "btnSpeech";
-            this.hint.SetToolTip(this.btnSpeech, resources.GetString("btnSpeech.ToolTip"));
-            this.btnSpeech.UseVisualStyleBackColor = true;
-            this.btnSpeech.Click += new System.EventHandler(this.btnSpeech_Click);
-            // 
             // notify
             // 
             this.notify.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
@@ -165,22 +184,30 @@
             // 
             this.notifyMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmiShowWindow,
+            this.tsmiTopMost,
+            this.tsmiOpacity,
+            this.tsmiCloseToTray,
+            this.tsmiSep0,
             this.tsmiShowOCRResult,
-            this.tsmiSep3,
             this.tsmiHistory,
-            this.tsmiSep4,
+            this.tsmiHistoryClear,
+            this.tsmiSep1,
+            this.tsmiTextAutoSpeech,
             this.tsmiTextPlay,
             this.tsmiTextPause,
             this.tsmiTextStop,
-            this.tsmiSep0,
-            this.tsmiTopMost,
-            this.tsmiCloseToTray,
-            this.tsmiOpacity,
+            this.tsmiSep2,
+            this.tsmiTranslateAuto,
+            this.tsmiTranslate,
+            this.tsmiTranslateSrc,
+            this.tsmiTranslateDst,
+            this.tsmiSep3,
             this.tsmiWatchClipboard,
             this.tsmiClearClipboard,
-            this.tsmiSep1,
+            this.tsmiSep4,
+            this.tsmiOptions,
             this.tsmiSaveState,
-            this.tsmiSep2,
+            this.tsmiSep9,
             this.tsmiExit});
             this.notifyMenu.Name = "notifyMenu";
             resources.ApplyResources(this.notifyMenu, "notifyMenu");
@@ -191,68 +218,12 @@
             resources.ApplyResources(this.tsmiShowWindow, "tsmiShowWindow");
             this.tsmiShowWindow.Click += new System.EventHandler(this.tsmiShowWindow_Click);
             // 
-            // tsmiShowOCRResult
-            // 
-            this.tsmiShowOCRResult.Name = "tsmiShowOCRResult";
-            resources.ApplyResources(this.tsmiShowOCRResult, "tsmiShowOCRResult");
-            this.tsmiShowOCRResult.Click += new System.EventHandler(this.tsmiShowLastOCRResultJSON_Click);
-            // 
-            // tsmiSep3
-            // 
-            this.tsmiSep3.Name = "tsmiSep3";
-            resources.ApplyResources(this.tsmiSep3, "tsmiSep3");
-            // 
-            // tsmiHistory
-            // 
-            this.tsmiHistory.Name = "tsmiHistory";
-            resources.ApplyResources(this.tsmiHistory, "tsmiHistory");
-            this.tsmiHistory.DropDownOpening += new System.EventHandler(this.tsmiHistory_DropDownOpening);
-            // 
-            // tsmiSep4
-            // 
-            this.tsmiSep4.Name = "tsmiSep4";
-            resources.ApplyResources(this.tsmiSep4, "tsmiSep4");
-            // 
-            // tsmiTextPlay
-            // 
-            this.tsmiTextPlay.Name = "tsmiTextPlay";
-            resources.ApplyResources(this.tsmiTextPlay, "tsmiTextPlay");
-            this.tsmiTextPlay.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
-            // 
-            // tsmiTextPause
-            // 
-            this.tsmiTextPause.Name = "tsmiTextPause";
-            resources.ApplyResources(this.tsmiTextPause, "tsmiTextPause");
-            this.tsmiTextPause.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
-            // 
-            // tsmiTextStop
-            // 
-            this.tsmiTextStop.Checked = true;
-            this.tsmiTextStop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.tsmiTextStop.Name = "tsmiTextStop";
-            resources.ApplyResources(this.tsmiTextStop, "tsmiTextStop");
-            this.tsmiTextStop.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
-            // 
-            // tsmiSep0
-            // 
-            this.tsmiSep0.Name = "tsmiSep0";
-            resources.ApplyResources(this.tsmiSep0, "tsmiSep0");
-            // 
             // tsmiTopMost
             // 
             this.tsmiTopMost.CheckOnClick = true;
             this.tsmiTopMost.Name = "tsmiTopMost";
             resources.ApplyResources(this.tsmiTopMost, "tsmiTopMost");
             this.tsmiTopMost.Click += new System.EventHandler(this.tsmiTopMost_Click);
-            // 
-            // tsmiCloseToTray
-            // 
-            this.tsmiCloseToTray.Checked = true;
-            this.tsmiCloseToTray.CheckOnClick = true;
-            this.tsmiCloseToTray.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.tsmiCloseToTray.Name = "tsmiCloseToTray";
-            resources.ApplyResources(this.tsmiCloseToTray, "tsmiCloseToTray");
-            this.tsmiCloseToTray.CheckedChanged += new System.EventHandler(this.tsmiCloseToTray_CheckedChanged);
             // 
             // tsmiOpacity
             // 
@@ -332,6 +303,101 @@
             resources.ApplyResources(this.tsmiOpacity10, "tsmiOpacity10");
             this.tsmiOpacity10.Click += new System.EventHandler(this.tsmiOpacityValue_Click);
             // 
+            // tsmiCloseToTray
+            // 
+            this.tsmiCloseToTray.Checked = true;
+            this.tsmiCloseToTray.CheckOnClick = true;
+            this.tsmiCloseToTray.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiCloseToTray.Name = "tsmiCloseToTray";
+            resources.ApplyResources(this.tsmiCloseToTray, "tsmiCloseToTray");
+            this.tsmiCloseToTray.CheckedChanged += new System.EventHandler(this.tsmiCloseToTray_CheckedChanged);
+            // 
+            // tsmiSep0
+            // 
+            this.tsmiSep0.Name = "tsmiSep0";
+            resources.ApplyResources(this.tsmiSep0, "tsmiSep0");
+            // 
+            // tsmiShowOCRResult
+            // 
+            this.tsmiShowOCRResult.Name = "tsmiShowOCRResult";
+            resources.ApplyResources(this.tsmiShowOCRResult, "tsmiShowOCRResult");
+            this.tsmiShowOCRResult.Click += new System.EventHandler(this.tsmiShowLastOCRResultJSON_Click);
+            // 
+            // tsmiHistory
+            // 
+            this.tsmiHistory.Name = "tsmiHistory";
+            resources.ApplyResources(this.tsmiHistory, "tsmiHistory");
+            this.tsmiHistory.DropDownOpening += new System.EventHandler(this.tsmiHistory_DropDownOpening);
+            // 
+            // tsmiHistoryClear
+            // 
+            this.tsmiHistoryClear.Name = "tsmiHistoryClear";
+            resources.ApplyResources(this.tsmiHistoryClear, "tsmiHistoryClear");
+            this.tsmiHistoryClear.Click += new System.EventHandler(this.tsmiHistoryClear_Click);
+            // 
+            // tsmiSep1
+            // 
+            this.tsmiSep1.Name = "tsmiSep1";
+            resources.ApplyResources(this.tsmiSep1, "tsmiSep1");
+            // 
+            // tsmiTextAutoSpeech
+            // 
+            this.tsmiTextAutoSpeech.CheckOnClick = true;
+            this.tsmiTextAutoSpeech.Name = "tsmiTextAutoSpeech";
+            resources.ApplyResources(this.tsmiTextAutoSpeech, "tsmiTextAutoSpeech");
+            // 
+            // tsmiTextPlay
+            // 
+            this.tsmiTextPlay.Name = "tsmiTextPlay";
+            resources.ApplyResources(this.tsmiTextPlay, "tsmiTextPlay");
+            this.tsmiTextPlay.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
+            // 
+            // tsmiTextPause
+            // 
+            this.tsmiTextPause.Name = "tsmiTextPause";
+            resources.ApplyResources(this.tsmiTextPause, "tsmiTextPause");
+            this.tsmiTextPause.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
+            // 
+            // tsmiTextStop
+            // 
+            this.tsmiTextStop.Checked = true;
+            this.tsmiTextStop.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiTextStop.Name = "tsmiTextStop";
+            resources.ApplyResources(this.tsmiTextStop, "tsmiTextStop");
+            this.tsmiTextStop.Click += new System.EventHandler(this.tsmiTextSpeech_Click);
+            // 
+            // tsmiSep2
+            // 
+            this.tsmiSep2.Name = "tsmiSep2";
+            resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
+            // 
+            // tsmiTranslateAuto
+            // 
+            this.tsmiTranslateAuto.CheckOnClick = true;
+            this.tsmiTranslateAuto.Name = "tsmiTranslateAuto";
+            resources.ApplyResources(this.tsmiTranslateAuto, "tsmiTranslateAuto");
+            // 
+            // tsmiTranslate
+            // 
+            this.tsmiTranslate.Name = "tsmiTranslate";
+            resources.ApplyResources(this.tsmiTranslate, "tsmiTranslate");
+            this.tsmiTranslate.Click += new System.EventHandler(this.tsmiTranslate_Click);
+            // 
+            // tsmiTranslateSrc
+            // 
+            this.tsmiTranslateSrc.Name = "tsmiTranslateSrc";
+            resources.ApplyResources(this.tsmiTranslateSrc, "tsmiTranslateSrc");
+            // 
+            // tsmiTranslateDst
+            // 
+            this.tsmiTranslateDst.Name = "tsmiTranslateDst";
+            resources.ApplyResources(this.tsmiTranslateDst, "tsmiTranslateDst");
+            // 
+            // tsmiSep3
+            // 
+            this.tsmiSep3.Name = "tsmiSep3";
+            resources.ApplyResources(this.tsmiSep3, "tsmiSep3");
+            // 
             // tsmiWatchClipboard
             // 
             this.tsmiWatchClipboard.Checked = true;
@@ -348,10 +414,16 @@
             resources.ApplyResources(this.tsmiClearClipboard, "tsmiClearClipboard");
             this.tsmiClearClipboard.CheckedChanged += new System.EventHandler(this.chkAutoClipboard_CheckedChanged);
             // 
-            // tsmiSep1
+            // tsmiSep4
             // 
-            this.tsmiSep1.Name = "tsmiSep1";
-            resources.ApplyResources(this.tsmiSep1, "tsmiSep1");
+            this.tsmiSep4.Name = "tsmiSep4";
+            resources.ApplyResources(this.tsmiSep4, "tsmiSep4");
+            // 
+            // tsmiOptions
+            // 
+            this.tsmiOptions.Name = "tsmiOptions";
+            resources.ApplyResources(this.tsmiOptions, "tsmiOptions");
+            this.tsmiOptions.Click += new System.EventHandler(this.tsmiOptions_Click);
             // 
             // tsmiSaveState
             // 
@@ -359,10 +431,10 @@
             resources.ApplyResources(this.tsmiSaveState, "tsmiSaveState");
             this.tsmiSaveState.Click += new System.EventHandler(this.tsmiSaveState_Click);
             // 
-            // tsmiSep2
+            // tsmiSep9
             // 
-            this.tsmiSep2.Name = "tsmiSep2";
-            resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
+            this.tsmiSep9.Name = "tsmiSep9";
+            resources.ApplyResources(this.tsmiSep9, "tsmiSep9");
             // 
             // tsmiExit
             // 
@@ -376,6 +448,7 @@
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ContextMenuStrip = this.notifyMenu;
+            this.Controls.Add(this.btnTranslate);
             this.Controls.Add(this.btnSpeech);
             this.Controls.Add(this.btnShowJSON);
             this.Controls.Add(this.pbar);
@@ -410,13 +483,13 @@
         private System.Windows.Forms.NotifyIcon notify;
         private System.Windows.Forms.ContextMenuStrip notifyMenu;
         private System.Windows.Forms.ToolStripMenuItem tsmiShowWindow;
-        private System.Windows.Forms.ToolStripSeparator tsmiSep1;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep0;
         private System.Windows.Forms.ToolStripMenuItem tsmiExit;
         private System.Windows.Forms.ToolStripMenuItem tsmiTopMost;
-        private System.Windows.Forms.ToolStripSeparator tsmiSep2;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep9;
         private System.Windows.Forms.ToolStripMenuItem tsmiShowOCRResult;
         private System.Windows.Forms.ToolStripMenuItem tsmiWatchClipboard;
-        private System.Windows.Forms.ToolStripSeparator tsmiSep0;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep2;
         private System.Windows.Forms.ToolStripMenuItem tsmiSaveState;
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity;
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity100;
@@ -430,14 +503,23 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity20;
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity10;
         private System.Windows.Forms.Button btnSpeech;
-        private System.Windows.Forms.ToolStripSeparator tsmiSep3;
-        private System.Windows.Forms.ToolStripMenuItem tsmiHistory;
         private System.Windows.Forms.ToolStripSeparator tsmiSep4;
+        private System.Windows.Forms.ToolStripMenuItem tsmiHistory;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep1;
         private System.Windows.Forms.ToolStripMenuItem tsmiTextPlay;
         private System.Windows.Forms.ToolStripMenuItem tsmiTextPause;
         private System.Windows.Forms.ToolStripMenuItem tsmiTextStop;
         private System.Windows.Forms.ToolStripMenuItem tsmiClearClipboard;
         private System.Windows.Forms.ToolStripMenuItem tsmiCloseToTray;
+        private System.Windows.Forms.ToolStripMenuItem tsmiHistoryClear;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextAutoSpeech;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep3;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTranslateAuto;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTranslate;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTranslateSrc;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTranslateDst;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOptions;
+        private System.Windows.Forms.Button btnTranslate;
     }
 }
 
