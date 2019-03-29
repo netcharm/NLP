@@ -79,6 +79,7 @@
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiLogOCRHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -100,6 +101,7 @@
             this.cbLanguage.FormattingEnabled = true;
             this.cbLanguage.Name = "cbLanguage";
             this.hint.SetToolTip(this.cbLanguage, resources.GetString("cbLanguage.ToolTip"));
+            this.cbLanguage.SelectedIndexChanged += new System.EventHandler(this.cbLanguage_SelectedIndexChanged);
             // 
             // lblLanguage
             // 
@@ -188,6 +190,7 @@
             this.tsmiOpacity,
             this.tsmiCloseToTray,
             this.tsmiSep0,
+            this.tsmiLogOCRHistory,
             this.tsmiShowOCRResult,
             this.tsmiHistory,
             this.tsmiHistoryClear,
@@ -345,6 +348,7 @@
             this.tsmiTextAutoSpeech.CheckOnClick = true;
             this.tsmiTextAutoSpeech.Name = "tsmiTextAutoSpeech";
             resources.ApplyResources(this.tsmiTextAutoSpeech, "tsmiTextAutoSpeech");
+            this.tsmiTextAutoSpeech.CheckedChanged += new System.EventHandler(this.tsmiTextAutoSpeech_CheckedChanged);
             // 
             // tsmiTextPlay
             // 
@@ -376,6 +380,7 @@
             this.tsmiTranslateAuto.CheckOnClick = true;
             this.tsmiTranslateAuto.Name = "tsmiTranslateAuto";
             resources.ApplyResources(this.tsmiTranslateAuto, "tsmiTranslateAuto");
+            this.tsmiTranslateAuto.CheckedChanged += new System.EventHandler(this.tsmiTranslateAuto_CheckedChanged);
             // 
             // tsmiTranslate
             // 
@@ -441,6 +446,13 @@
             this.tsmiExit.Name = "tsmiExit";
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
+            // tsmiLogOCRHistory
+            // 
+            this.tsmiLogOCRHistory.CheckOnClick = true;
+            this.tsmiLogOCRHistory.Name = "tsmiLogOCRHistory";
+            resources.ApplyResources(this.tsmiLogOCRHistory, "tsmiLogOCRHistory");
+            this.tsmiLogOCRHistory.CheckedChanged += new System.EventHandler(this.tsmiLogOCRHistory_CheckedChanged);
             // 
             // MainForm
             // 
@@ -520,6 +532,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiTranslateDst;
         private System.Windows.Forms.ToolStripMenuItem tsmiOptions;
         private System.Windows.Forms.Button btnTranslate;
+        private System.Windows.Forms.ToolStripMenuItem tsmiLogOCRHistory;
     }
 }
 

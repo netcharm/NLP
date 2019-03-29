@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -16,8 +18,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace OCR_MS
 {
@@ -33,6 +33,9 @@ namespace OCR_MS
         private bool CLIPBOARD_CLEAR = false;
         private bool CLIPBOARD_WATCH = true;
 
+        private bool OCR_HISTORY = false;
+
+        private bool SPEECH_AUTO = false;
         private bool SPEECH_SLOW = false;
         private string SPEECH_TEXT = string.Empty;
 
@@ -267,7 +270,7 @@ namespace OCR_MS
 
             return (result);
         }
-
+        private bool TRANSLATING_AUTO = false;
         #endregion
 
         #region Speech
@@ -460,13 +463,32 @@ namespace OCR_MS
                 }
                 #endregion
 
+                #region OCR History
+                JToken ocrhist = token.SelectToken("$..ocr.log_history", false);
+                if (ocrhist != null)
+                {
+                    try
+                    {
+                        OCR_HISTORY = Convert.ToBoolean(ocrhist);
+
+                    }
+                    catch (Exception) { }
+                }
+                tsmiLogOCRHistory.Checked = OCR_HISTORY;
+                tsmiHistory.Visible = OCR_HISTORY;
+                tsmiHistory.Enabled = OCR_HISTORY;
+                tsmiHistoryClear.Visible = OCR_HISTORY;
+                tsmiHistoryClear.Enabled = OCR_HISTORY;
+                #endregion
+
                 #region Translate Options
                 JToken autotrans = token.SelectToken("$..translate.auto_translate", false);
                 if (autotrans != null)
                 {
                     try
                     {
-                        tsmiTranslateAuto.Checked = Convert.ToBoolean(autotrans);
+                        TRANSLATING_AUTO = Convert.ToBoolean(autotrans);
+                        tsmiTranslateAuto.Checked = TRANSLATING_AUTO;
                     }
                     catch (Exception) { }
                 }
@@ -497,11 +519,13 @@ namespace OCR_MS
                 {
                     try
                     {
-                        tsmiTextAutoSpeech.Checked = Convert.ToBoolean(autospeech);
+                        SPEECH_AUTO = Convert.ToBoolean(autospeech);
+                        tsmiTextAutoSpeech.Checked = SPEECH_AUTO;
                     }
                     catch (Exception) { }
                 }
                 #endregion
+
             }
             CFGLOADED = true;
         }
@@ -533,6 +557,11 @@ namespace OCR_MS
                     {
                         { "w", this.Width },
                         { "h", this.Height }
+                    }
+                },
+                { "ocr",new Dictionary<string, object>()
+                    {
+                        { "log_history", OCR_HISTORY },
                     }
                 },
                 {"translate", new Dictionary<string, object>()
@@ -732,8 +761,11 @@ namespace OCR_MS
                         if (!string.IsNullOrEmpty(edResult.Text))
                         {
                             tsmiShowWindow.PerformClick();
-                            if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
-                            ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
+                            if (OCR_HISTORY)
+                            {
+                                if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
+                                ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
+                            }
                         }
                         if (CLIPBOARD_CLEAR && !string.IsNullOrEmpty(edResult.Text)) Clipboard.Clear();
                     }
@@ -774,28 +806,30 @@ namespace OCR_MS
 
             try
             {
-                synth.SelectVoice(voice_default);
-                string lang = cbLanguage.SelectedValue.ToString();
-                if (lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase)) lang = Result_Lang;
-
                 string text = edResult.Text;
                 if (edResult.SelectionLength > 0) text = edResult.SelectedText;
 
-                //
-                // 中文：[\u4e00-\u9fcc, \u3400-\u4db5, \u20000-\u2a6d6, \u2a700-\u2b734, \u2b740-\u2b81d, \uf900-\ufad9, \u2f800-\u2fa1d]
-                // 日文：[\u0800-\u4e00] [\u3041-\u31ff]
-                // 韩文：[\uac00-\ud7ff]
-                //
-                //var m_jp = Regex.Matches(text, @"([\u0800-\u4e00])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-                //var m_zh = Regex.Matches(text, @"([\u4e00-\u9fbb])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+                synth.SelectVoice(voice_default);
+                string lang = cbLanguage.SelectedValue.ToString();
+                if (lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    lang = Result_Lang;
+                    //
+                    // 中文：[\u4e00-\u9fcc, \u3400-\u4db5, \u20000-\u2a6d6, \u2a700-\u2b734, \u2b740-\u2b81d, \uf900-\ufad9, \u2f800-\u2fa1d]
+                    // 日文：[\u0800-\u4e00] [\u3041-\u31ff]
+                    // 韩文：[\uac00-\ud7ff]
+                    //
+                    //var m_jp = Regex.Matches(text, @"([\u0800-\u4e00])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+                    //var m_zh = Regex.Matches(text, @"([\u4e00-\u9fbb])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
-                if (Regex.Matches(text, @"[\u3041-\u31ff]", RegexOptions.Multiline).Count > 0)
-                {
-                    lang = "ja";
-                }
-                else if (Regex.Matches(text, @"[\u4e00-\u9fbb]", RegexOptions.Multiline).Count > 0)
-                {
-                    lang = "zh";
+                    if (Regex.Matches(text, @"[\u3041-\u31ff]", RegexOptions.Multiline).Count > 0)
+                    {
+                        lang = "ja";
+                    }
+                    else if (Regex.Matches(text, @"[\u4e00-\u9fbb]", RegexOptions.Multiline).Count > 0)
+                    {
+                        lang = "zh";
+                    }
                 }
 
                 // Initialize a new instance of the SpeechSynthesizer.
@@ -868,6 +902,7 @@ namespace OCR_MS
                     if (!ls.Equals("unk", StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(ls))
                         langSrc = ls;
                     //else langSrc = string.Empty;
+                    if (string.IsNullOrEmpty(langSrc) && !lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase)) langSrc = lang;
 
                     if (!ld.Equals("unk", StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(ld))
                         langDst = ld;
@@ -1022,17 +1057,20 @@ namespace OCR_MS
 
         private void tsmiHistory_DropDownOpening(object sender, EventArgs e)
         {
-            tsmiHistory.DropDownItems.Clear();
-            foreach (var item in ResultHistory)
+            if (OCR_HISTORY)
             {
-                ToolStripMenuItem mi = new ToolStripMenuItem(item.Key);
-                mi.Name = $"ResultHistory_{ResultHistory.IndexOf(item)}";
-                mi.Text = item.Key;
-                mi.Tag = item.Value;
-                mi.Click += tsmiHistory_Click;
-                tsmiHistory.DropDownItems.Insert(0, mi);
-                if ((string)tsmiHistory.Tag == mi.Name) mi.Checked = true;
-                if (tsmiHistory.DropDownItems.Count > 25) break;
+                tsmiHistory.DropDownItems.Clear();
+                foreach (var item in ResultHistory)
+                {
+                    ToolStripMenuItem mi = new ToolStripMenuItem(item.Key);
+                    mi.Name = $"ResultHistory_{ResultHistory.IndexOf(item)}";
+                    mi.Text = item.Key;
+                    mi.Tag = item.Value;
+                    mi.Click += tsmiHistory_Click;
+                    tsmiHistory.DropDownItems.Insert(0, mi);
+                    if ((string)tsmiHistory.Tag == mi.Name) mi.Checked = true;
+                    if (tsmiHistory.DropDownItems.Count > 25) break;
+                }
             }
         }
 
@@ -1125,6 +1163,30 @@ namespace OCR_MS
                     tsmiTranslateDst.Tag = obj.Tag;
                 }
             }
+        }
+
+        private void tsmiLogOCRHistory_CheckedChanged(object sender, EventArgs e)
+        {
+            OCR_HISTORY = tsmiLogOCRHistory.Checked;
+            tsmiHistory.Visible = OCR_HISTORY;
+            tsmiHistory.Enabled = OCR_HISTORY;
+            tsmiHistoryClear.Visible = OCR_HISTORY;
+            tsmiHistoryClear.Enabled = OCR_HISTORY;
+        }
+
+        private void tsmiTranslateAuto_CheckedChanged(object sender, EventArgs e)
+        {
+            TRANSLATING_AUTO = tsmiTranslateAuto.Checked;
+        }
+
+        private void tsmiTextAutoSpeech_CheckedChanged(object sender, EventArgs e)
+        {
+            SPEECH_AUTO = tsmiTextAutoSpeech.Checked;
+        }
+
+        private void cbLanguage_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SPEECH_SLOW = true;
         }
     }
 }
