@@ -806,8 +806,7 @@ namespace OCR_MS
 
             try
             {
-                string text = edResult.Text;
-                if (edResult.SelectionLength > 0) text = edResult.SelectedText;
+                string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
 
                 synth.SelectVoice(voice_default);
                 string lang = cbLanguage.SelectedValue.ToString();
@@ -884,6 +883,7 @@ namespace OCR_MS
             {
                 MessageBox.Show(this, ex.Data.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
             }
+            edResult.Focus();
         }
 
         private async void btnTranslate_Click(object sender, EventArgs e)
@@ -912,16 +912,13 @@ namespace OCR_MS
                         langDst = cl.Parent.IetfLanguageTag;
                     }
 
+                    string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
+
                     StringBuilder sb = new StringBuilder();
                     sb.AppendLine(edResult.Text.Trim());
                     sb.AppendLine();
-                    sb.AppendLine(await MakeRequest_Translate(edResult.Text.Trim(), langDst, langSrc));
+                    sb.AppendLine(await MakeRequest_Translate(text, langDst, langSrc));
                     edResult.Text = sb.ToString();
-
-                    if (!string.IsNullOrEmpty(edResult.Text))
-                    {
-                        tsmiShowWindow.PerformClick();
-                    }
                 }
                 catch (Exception) { }
                 finally
