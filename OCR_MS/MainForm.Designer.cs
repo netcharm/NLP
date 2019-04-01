@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.edResult = new System.Windows.Forms.TextBox();
+            this.edResult = new System.Windows.Forms.RichTextBox();
             this.cbLanguage = new System.Windows.Forms.ComboBox();
             this.lblLanguage = new System.Windows.Forms.Label();
             this.timer = new System.Windows.Forms.Timer(this.components);
@@ -58,6 +58,7 @@
             this.tsmiOpacity10 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiCloseToTray = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiLogOCRHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiHistoryClear = new System.Windows.Forms.ToolStripMenuItem();
@@ -79,19 +80,21 @@
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiLogOCRHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // edResult
             // 
-            this.edResult.AcceptsReturn = true;
             this.edResult.AcceptsTab = true;
             this.edResult.AccessibleRole = System.Windows.Forms.AccessibleRole.Client;
             resources.ApplyResources(this.edResult, "edResult");
-            this.edResult.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.edResult.AutoWordSelection = true;
+            this.edResult.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.edResult.HideSelection = false;
             this.edResult.Name = "edResult";
+            this.edResult.ShowSelectionMargin = true;
+            this.edResult.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.edResult.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
             this.edResult.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edResult_KeyUp);
             // 
             // cbLanguage
@@ -320,6 +323,13 @@
             this.tsmiSep0.Name = "tsmiSep0";
             resources.ApplyResources(this.tsmiSep0, "tsmiSep0");
             // 
+            // tsmiLogOCRHistory
+            // 
+            this.tsmiLogOCRHistory.CheckOnClick = true;
+            this.tsmiLogOCRHistory.Name = "tsmiLogOCRHistory";
+            resources.ApplyResources(this.tsmiLogOCRHistory, "tsmiLogOCRHistory");
+            this.tsmiLogOCRHistory.CheckedChanged += new System.EventHandler(this.tsmiLogOCRHistory_CheckedChanged);
+            // 
             // tsmiShowOCRResult
             // 
             this.tsmiShowOCRResult.Name = "tsmiShowOCRResult";
@@ -447,16 +457,10 @@
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
-            // tsmiLogOCRHistory
-            // 
-            this.tsmiLogOCRHistory.CheckOnClick = true;
-            this.tsmiLogOCRHistory.Name = "tsmiLogOCRHistory";
-            resources.ApplyResources(this.tsmiLogOCRHistory, "tsmiLogOCRHistory");
-            this.tsmiLogOCRHistory.CheckedChanged += new System.EventHandler(this.tsmiLogOCRHistory_CheckedChanged);
-            // 
             // MainForm
             // 
             this.AcceptButton = this.btnOCR;
+            this.AllowDrop = true;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ContextMenuStrip = this.notifyMenu;
@@ -474,24 +478,27 @@
             this.Name = "MainForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             this.notifyMenu.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.Button btnOCR;
-        private System.Windows.Forms.TextBox edResult;
+        private System.Windows.Forms.Button btnShowJSON;
+        private System.Windows.Forms.Button btnSpeech;
+        private System.Windows.Forms.Button btnTranslate;
+        private System.Windows.Forms.RichTextBox edResult;
         private System.Windows.Forms.CheckBox chkAutoClipboard;
         private System.Windows.Forms.ComboBox cbLanguage;
         private System.Windows.Forms.Label lblLanguage;
         private System.Windows.Forms.Timer timer;
         private System.Windows.Forms.ProgressBar pbar;
         private System.Windows.Forms.ToolTip hint;
-        private System.Windows.Forms.Button btnShowJSON;
         private System.Windows.Forms.NotifyIcon notify;
         private System.Windows.Forms.ContextMenuStrip notifyMenu;
         private System.Windows.Forms.ToolStripMenuItem tsmiShowWindow;
@@ -514,7 +521,6 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity30;
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity20;
         private System.Windows.Forms.ToolStripMenuItem tsmiOpacity10;
-        private System.Windows.Forms.Button btnSpeech;
         private System.Windows.Forms.ToolStripSeparator tsmiSep4;
         private System.Windows.Forms.ToolStripMenuItem tsmiHistory;
         private System.Windows.Forms.ToolStripSeparator tsmiSep1;
@@ -531,7 +537,6 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiTranslateSrc;
         private System.Windows.Forms.ToolStripMenuItem tsmiTranslateDst;
         private System.Windows.Forms.ToolStripMenuItem tsmiOptions;
-        private System.Windows.Forms.Button btnTranslate;
         private System.Windows.Forms.ToolStripMenuItem tsmiLogOCRHistory;
     }
 }

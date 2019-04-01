@@ -125,24 +125,21 @@
   <data name="edResult.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 7</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="edResult.Multiline" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="edResult.ScrollBars" type="System.Windows.Forms.ScrollBars, System.Windows.Forms">
-    <value>Both</value>
-  </data>
   <data name="edResult.Size" type="System.Drawing.Size, System.Drawing">
     <value>337, 80</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="edResult.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
+  </data>
+  <data name="edResult.Text" xml:space="preserve">
+    <value />
   </data>
   <data name="&gt;&gt;edResult.Name" xml:space="preserve">
     <value>edResult</value>
   </data>
   <data name="&gt;&gt;edResult.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.RichTextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;edResult.Parent" xml:space="preserve">
     <value>$this</value>
@@ -441,6 +438,66 @@
   <data name="tsmiTopMost.Text" xml:space="preserve">
     <value>Always On Top</value>
   </data>
+  <data name="tsmiOpacity100.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity100.Text" xml:space="preserve">
+    <value>100%</value>
+  </data>
+  <data name="tsmiOpacity90.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity90.Text" xml:space="preserve">
+    <value>90%</value>
+  </data>
+  <data name="tsmiOpacity80.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity80.Text" xml:space="preserve">
+    <value>80%</value>
+  </data>
+  <data name="tsmiOpacity70.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity70.Text" xml:space="preserve">
+    <value>70%</value>
+  </data>
+  <data name="tsmiOpacity60.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity60.Text" xml:space="preserve">
+    <value>60%</value>
+  </data>
+  <data name="tsmiOpacity50.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity50.Text" xml:space="preserve">
+    <value>50%</value>
+  </data>
+  <data name="tsmiOpacity40.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity40.Text" xml:space="preserve">
+    <value>40%</value>
+  </data>
+  <data name="tsmiOpacity30.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity30.Text" xml:space="preserve">
+    <value>30%</value>
+  </data>
+  <data name="tsmiOpacity20.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity20.Text" xml:space="preserve">
+    <value>20%</value>
+  </data>
+  <data name="tsmiOpacity10.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiOpacity10.Text" xml:space="preserve">
+    <value>10%</value>
+  </data>
   <data name="tsmiOpacity.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
   </data>
@@ -585,66 +642,6 @@
   <data name="notify.Visible" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="tsmiOpacity100.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity100.Text" xml:space="preserve">
-    <value>100%</value>
-  </data>
-  <data name="tsmiOpacity90.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity90.Text" xml:space="preserve">
-    <value>90%</value>
-  </data>
-  <data name="tsmiOpacity80.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity80.Text" xml:space="preserve">
-    <value>80%</value>
-  </data>
-  <data name="tsmiOpacity70.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity70.Text" xml:space="preserve">
-    <value>70%</value>
-  </data>
-  <data name="tsmiOpacity60.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity60.Text" xml:space="preserve">
-    <value>60%</value>
-  </data>
-  <data name="tsmiOpacity50.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity50.Text" xml:space="preserve">
-    <value>50%</value>
-  </data>
-  <data name="tsmiOpacity40.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity40.Text" xml:space="preserve">
-    <value>40%</value>
-  </data>
-  <data name="tsmiOpacity30.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity30.Text" xml:space="preserve">
-    <value>30%</value>
-  </data>
-  <data name="tsmiOpacity20.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity20.Text" xml:space="preserve">
-    <value>20%</value>
-  </data>
-  <data name="tsmiOpacity10.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
-  </data>
-  <data name="tsmiOpacity10.Text" xml:space="preserve">
-    <value>10%</value>
-  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -771,6 +768,12 @@
   <data name="&gt;&gt;tsmiSep0.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;tsmiLogOCRHistory.Name" xml:space="preserve">
+    <value>tsmiLogOCRHistory</value>
+  </data>
+  <data name="&gt;&gt;tsmiLogOCRHistory.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;tsmiShowOCRResult.Name" xml:space="preserve">
     <value>tsmiShowOCRResult</value>
   </data>
@@ -895,12 +898,6 @@
     <value>tsmiExit</value>
   </data>
   <data name="&gt;&gt;tsmiExit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tsmiLogOCRHistory.Name" xml:space="preserve">
-    <value>tsmiLogOCRHistory</value>
-  </data>
-  <data name="&gt;&gt;tsmiLogOCRHistory.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
