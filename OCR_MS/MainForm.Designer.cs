@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.edResult = new System.Windows.Forms.RichTextBox();
+            this.edResult = new System.Windows.Forms.TextBox();
             this.cbLanguage = new System.Windows.Forms.ComboBox();
             this.lblLanguage = new System.Windows.Forms.Label();
             this.timer = new System.Windows.Forms.Timer(this.components);
@@ -86,16 +86,12 @@
             // edResult
             // 
             this.edResult.AcceptsTab = true;
-            this.edResult.AccessibleRole = System.Windows.Forms.AccessibleRole.Client;
             resources.ApplyResources(this.edResult, "edResult");
-            this.edResult.AutoWordSelection = true;
-            this.edResult.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.edResult.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.edResult.HideSelection = false;
             this.edResult.Name = "edResult";
-            this.edResult.ShowSelectionMargin = true;
-            this.edResult.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
-            this.edResult.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
             this.edResult.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edResult_KeyUp);
+            this.edResult.MouseMove += new System.Windows.Forms.MouseEventHandler(this.edResult_MouseMove);
             // 
             // cbLanguage
             // 
@@ -483,6 +479,7 @@
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             this.notifyMenu.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -492,7 +489,7 @@
         private System.Windows.Forms.Button btnShowJSON;
         private System.Windows.Forms.Button btnSpeech;
         private System.Windows.Forms.Button btnTranslate;
-        private System.Windows.Forms.RichTextBox edResult;
+        private System.Windows.Forms.TextBox edResult;
         private System.Windows.Forms.CheckBox chkAutoClipboard;
         private System.Windows.Forms.ComboBox cbLanguage;
         private System.Windows.Forms.Label lblLanguage;

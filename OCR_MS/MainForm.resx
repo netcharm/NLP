@@ -125,21 +125,21 @@
   <data name="edResult.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 7</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="edResult.Multiline" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
   <data name="edResult.Size" type="System.Drawing.Size, System.Drawing">
     <value>337, 80</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="edResult.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
-  </data>
-  <data name="edResult.Text" xml:space="preserve">
-    <value />
   </data>
   <data name="&gt;&gt;edResult.Name" xml:space="preserve">
     <value>edResult</value>
   </data>
   <data name="&gt;&gt;edResult.Type" xml:space="preserve">
-    <value>System.Windows.Forms.RichTextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;edResult.Parent" xml:space="preserve">
     <value>$this</value>

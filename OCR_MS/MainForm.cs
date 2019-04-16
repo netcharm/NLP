@@ -28,6 +28,9 @@ namespace OCR_MS
 
         private static Dictionary<string, string> ApiKey = new Dictionary<string, string>();
 
+        private static string[] exts_img = new string[] { ".bmp", ".jpg", ".png", ".jpeg", ".tif", ".tiff", ".gif" };
+        private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
+
         private bool CFGLOADED = false;
         private bool CLOSE_TO_TRAY = false;
         private bool CLIPBOARD_CLEAR = false;
@@ -684,6 +687,10 @@ namespace OCR_MS
             tsmiTranslateSrc.Tag = "unk";
             tsmiTranslateDst.Tag = "unk";
 
+            edResult.AcceptsReturn = true;
+            edResult.AcceptsTab = true;
+            edResult.AllowDrop = false;
+
             LoadConfig();
         }
 
@@ -715,89 +722,134 @@ namespace OCR_MS
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
         {
-            var fmts = e.Data.GetFormats();
+            try
+            {
+                var fmts = e.Data.GetFormats();
 #if DEBUG
-            Console.WriteLine($"{string.Join(", ",fmts)}");
+                Console.WriteLine($"{string.Join(", ", fmts)}");
 #endif
-            if (fmts.Contains("System.String") ||
-                fmts.Contains("UnicodeText") ||
-                fmts.Contains("Text") ||
-                //fmts.Contains("PNG") ||
-                //fmts.Contains("Bitmap") ||
-                fmts.Contains("FileName"))
-            {
-                e.Effect = DragDropEffects.Copy;
-                edResult.AllowDrop = true;
-                edResult.EnableAutoDragDrop = true;
+                if (fmts.Contains("System.String") ||
+                    fmts.Contains("UnicodeText") ||
+                    fmts.Contains("Text") ||
+                    //fmts.Contains("PNG") ||
+                    //fmts.Contains("Bitmap") ||
+                    fmts.Contains("FileName"))
+                {
+                    e.Effect = DragDropEffects.Copy;
+                    //edResult.AllowDrop = true;
+                }
+                else
+                {
+                    e.Effect = DragDropEffects.None;
+                    //edResult.AllowDrop = false;
+                }
             }
-            else
-            {
-                e.Effect = DragDropEffects.None;
-                edResult.AllowDrop = false;
-                edResult.EnableAutoDragDrop = false;
-            }
+            catch (Exception) { }
         }
 
         private async void MainForm_DragDrop(object sender, DragEventArgs e)
         {
-            var fmts = e.Data.GetFormats();
-            if (fmts.Contains("System.String"))
+            try
             {
-                if (!edResult.EnableAutoDragDrop)
-                    edResult.Text += (string)e.Data.GetData("System.String");
-            }
-            else if (fmts.Contains("UnicodeText"))
-            {
-                if (!edResult.EnableAutoDragDrop)
-                    edResult.Text += (string)e.Data.GetData("UnicodeText");
-            }
-            else if (fmts.Contains("Text"))
-            {
-                if (!edResult.EnableAutoDragDrop)
-                    edResult.Text += Encoding.UTF8.GetString(Encoding.Default.GetBytes(e.Data.GetData("Text") as string));
-            }
-            else if (fmts.Contains("PNG"))
-            {
-
-            }
-            else if (fmts.Contains("Bitmap"))
-            {
-
-            }
-            else if (fmts.Contains("FileName"))
-            {
-                try
+                var fmts = e.Data.GetFormats();
+                if (fmts.Contains("System.String"))
                 {
-                    btnOCR.Enabled = false;
-                    pbar.Style = ProgressBarStyle.Marquee;
-
-                    var fns = (string[])e.Data.GetData("FileName");
-                    if (fns.Length > 0)
+                    //if (edResult.AllowDrop)
                     {
-                        foreach (var fn in fns)
-                        {
-                            StringBuilder sb = new StringBuilder();
-                            try
-                            {
-                                using (Bitmap src = (Bitmap)Image.FromFile(fn))
-                                {
-                                    string lang = cbLanguage.SelectedValue.ToString();
-                                    sb.AppendLine(await Run_OCR(src, lang));
-                                    src.Dispose();
-                                }
-                            }
-                            catch (Exception) { }
-                            edResult.Text = sb.ToString();
-                        }
+                        var text = (string)e.Data.GetData("System.String");
+                        var idx = edResult.SelectionStart;
+                        edResult.Text = edResult.Text.Insert(idx, text);
+                        edResult.SelectionStart = idx;
                     }
                 }
-                catch (Exception) { }
-                finally
+                else if (fmts.Contains("UnicodeText"))
                 {
-                    pbar.Style = ProgressBarStyle.Blocks;
-                    btnOCR.Enabled = true;
+                    //if (edResult.AllowDrop)
+                    {
+                        var text = (string)e.Data.GetData("UnicodeText");
+                        var idx = edResult.SelectionStart;
+                        edResult.Text = edResult.Text.Insert(idx, text);
+                        edResult.SelectionStart = idx;
+                    }
+                }
+                else if (fmts.Contains("Text"))
+                {
+                    //if (edResult.AllowDrop)
+                    {
+                        var text = Encoding.UTF8.GetString(Encoding.Default.GetBytes(e.Data.GetData("Text") as string));
+                        var idx = edResult.SelectionStart;
+                        edResult.Text = edResult.Text.Insert(idx, text);
+                        edResult.SelectionStart = idx;
+                    }
+                }
+                else if (fmts.Contains("PNG"))
+                {
+                    var src = (Bitmap)(e.Data.GetData("PNG"));
+                    string lang = cbLanguage.SelectedValue.ToString();
+                    edResult.Text = await Run_OCR(src, lang);
+                }
+                else if (fmts.Contains("Bitmap"))
+                {
+                    var src = (Bitmap)e.Data.GetData("Bitmap");
+                    string lang = cbLanguage.SelectedValue.ToString();
+                    edResult.Text = await Run_OCR(src, lang);
+                }
+                else if (fmts.Contains("FileName"))
+                {
+                    try
+                    {
+                        btnOCR.Enabled = false;
+                        pbar.Style = ProgressBarStyle.Marquee;
+
+                        var fns = (string[])e.Data.GetData("FileName");
+                        if (fns.Length > 0)
+                        {
+                            foreach (var fn in fns)
+                            {
+                                var ext = Path.GetExtension(fn).ToLower();
+
+                                StringBuilder sb = new StringBuilder();
+                                if (exts_img.Contains(ext))
+                                {
+                                    try
+                                    {
+                                        string[] lines = File.ReadAllLines(fn);
+                                        foreach(var l in lines)
+                                        {
+                                            sb.AppendLine(l);
+                                        }
+                                    }
+                                    catch (Exception) { }
+                                }
+                                else if (exts_img.Contains(ext))
+                                {
+                                    try
+                                    {
+                                        using (Bitmap src = (Bitmap)Image.FromFile(fn))
+                                        {
+                                            string lang = cbLanguage.SelectedValue.ToString();
+                                            sb.AppendLine(await Run_OCR(src, lang));
+                                            src.Dispose();
+                                        }
+                                    }
+                                    catch (Exception) { }
+                                }
+
+                                var idx = edResult.SelectionStart;
+                                edResult.Text = edResult.Text.Insert(idx, sb.ToString());
+                                edResult.SelectionStart = idx;
+                            }
+                        }
+                    }
+                    catch (Exception) { }
+                    finally
+                    {
+                        pbar.Style = ProgressBarStyle.Blocks;
+                        btnOCR.Enabled = true;
+                    }
                 }
             }
+            catch (Exception) { }
         }
 
         private void notify_Click(object sender, EventArgs e)
@@ -1279,5 +1331,12 @@ namespace OCR_MS
             SPEECH_SLOW = true;
         }
 
+        private void edResult_MouseMove(object sender, MouseEventArgs e)
+        {
+            if(ModifierKeys == Keys.Control && e.Button == MouseButtons.Left && edResult.SelectionLength>0 )
+            {
+                edResult.DoDragDrop(edResult.SelectedText, DragDropEffects.Copy);
+            }
+        }
     }
 }
