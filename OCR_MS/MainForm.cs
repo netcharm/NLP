@@ -80,67 +80,10 @@ namespace OCR_MS
         internal static int ResultHistoryLimit = 100;
         internal List<KeyValuePair<string, string>> ResultHistory = new List<KeyValuePair<string, string>>(ResultHistoryLimit);
 
-        internal void init_ocr_lang()
-        {
-            ocr_lang.Clear();
-            foreach (var k in ocr_languages.Keys)
-            {
-                ocr_lang[ocr_languages[k]] = k;
-            }
-        }
-
-        internal static ImageCodecInfo GetEncoder(ImageFormat format)
-        {
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-            foreach (ImageCodecInfo codec in codecs)
-            {
-                if (codec.FormatID == format.Guid)
-                {
-                    return codec;
-                }
-            }
-            return null;
-        }
-
-        internal string ocr_ms(Bitmap src, string lang = "unk")
-        {
-            string result = "";
-
-            var uri = @"https://westus.api.cognitive.microsoft.com/vision/v1.0/ocr?language=unk&detectOrientation=true";
-
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create( uri );
-            request.Method = "POST";
-            //request.Timeout = 10000;
-            request.UserAgent = @"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20190101 Firefox/87.0";
-            request.Referer = @"https://westus.api.cognitive.microsoft.com";
-            request.ContentType = "application/octet-stream";
-            request.Headers["Ocp-Apim-Subscription-Key"] = "cd959382432345968384df3cd4663129";
-
-            using (Stream png = new MemoryStream())
-            {
-                src.Save(png, ImageFormat.Png);
-                byte[] buffer = ( (MemoryStream) png ).ToArray();
-                string buf = "data:image/png;base64," + Convert.ToBase64String( buffer );
-                request.ContentLength = buf.Length;
-                Stream requestStream = request.GetRequestStream();
-                requestStream.Write(Encoding.ASCII.GetBytes(buf), 0, buf.Length);
-                requestStream.Close();
-                //using ( Stream requestStream = request.GetRequestStream() )
-                //{
-                //    //png.CopyTo( requestStream );
-                //    requestStream.Write( Encoding.ASCII.GetBytes( buf ), 0, buf.Length );
-                //    //requestStream.Flush();
-                //}
-                HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-            }
-
-            return (result);
-        }
-
         internal async Task<string> MakeRequest_OCR(Bitmap src, string lang = "unk")
         {
             string result = "";
-            string ApiKey_CV = ApiKey.ContainsKey( "Computer Vision API" ) ? ApiKey["Computer Vision API"] : string.Empty;
+            string ApiKey_CV = ApiKey.ContainsKey( APIKEYTITLE_CV ) ? ApiKey[APIKEYTITLE_CV] : string.Empty;
 
             if (string.IsNullOrEmpty(ApiKey_CV)) return (result);
 
@@ -217,7 +160,7 @@ namespace OCR_MS
         #endregion
 
         #region Translate with microsoft cognitive api
-        private string APIKEYTITLE_TT = "Translator Text API";
+        private const string APIKEYTITLE_TT = "Translator Text API";
         internal async Task<string> MakeRequest_Translate(string src, string langDst = "zh-Hans", string langSrc = "")
         {
             string result = "";
