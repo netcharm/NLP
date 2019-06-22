@@ -38,6 +38,7 @@
             this.btnKeyword = new System.Windows.Forms.Button();
             this.layoutMain = new System.Windows.Forms.TableLayoutPanel();
             this.pnlTools = new System.Windows.Forms.Panel();
+            this.btnOCR = new System.Windows.Forms.Button();
             this.pnlOption = new System.Windows.Forms.Panel();
             this.lblInfo = new System.Windows.Forms.Label();
             this.chkTermNature = new System.Windows.Forms.CheckBox();
@@ -70,8 +71,9 @@
             this.cmiSepToPy = new System.Windows.Forms.ToolStripSeparator();
             this.cmiPyShowPunctuation = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiPySeprateCommas = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCustomDictReload = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.btnOCR = new System.Windows.Forms.Button();
+            this.cmiSepReload = new System.Windows.Forms.ToolStripSeparator();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
             this.pnlOption.SuspendLayout();
@@ -148,6 +150,13 @@
             this.pnlTools.Controls.Add(this.btnSummary);
             resources.ApplyResources(this.pnlTools, "pnlTools");
             this.pnlTools.Name = "pnlTools";
+            // 
+            // btnOCR
+            // 
+            resources.ApplyResources(this.btnOCR, "btnOCR");
+            this.btnOCR.Name = "btnOCR";
+            this.btnOCR.UseVisualStyleBackColor = true;
+            this.btnOCR.Click += new System.EventHandler(this.btnOCR_Click);
             // 
             // pnlOption
             // 
@@ -252,7 +261,9 @@
             this.cmiCutRecognizeOrganization,
             this.cmiSepToPy,
             this.cmiPyShowPunctuation,
-            this.cmiPySeprateCommas});
+            this.cmiPySeprateCommas,
+            this.cmiSepReload,
+            this.cmiCustomDictReload});
             this.cmActions.Name = "cmFilterText";
             resources.ApplyResources(this.cmActions, "cmActions");
             // 
@@ -395,12 +406,16 @@
             this.cmiPySeprateCommas.Name = "cmiPySeprateCommas";
             resources.ApplyResources(this.cmiPySeprateCommas, "cmiPySeprateCommas");
             // 
-            // btnOCR
+            // cmiCustomDictReload
             // 
-            resources.ApplyResources(this.btnOCR, "btnOCR");
-            this.btnOCR.Name = "btnOCR";
-            this.btnOCR.UseVisualStyleBackColor = true;
-            this.btnOCR.Click += new System.EventHandler(this.btnOCR_Click);
+            this.cmiCustomDictReload.Name = "cmiCustomDictReload";
+            resources.ApplyResources(this.cmiCustomDictReload, "cmiCustomDictReload");
+            this.cmiCustomDictReload.Click += new System.EventHandler(this.cmiCustomDictReload_Click);
+            // 
+            // cmiSepReload
+            // 
+            this.cmiSepReload.Name = "cmiSepReload";
+            resources.ApplyResources(this.cmiSepReload, "cmiSepReload");
             // 
             // MainForm
             // 
@@ -467,6 +482,8 @@
         private System.Windows.Forms.ToolStripMenuItem cmiPyShowPunctuation;
         private System.Windows.Forms.ToolStripMenuItem cmiPySeprateCommas;
         private System.Windows.Forms.Button btnOCR;
+        private System.Windows.Forms.ToolStripMenuItem cmiCustomDictReload;
+        private System.Windows.Forms.ToolStripSeparator cmiSepReload;
     }
 }
 

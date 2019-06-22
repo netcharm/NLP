@@ -51,65 +51,65 @@ namespace HanLP_Utils
         private void LoadConfig()
         {
             var config = Path.Combine(AppPath, "hanlp.properties");
-            if ( File.Exists( config ) )
+            if (File.Exists(config))
             {
                 var lines = File.ReadAllLines(config);
-                foreach ( string line in lines )
+                foreach (string line in lines)
                 {
-                    if ( line.StartsWith( "#" ) ) continue;
+                    if (line.StartsWith("#")) continue;
                     var kv = line.Split('=');
-                    if ( kv.Length == 2 )
+                    if (kv.Length == 2)
                     {
                         var k = kv[0].Trim();
                         var v = kv[1].Trim();
 
-                        if ( k.Equals( "root", StringComparison.CurrentCultureIgnoreCase ) )
+                        if (k.Equals("root", StringComparison.CurrentCultureIgnoreCase))
                         {
                             ROOT = v;
                         }
-                        else if ( k.Equals( "CoreDictionaryPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("CoreDictionaryPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             CoreDictionaryPath = v;
                         }
-                        else if ( k.Equals( "BiGramDictionaryPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("BiGramDictionaryPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             BiGramDictionaryPath = v;
                         }
-                        else if ( k.Equals( "CoreStopWordDictionaryPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("CoreStopWordDictionaryPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             CoreStopWordDictionaryPath = v;
                         }
-                        else if ( k.Equals( "CoreSynonymDictionaryDictionaryPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("CoreSynonymDictionaryDictionaryPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             CoreSynonymDictionaryDictionaryPath = v;
                         }
-                        else if ( k.Equals( "PersonDictionaryPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("PersonDictionaryPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             PersonDictionaryPath = v;
                         }
-                        else if ( k.Equals( "PersonDictionaryTrPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("PersonDictionaryTrPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             PersonDictionaryTrPath = v;
                         }
-                        else if ( k.Equals( "TraditionalChineseDictionaryPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("TraditionalChineseDictionaryPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             TraditionalChineseDictionaryPath = v;
                         }
-                        else if ( k.Equals( "CustomDictionaryPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("CustomDictionaryPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             CustomDictionaryPath = v;
                         }
-                        else if ( k.Equals( "CRFSegmentModelPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("CRFSegmentModelPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             CRFSegmentModelPath = v;
                         }
-                        else if ( k.Equals( "HMMSegmentModelPath", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("HMMSegmentModelPath", StringComparison.CurrentCultureIgnoreCase))
                         {
                             HMMSegmentModelPath = v;
                         }
-                        else if ( k.Equals( "ShowTermNature", StringComparison.CurrentCultureIgnoreCase ) )
+                        else if (k.Equals("ShowTermNature", StringComparison.CurrentCultureIgnoreCase))
                         {
-                            if ( bool.TryParse( v, out ShowTermNature ) )
+                            if (bool.TryParse(v, out ShowTermNature))
                             {
                                 //HanLP.Config.ShowTermNature = ShowTermNature;
                             }
@@ -117,7 +117,7 @@ namespace HanLP_Utils
                     }
                 }
             }
-            java.lang.System.getProperties().setProperty( "java.class.path", $"{ROOT};." );
+            java.lang.System.getProperties().setProperty("java.class.path", $"{ROOT};.");
             HanLP.Config.ShowTermNature = ShowTermNature;
             chkTermNature.Checked = HanLP.Config.ShowTermNature;
         }
@@ -127,95 +127,97 @@ namespace HanLP_Utils
             var sw = Stopwatch.StartNew();
 
             List<string> filelist = new List<string>();
-            filelist.AddRange( CustomDictionary.path );
+            filelist.AddRange(CustomDictionary.path);
             var CustomDict = CustomDictionaryPath.Split(';');
-            if ( CustomDict.Length > filelist.Count )
+            if (CustomDict.Length > filelist.Count)
             {
                 filelist.Clear();
                 string lastfolder = "";
-                for ( int i = 0; i < CustomDict.Length; i++ )
+                for (int i = 0; i < CustomDict.Length; i++)
                 {
-                    if ( string.IsNullOrEmpty( Path.GetDirectoryName( CustomDict[i] ) ) )
+                    if (string.IsNullOrEmpty(Path.GetDirectoryName(CustomDict[i].Trim())))
                     {
-                        filelist.Add( Path.Combine( ROOT, lastfolder, CustomDict[i].Trim() ) );
+                        var path = Path.Combine(ROOT, lastfolder, CustomDict[i].Trim()).Replace("\\", "/");
+                        if (!filelist.Contains(path)) filelist.Add(path);
                     }
                     else
                     {
-                        filelist.Add( Path.Combine( ROOT, CustomDict[i].Trim() ) );
-                        lastfolder = Path.GetDirectoryName( CustomDict[i] );
+                        var path = Path.Combine(ROOT, CustomDict[i].Trim()).Replace("\\", "/");
+                        if (!filelist.Contains(path)) filelist.Add(path);
+                        lastfolder = Path.GetDirectoryName(CustomDict[i].Trim());
                     }
                 }
             }
 
             List<string> userdict = new List<string>() {
-                    Path.Combine( ROOT, "data", "dictionary", "userdict.txt" ),
-                    Path.Combine( AppPath, "userdict.txt" ),
+                    Path.Combine( ROOT, "data", "dictionary", "userdict.txt" ).Replace("\\", "/"),
+                    Path.Combine( AppPath, "userdict.txt" ).Replace("\\", "/"),
                 }.ToList();
-            if ( !CWD.Equals( AppPath, StringComparison.CurrentCultureIgnoreCase ) )
-                userdict.Add( Path.Combine( CWD, "userdict.txt" ) );
+            if (!CWD.Equals(AppPath, StringComparison.CurrentCultureIgnoreCase))
+                userdict.Add(Path.Combine(CWD, "userdict.txt").Replace("\\", "/"));
 
-            foreach ( var f in userdict )
+            foreach (var f in userdict)
             {
-                if ( File.Exists( f ) )
+                if (File.Exists(f))
                 {
-                    filelist.Add( f );
+                    filelist.Add(f);
                 }
             }
 
             StringBuilder sb = new StringBuilder();
             List<string> ss = new List<string>();
-            foreach ( string file in filelist )
+            foreach (string file in filelist)
             {
                 try
                 {
-                    var fn = $"{Path.GetDirectoryName(file)}\\{Path.GetFileNameWithoutExtension(file)}.txt";
-                    if ( !Directory.Exists( ROOT ) )
+                    var fn = $"{Path.GetDirectoryName(file)}{Path.DirectorySeparatorChar}{Path.GetFileNameWithoutExtension(file)}.txt";
+                    if (!Directory.Exists(ROOT))
                     {
-                        fn = fn.Replace( Path.GetFullPath( ROOT ), AppPath + Path.DirectorySeparatorChar );
+                        fn = fn.Replace(Path.GetFullPath(ROOT), AppPath + Path.DirectorySeparatorChar);
                     }
                     var nt = Path.GetExtension(file).Split();
-                    if ( File.Exists( fn ) )
+                    if (File.Exists(fn))
                     {
                         var lines = File.ReadAllLines(fn);
-                        if ( nt.Length > 1 )
+                        if (nt.Length > 1)
                         {
                             var nu = string.Join(" ", nt.Skip(1));
-                            for ( int i = 0; i < lines.Length; i++ )
+                            for (int i = 0; i < lines.Length; i++)
                             {
                                 lines[i] = $"{lines[i]} {nu} 1";
                             }
                         }
-                        ss.AddRange( lines );
+                        ss.AddRange(lines);
                     }
                 }
-                catch ( Exception ex )
+                catch (Exception ex)
                 {
-                    MessageBox.Show( ex.ToString() );
+                    MessageBox.Show(ex.ToString());
                 }
             }
-            foreach ( var w in ss )
+            foreach (var w in ss)
             {
                 try
                 {
-                    if ( string.IsNullOrEmpty( w ) )
+                    if (string.IsNullOrEmpty(w))
                         continue;
                     var ws = w.Split();
                     var uw = ws[0].Trim();
-                    if ( ws.Length == 1 )
-                        CustomDictionary.add( uw );
-                    else if ( ws.Length >= 2 )
+                    if (ws.Length == 1)
+                        CustomDictionary.add(uw);
+                    else if (ws.Length >= 2)
                     {
                         var nf = string.Join(" ", ws.Skip(1));
-                        CustomDictionary.add( uw, nf.Trim() );
+                        CustomDictionary.add(uw, nf.Trim());
                     }
-                    if ( CoreStopWordDictionary.contains( uw ) )
+                    if (CoreStopWordDictionary.contains(uw))
                     {
-                        CoreStopWordDictionary.remove( uw );
+                        CoreStopWordDictionary.remove(uw);
                     }
                 }
-                catch ( Exception ex )
+                catch (Exception ex)
                 {
-                    MessageBox.Show( ex.ToString() );
+                    MessageBox.Show(ex.ToString());
                 }
             }
 
@@ -228,36 +230,37 @@ namespace HanLP_Utils
             try
             {
                 List<string> stopwords = new List<string>();
-                stopwords.AddRange(new string[]{ "。", "、", "，", "　", "　　", "□", "□□", "一", "一一" } );
+                stopwords.AddRange(new string[] { "。", "、", "，", "　", "　　", "□", "□□", "一", "一一" });
 
                 List<string> stopfile = new List<string>() {
                     Path.Combine( ROOT, "data", "dictionary", "stopwords.txt" ),
                     Path.Combine( AppPath, "stopwords.txt" ),
-                }.ToList();
-                if ( !CWD.Equals( AppPath, StringComparison.CurrentCultureIgnoreCase ) )
-                    stopfile.Add(Path.Combine( CWD, "stopwords.txt" ));
+                };
+                if (!CWD.Equals(AppPath, StringComparison.CurrentCultureIgnoreCase))
+                    stopfile.Add(Path.Combine(CWD, "stopwords.txt"));
 
-                foreach ( var f in stopfile )
+                foreach (var f in stopfile)
                 {
-                    if ( File.Exists( f ) )
+                    if (File.Exists(f))
                     {
                         var lines = File.ReadAllLines( f );
-                        stopwords.AddRange( lines );
+                        stopwords.AddRange(lines);
                     }
                 }
-                foreach ( var w in stopwords )
+
+                foreach (var w in stopwords)
                 {
-                    if ( w.Trim().Length > 0 && !CustomDictionary.contains( w.Trim() ) )
-                        CoreStopWordDictionary.add( w );
+                    if (w.Trim().Length > 0 && !CustomDictionary.contains(w.Trim()) && !CoreStopWordDictionary.contains(w))
+                        CoreStopWordDictionary.add(w);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show( ex.ToString() );
+                MessageBox.Show(ex.ToString());
             }
         }
 
-        private string ReadUrl( string url )
+        private string ReadUrl(string url)
         {
             string result = string.Empty;
 
@@ -275,17 +278,17 @@ namespace HanLP_Utils
             var styles = doc.DocumentNode.SelectNodes( "//style" );
             var links = doc.DocumentNode.SelectNodes( "//a" );
             var comments = doc.DocumentNode.SelectNodes( "//comment()" );
-            foreach ( var node in scripts ) { node.Remove(); }
-            foreach ( var node in styles ) { node.Remove(); }
-            foreach ( var node in links ) { node.Remove(); }
-            foreach ( var node in comments ) { node.Remove(); }
+            foreach (var node in scripts) { node.Remove(); }
+            foreach (var node in styles) { node.Remove(); }
+            foreach (var node in links) { node.Remove(); }
+            foreach (var node in comments) { node.Remove(); }
 
-            result = doc.DocumentNode.SelectSingleNode( "//body" ).InnerText.Trim();
+            result = doc.DocumentNode.SelectSingleNode("//body").InnerText.Trim();
 
-            result = Regex.Replace( result, @"[ |(\r\n)|(\t)]{2,}", ", ", RegexOptions.IgnoreCase );
-            result = Regex.Replace( result, @"[(&gt;)|(&lt;)|(&amp;)]{1,}", " ", RegexOptions.IgnoreCase );
+            result = Regex.Replace(result, @"[ |(\r\n)|(\t)]{2,}", ", ", RegexOptions.IgnoreCase);
+            result = Regex.Replace(result, @"[(&gt;)|(&lt;)|(&amp;)]{1,}", " ", RegexOptions.IgnoreCase);
 
-            return ( result );
+            return (result);
         }
 
         private string[] GetLinks(string html)
@@ -294,83 +297,86 @@ namespace HanLP_Utils
 
             HtmlAgilityPack.HtmlWeb web = new HtmlWeb();
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument(); //web.Load(html);
-            doc.LoadHtml( html );
+            doc.LoadHtml(html);
             var alist = doc.DocumentNode.SelectNodes( "//a" );
-            foreach(var a in alist)
+            foreach (var a in alist)
             {
                 string href = a.GetAttributeValue( "href", "" );
-                links.Add( href );
+                links.Add(href);
             }
 
-            return ( links.ToArray() );
+            return (links.ToArray());
         }
 
-        private void MainForm_Load( object sender, EventArgs e )
+        private void MainForm_Load(object sender, EventArgs e)
         {
-            Icon = Icon.ExtractAssociatedIcon( Application.ExecutablePath );
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             try
             {
                 LoadConfig();
-                AddCustomDict();
                 AddStopWords();
+                AddCustomDict();
 
                 DefaultOutputFont = edDst.Font;
+
+                btnOCR.Visible = false;
+                btnOCR.Enabled = false;
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                MessageBox.Show( ex.ToString() );
+                MessageBox.Show(ex.ToString());
             }
         }
 
-        private void MainForm_DragOver( object sender, DragEventArgs e )
+        private void MainForm_DragOver(object sender, DragEventArgs e)
         {
-            if ( e.Data.GetDataPresent( DataFormats.FileDrop ) )
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] dragFiles = (string [])e.Data.GetData(DataFormats.FileDrop, true);
-                if ( dragFiles.Length > 0 )
+                if (dragFiles.Length > 0)
                 {
                     e.Effect = DragDropEffects.Copy;
                 }
             }
-            else if ( e.Data.GetDataPresent( DataFormats.Text ) || e.Data.GetDataPresent( DataFormats.UnicodeText ) )
+            else if (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(DataFormats.UnicodeText))
             {
                 e.Effect = DragDropEffects.Copy;
             }
             return;
         }
 
-        private void MainForm_DragDrop( object sender, DragEventArgs e )
+        private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
             // Determine whether string data exists in the drop data. If not, then 
             // the drop effect reflects that the drop cannot occur. 
-            if ( e.Data.GetDataPresent( DataFormats.FileDrop ) )
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 //e.Effect = DragDropEffects.Copy;
                 try
                 {
                     string[] dragFiles = (string [])e.Data.GetData(DataFormats.FileDrop, true);
-                    if ( dragFiles.Length > 0 )
+                    if (dragFiles.Length > 0)
                     {
                         string dragFileName = dragFiles[0].ToString();
                         string ext = Path.GetExtension(dragFileName).ToLower();
                         string[] text = { ".txt", ".text"};
                         string[] html = { ".htm", ".html", ".xml"};
 
-                        if ( dragFileName.EndsWith( ".url", StringComparison.CurrentCultureIgnoreCase ) )
+                        if (dragFileName.EndsWith(".url", StringComparison.CurrentCultureIgnoreCase))
                         {
                             var content = File.ReadAllLines( dragFileName );
-                            foreach ( var line in content )
+                            foreach (var line in content)
                             {
 
                             }
                         }
-                        else if ( text.Contains( ext )) 
+                        else if (text.Contains(ext))
                         {
-                            edSrc.Text = File.ReadAllText( dragFileName );
+                            edSrc.Text = File.ReadAllText(dragFileName);
                         }
-                        else if ( html.Contains( ext ) ) 
+                        else if (html.Contains(ext))
                         {
-                            edSrc.Text = ReadUrl( dragFileName );
+                            edSrc.Text = ReadUrl(dragFileName);
                         }
                     }
                 }
@@ -384,16 +390,16 @@ namespace HanLP_Utils
             //    var content = e.Data.GetData( DataFormats.Html, true ).ToString();
             //    edSrc.Text = string.Join("\n", GetLinks( content ));
             //}
-            else if ( e.Data.GetDataPresent( DataFormats.Text ) || 
-                      e.Data.GetDataPresent( DataFormats.UnicodeText ))
+            else if (e.Data.GetDataPresent(DataFormats.Text) ||
+                      e.Data.GetDataPresent(DataFormats.UnicodeText))
             {
                 var content = e.Data.GetData( "System.String", true ).ToString();
-                if ( content.StartsWith( "http://", StringComparison.CurrentCultureIgnoreCase ) ||
-                     content.StartsWith( "https://", StringComparison.CurrentCultureIgnoreCase ) ||
-                     content.StartsWith( "ftp://", StringComparison.CurrentCultureIgnoreCase ) ||
-                     content.StartsWith( "file://", StringComparison.CurrentCultureIgnoreCase ) )
+                if (content.StartsWith("http://", StringComparison.CurrentCultureIgnoreCase) ||
+                     content.StartsWith("https://", StringComparison.CurrentCultureIgnoreCase) ||
+                     content.StartsWith("ftp://", StringComparison.CurrentCultureIgnoreCase) ||
+                     content.StartsWith("file://", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    edSrc.Text = ReadUrl( content );
+                    edSrc.Text = ReadUrl(content);
                 }
                 else
                 {
@@ -403,22 +409,22 @@ namespace HanLP_Utils
             return;
         }
 
-        private void cmiCutMethod_Click( object sender, EventArgs e )
+        private void cmiCutMethod_Click(object sender, EventArgs e)
         {
-            foreach ( var cmi in cmActions.Items )
+            foreach (var cmi in cmActions.Items)
             {
-                if ( cmi.GetType() == typeof( ToolStripMenuItem ))
+                if (cmi.GetType() == typeof(ToolStripMenuItem))
                 {
                     var mi = cmi as ToolStripMenuItem;
-                    if ( mi.CheckOnClick && mi != sender && mi.Name.StartsWith( "cmiCutMethod", StringComparison.CurrentCultureIgnoreCase))
+                    if (mi.CheckOnClick && mi != sender && mi.Name.StartsWith("cmiCutMethod", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        mi.Checked = !( sender as ToolStripMenuItem ).Checked;
+                        mi.Checked = !(sender as ToolStripMenuItem).Checked;
                     }
                 }
             }
         }
 
-        private void cmiFilterText_Click( object sender, EventArgs e )
+        private void cmiFilterText_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
@@ -426,19 +432,19 @@ namespace HanLP_Utils
             {
                 var txt = edSrc.Text;
                 var mi = sender as ToolStripMenuItem;
-                if ( mi.Name == cmiActionFilterSub.Name )
+                if (mi.Name == cmiActionFilterSub.Name)
                 {
-                    txt = filterASS( txt );
+                    txt = filterASS(txt);
                 }
-                else if ( mi.Name == cmiActionFilterLrc.Name )
+                else if (mi.Name == cmiActionFilterLrc.Name)
                 {
-                    txt = filterLrc( txt );
+                    txt = filterLrc(txt);
                 }
-                else if ( mi.Name == cmiActionFilterMlTag.Name )
+                else if (mi.Name == cmiActionFilterMlTag.Name)
                 {
-                    txt = filterHtmlTag( txt );
+                    txt = filterHtmlTag(txt);
                 }
-                edSrc.Text = filterMisc( txt );
+                edSrc.Text = filterMisc(txt);
             }
             catch { }
 
@@ -446,275 +452,295 @@ namespace HanLP_Utils
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void chkTermNature_CheckedChanged( object sender, EventArgs e )
+        private void chkTermNature_CheckedChanged(object sender, EventArgs e)
         {
             HanLP.Config.ShowTermNature = chkTermNature.Checked;
         }
 
-        private void edSrc_KeyUp( object sender, KeyEventArgs e )
+        private void edSrc_KeyUp(object sender, KeyEventArgs e)
         {
-            if ( e.Control && e.KeyCode == Keys.A )
+            if (e.Control && e.KeyCode == Keys.A)
             {
                 edSrc.SelectAll();
             }
         }
 
-        private void edDst_KeyUp( object sender, KeyEventArgs e )
+        private void edDst_KeyUp(object sender, KeyEventArgs e)
         {
-            if ( e.Control && e.KeyCode == Keys.A )
+            if (e.Control && e.KeyCode == Keys.A)
             {
                 edDst.SelectAll();
             }
         }
 
-        private void btnSegment_Click( object sender, EventArgs e )
+        private void btnSegment_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
             #region Create Segment
             Segment segment = HanLP.newSegment();
 
-            if ( cmiCutMethodDefault.Checked )
+            if (cmiCutMethodDefault.Checked)
             {
             }
-            else if ( cmiCutMethodStandard.Checked )
+            else if (cmiCutMethodStandard.Checked)
             {
                 segment = StandardTokenizer.SEGMENT;
             }
-            else if ( cmiCutMethodNLP.Checked )
+            else if (cmiCutMethodNLP.Checked)
             {
                 segment = NLPTokenizer.SEGMENT;
             }
-            else if ( cmiCutMethodIndex.Checked )
+            else if (cmiCutMethodIndex.Checked)
             {
                 segment = IndexTokenizer.SEGMENT;
             }
-            else if ( cmiCutMethodNShort.Checked )
+            else if (cmiCutMethodNShort.Checked)
             {
                 segment = new NShortSegment();
             }
-            else if ( cmiCutMethodShortest.Checked )
+            else if (cmiCutMethodShortest.Checked)
             {
                 segment = new DijkstraSegment();
             }
-            else if ( cmiCutMethodCRF.Checked )
+            else if (cmiCutMethodCRF.Checked)
             {
                 segment = new CRFSegment();
             }
-            else if ( cmiCutMethodHighSpeed.Checked )
+            else if (cmiCutMethodHighSpeed.Checked)
             {
                 segment = SpeedTokenizer.SEGMENT;
             }
 
-            segment.enableCustomDictionary( true );
-            segment.enablePartOfSpeechTagging( true );
-            segment.enableNameRecognize( cmiCutRecognizeChineseName.Checked );
-            segment.enableTranslatedNameRecognize( cmiCutRecognizeTranslatedName.Checked );
-            segment.enableJapaneseNameRecognize( cmiCutRecognizeJapaneseName.Checked );
-            segment.enablePlaceRecognize( cmiCutRecognizePlace.Checked );
-            segment.enableOrganizationRecognize( cmiCutRecognizeOrganization.Checked );
+            segment.enableCustomDictionary(true);
+            segment.enablePartOfSpeechTagging(true);
+            segment.enableNameRecognize(cmiCutRecognizeChineseName.Checked);
+            segment.enableTranslatedNameRecognize(cmiCutRecognizeTranslatedName.Checked);
+            segment.enableJapaneseNameRecognize(cmiCutRecognizeJapaneseName.Checked);
+            segment.enablePlaceRecognize(cmiCutRecognizePlace.Checked);
+            segment.enableOrganizationRecognize(cmiCutRecognizeOrganization.Checked);
             #endregion
 
             StringBuilder sb = new StringBuilder();
-            foreach ( string line in edSrc.Lines )
+            foreach (string line in edSrc.Lines)
             {
                 var t = line.Trim().Replace("　", " ").Replace("□", " ");
                 var result = segment.seg( t );
                 var text = result.toArray();
-                if ( text.Length <= 0 )
+                if (text.Length <= 0)
                     sb.AppendLine();
                 else
-                    sb.AppendLine( string.Join( ", ", text ).Trim() );
+                    sb.AppendLine(string.Join(", ", text).Trim());
             }
             edDst.Font = DefaultOutputFont;
-            edDst.Text = string.Join( "\n", sb );
+            edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnTokenizer_Click( object sender, EventArgs e )
+        private void btnTokenizer_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
             StringBuilder sb = new StringBuilder();
-            foreach ( string line in edSrc.Lines )
+            foreach (string line in edSrc.Lines)
             {
                 var text = NLPTokenizer.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
-                if ( text.Length <= 0 ) continue;
-                sb.AppendLine( string.Join( ", ", text ).Trim() );
+                if (text.Length <= 0) continue;
+                sb.AppendLine(string.Join(", ", text).Trim());
             }
             edDst.Font = DefaultOutputFont;
-            edDst.Text = string.Join( "\n", sb);
+            edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnKeyword_Click( object sender, EventArgs e )
+        private void btnKeyword_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
             var text = HanLP.extractKeyword( edSrc.Text, 25 ).toArray();
-            if ( text.Length <= 0 ) return;
+            if (text.Length <= 0) return;
             edDst.Font = DefaultOutputFont;
-            edDst.Text = string.Join( ", ", text);
+            edDst.Text = string.Join(", ", text);
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnSummary_Click( object sender, EventArgs e )
+        private void btnSummary_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
             var text = HanLP.extractSummary( edSrc.Text, 15 ).toArray();
-            if ( text.Length <= 0 ) return;
+            if (text.Length <= 0) return;
             var ro = RegexOptions.IgnoreCase | RegexOptions.Multiline;
             edDst.Font = DefaultOutputFont;
-            edDst.Text = Regex.Replace(string.Join( ", ", text), @"[　| ]{2,}", " ", ro );
+            edDst.Text = Regex.Replace(string.Join(", ", text), @"[　| ]{2,}", " ", ro);
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnPhrase_Click( object sender, EventArgs e )
+        private void btnPhrase_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
             StringBuilder sb = new StringBuilder();
-            foreach ( string line in edSrc.Lines )
+            foreach (string line in edSrc.Lines)
             {
-                var text = HanLP.extractPhrase( line.Trim().Replace("　", " ").Replace("□", " "), 10 ).toArray();                
-                if ( text.Length <= 0 ) continue;
-                sb.AppendLine( string.Join(", ", text ).Trim() );
+                var text = HanLP.extractPhrase( line.Trim().Replace("　", " ").Replace("□", " "), 10 ).toArray();
+                if (text.Length <= 0) continue;
+                sb.AppendLine(string.Join(", ", text).Trim());
             }
             edDst.Font = DefaultOutputFont;
-            edDst.Text = string.Join( "\n", sb );
+            edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnSC2TC_Click( object sender, EventArgs e )
+        private void btnSC2TC_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
             StringBuilder sb = new StringBuilder();
-            foreach ( string line in edSrc.Lines )
+            foreach (string line in edSrc.Lines)
             {
-                sb.AppendLine( HanLP.convertToTraditionalChinese( line ).ToString() );
+                sb.AppendLine(HanLP.convertToTraditionalChinese(line).ToString());
             }
             edDst.Font = DefaultOutputFont;
-            edDst.Text = string.Join( "\n", sb );
+            edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnTC2SC_Click( object sender, EventArgs e )
+        private void btnTC2SC_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
             StringBuilder sb = new StringBuilder();
-            foreach ( string line in edSrc.Lines )
+            foreach (string line in edSrc.Lines)
             {
-                sb.AppendLine( HanLP.convertToSimplifiedChinese( line ).ToString() );
+                sb.AppendLine(HanLP.convertToSimplifiedChinese(line).ToString());
             }
             edDst.Font = DefaultOutputFont;
-            edDst.Text = string.Join( "\n", sb );
+            edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnSrc2Py_Click( object sender, EventArgs e )
+        private void btnSrc2Py_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
 
             var mode = Convert.ToInt32( ( sender as Button ).Tag );
             StringBuilder sb = new StringBuilder();
-            foreach ( string line in edSrc.Lines )
+            foreach (string line in edSrc.Lines)
             {
                 List<string> text = new List<string>();
                 string lt = line.Trim().Replace( "　", " " ).Replace( "□", " ");
                 int idx = -1;
-                foreach ( Pinyin py in HanLP.convertToPinyinList( lt ).toArray() )
+                foreach (Pinyin py in HanLP.convertToPinyinList(lt).toArray())
                 {
                     idx++;
-                    if ( py.getPinyinWithoutTone().ToString().Equals( "none", StringComparison.CurrentCultureIgnoreCase ) )
-                        text.Add( lt[idx].ToString() );
-                    else if ( mode == 0 )
-                        text.Add( py.getPinyinWithoutTone().ToString() );
-                    else if ( mode == 1 )
-                        text.Add( py.ToString() );
-                    else if ( mode == 2 )
-                        text.Add( py.getPinyinWithToneMark().ToString() );
+                    if (py.getPinyinWithoutTone().ToString().Equals("none", StringComparison.CurrentCultureIgnoreCase))
+                        text.Add(lt[idx].ToString());
+                    else if (mode == 0)
+                        text.Add(py.getPinyinWithoutTone().ToString());
+                    else if (mode == 1)
+                        text.Add(py.ToString());
+                    else if (mode == 2)
+                        text.Add(py.getPinyinWithToneMark().ToString());
                 }
-                if ( text.Count <= 0 ) { sb.AppendLine(); continue; }
+                if (text.Count <= 0) { sb.AppendLine(); continue; }
                 var conn = ", ";
-                if ( !cmiPySeprateCommas.Checked ) conn = " ";
+                if (!cmiPySeprateCommas.Checked) conn = " ";
                 //if( cmiPyShowPunctuation.Checked )
-                sb.AppendLine( string.Join( conn, text ).Trim() );
+                sb.AppendLine(string.Join(conn, text).Trim());
             }
             //edDst.Font = new Font( "Courier New", 10 );
-            edDst.Font = new Font( "Consolas", 10 );
-            edDst.Text = string.Join( "\n", sb );
+            edDst.Font = new Font("Consolas", 10);
+            edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnWordFreq_Click( object sender, EventArgs e )
+        private void btnWordFreq_Click(object sender, EventArgs e)
         {
             var sw = Stopwatch.StartNew();
             try
             {
                 Dictionary<string, int> freq = new Dictionary<string, int>( );
-                foreach ( string line in edSrc.Lines )
+                foreach (string line in edSrc.Lines)
                 {
                     var text = NLPTokenizer.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
                     //var text = HanLP.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
-                    if ( text.Length <= 0 ) continue;
-                    foreach ( Term t in text )
+                    if (text.Length <= 0) continue;
+                    foreach (Term t in text)
                     {
                         var word = t.ToString().Trim();
                         var wt = t.word.Trim();
-                        if ( string.IsNullOrEmpty( wt ) || wt.Length <= 1 ) continue;
-                        if ( CoreStopWordDictionary.contains( wt ) ) continue;
+                        if (string.IsNullOrEmpty(wt) || wt.Length <= 1) continue;
+                        if (CoreStopWordDictionary.contains(wt)) continue;
 
-                        if ( freq.ContainsKey( word ) )
+                        if (freq.ContainsKey(word))
                             freq[word]++;
                         else
-                            freq.Add( word, 1 );
+                            freq.Add(word, 1);
                     }
                 }
 
                 var sortedword = freq.ToList();
-                sortedword.Sort( ( pair1, pair2 ) => pair2.Value.CompareTo( pair1.Value ) );
+                sortedword.Sort((pair1, pair2) => pair2.Value.CompareTo(pair1.Value));
 
                 StringBuilder sb = new StringBuilder();
-                foreach ( var w in sortedword )
+                foreach (var w in sortedword)
                 {
-                    sb.AppendLine( $"{w.Key}\t{w.Value}".Replace( "/", "\t" ) );
+                    sb.AppendLine($"{w.Key}\t{w.Value}".Replace("/", "\t"));
                 }
-                edDst.Text = string.Join( "\n", sb );
+                edDst.Text = string.Join("\n", sb);
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                MessageBox.Show( ex.ToString() );
+                MessageBox.Show(ex.ToString());
             }
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnOCR_Click( object sender, EventArgs e )
+        private void btnOCR_Click(object sender, EventArgs e)
         {
-            if ( Clipboard.ContainsImage() )
+            if (Clipboard.ContainsImage())
             {
-                Bitmap src = (Bitmap)Clipboard.GetImage();
-                ocr_ms( src );
+                try
+                {
+                    Bitmap src = (Bitmap)Clipboard.GetImage();
+                    ocr_ms(src);
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+        private void cmiCustomDictReload_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AddStopWords();
+                AddCustomDict();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
             }
         }
     }
