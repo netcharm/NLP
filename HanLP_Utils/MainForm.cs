@@ -308,6 +308,56 @@ namespace HanLP_Utils
             return (links.ToArray());
         }
 
+        private Segment GetSegment()
+        {
+            #region Create Segment
+            Segment segment = HanLP.newSegment();
+
+            if (cmiCutMethodDefault.Checked)
+            {
+            }
+            else if (cmiCutMethodStandard.Checked)
+            {
+                segment = StandardTokenizer.SEGMENT;
+            }
+            else if (cmiCutMethodNLP.Checked)
+            {
+                segment = NLPTokenizer.SEGMENT;
+            }
+            else if (cmiCutMethodIndex.Checked)
+            {
+                segment = IndexTokenizer.SEGMENT;
+            }
+            else if (cmiCutMethodNShort.Checked)
+            {
+                segment = new NShortSegment();
+            }
+            else if (cmiCutMethodShortest.Checked)
+            {
+                segment = new DijkstraSegment();
+            }
+            else if (cmiCutMethodCRF.Checked)
+            {
+                segment = new CRFSegment();
+            }
+            else if (cmiCutMethodHighSpeed.Checked)
+            {
+                segment = SpeedTokenizer.SEGMENT;
+            }
+
+            segment.enableCustomDictionary(true);
+            segment.enableMultithreading(true);
+            segment.enablePartOfSpeechTagging(true);
+            segment.enableNameRecognize(cmiCutRecognizeChineseName.Checked);
+            segment.enableTranslatedNameRecognize(cmiCutRecognizeTranslatedName.Checked);
+            segment.enableJapaneseNameRecognize(cmiCutRecognizeJapaneseName.Checked);
+            segment.enablePlaceRecognize(cmiCutRecognizePlace.Checked);
+            segment.enableOrganizationRecognize(cmiCutRecognizeOrganization.Checked);
+            #endregion
+
+            return (segment);
+        }
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
@@ -452,6 +502,19 @@ namespace HanLP_Utils
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
+        private void cmiCustomDictReload_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AddStopWords();
+                AddCustomDict();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
         private void chkTermNature_CheckedChanged(object sender, EventArgs e)
         {
             HanLP.Config.ShowTermNature = chkTermNature.Checked;
@@ -477,55 +540,17 @@ namespace HanLP_Utils
         {
             var sw = Stopwatch.StartNew();
 
-            #region Create Segment
-            Segment segment = HanLP.newSegment();
-
-            if (cmiCutMethodDefault.Checked)
-            {
-            }
-            else if (cmiCutMethodStandard.Checked)
-            {
-                segment = StandardTokenizer.SEGMENT;
-            }
-            else if (cmiCutMethodNLP.Checked)
-            {
-                segment = NLPTokenizer.SEGMENT;
-            }
-            else if (cmiCutMethodIndex.Checked)
-            {
-                segment = IndexTokenizer.SEGMENT;
-            }
-            else if (cmiCutMethodNShort.Checked)
-            {
-                segment = new NShortSegment();
-            }
-            else if (cmiCutMethodShortest.Checked)
-            {
-                segment = new DijkstraSegment();
-            }
-            else if (cmiCutMethodCRF.Checked)
-            {
-                segment = new CRFSegment();
-            }
-            else if (cmiCutMethodHighSpeed.Checked)
-            {
-                segment = SpeedTokenizer.SEGMENT;
-            }
-
-            segment.enableCustomDictionary(true);
-            segment.enablePartOfSpeechTagging(true);
-            segment.enableNameRecognize(cmiCutRecognizeChineseName.Checked);
-            segment.enableTranslatedNameRecognize(cmiCutRecognizeTranslatedName.Checked);
-            segment.enableJapaneseNameRecognize(cmiCutRecognizeJapaneseName.Checked);
-            segment.enablePlaceRecognize(cmiCutRecognizePlace.Checked);
-            segment.enableOrganizationRecognize(cmiCutRecognizeOrganization.Checked);
-            #endregion
+            Segment segment = GetSegment();
 
             StringBuilder sb = new StringBuilder();
             foreach (string line in edSrc.Lines)
             {
                 var t = line.Trim().Replace("　", " ").Replace("□", " ");
-                var result = segment.seg( t );
+                var result = segment.seg(t);
+                foreach(Term r in result.toArray())
+                {
+                    if (CoreStopWordDictionary.contains(r.word)) result.remove(r);
+                }
                 var text = result.toArray();
                 if (text.Length <= 0)
                     sb.AppendLine();
@@ -543,10 +568,16 @@ namespace HanLP_Utils
         {
             var sw = Stopwatch.StartNew();
 
+            Segment segment = GetSegment();
             StringBuilder sb = new StringBuilder();
             foreach (string line in edSrc.Lines)
             {
-                var text = NLPTokenizer.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
+                var result = segment.seg(line.Trim().Replace("　", " ").Replace("□", " ") );
+                foreach (Term r in result.toArray())
+                {
+                    if (CoreStopWordDictionary.contains(r.word)) result.remove(r);
+                }
+                var text = result.toArray();
                 if (text.Length <= 0) continue;
                 sb.AppendLine(string.Join(", ", text).Trim());
             }
@@ -597,6 +628,50 @@ namespace HanLP_Utils
             }
             edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join("\n", sb);
+
+            sw.Stop();
+            lblInfo.Text = $"{sw.Elapsed}s";
+        }
+
+        private void btnWordFreq_Click(object sender, EventArgs e)
+        {
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                Segment segment = GetSegment();
+                Dictionary<string, int> freq = new Dictionary<string, int>( );
+                foreach (string line in edSrc.Lines)
+                {
+                    var text = segment.seg( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
+                    if (text.Length <= 0) continue;
+                    foreach (Term t in text)
+                    {
+                        var word = t.ToString().Trim();
+                        var wt = t.word.Trim();
+                        if (string.IsNullOrEmpty(wt) || wt.Length <= 1) continue;
+                        if (CoreStopWordDictionary.contains(wt)) continue;
+
+                        if (freq.ContainsKey(word))
+                            freq[word]++;
+                        else
+                            freq.Add(word, 1);
+                    }
+                }
+
+                var sortedword = freq.ToList();
+                sortedword.Sort((pair1, pair2) => pair2.Value.CompareTo(pair1.Value));
+
+                StringBuilder sb = new StringBuilder();
+                foreach (var w in sortedword)
+                {
+                    sb.AppendLine($"{w.Key}\t{w.Value}".Replace("/", "\t"));
+                }
+                edDst.Text = string.Join("\n", sb);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
 
             sw.Stop();
             lblInfo.Text = $"{sw.Elapsed}s";
@@ -671,50 +746,6 @@ namespace HanLP_Utils
             lblInfo.Text = $"{sw.Elapsed}s";
         }
 
-        private void btnWordFreq_Click(object sender, EventArgs e)
-        {
-            var sw = Stopwatch.StartNew();
-            try
-            {
-                Dictionary<string, int> freq = new Dictionary<string, int>( );
-                foreach (string line in edSrc.Lines)
-                {
-                    var text = NLPTokenizer.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
-                    //var text = HanLP.segment( line.Trim().Replace("　", " ").Replace("□", " ") ).toArray();
-                    if (text.Length <= 0) continue;
-                    foreach (Term t in text)
-                    {
-                        var word = t.ToString().Trim();
-                        var wt = t.word.Trim();
-                        if (string.IsNullOrEmpty(wt) || wt.Length <= 1) continue;
-                        if (CoreStopWordDictionary.contains(wt)) continue;
-
-                        if (freq.ContainsKey(word))
-                            freq[word]++;
-                        else
-                            freq.Add(word, 1);
-                    }
-                }
-
-                var sortedword = freq.ToList();
-                sortedword.Sort((pair1, pair2) => pair2.Value.CompareTo(pair1.Value));
-
-                StringBuilder sb = new StringBuilder();
-                foreach (var w in sortedword)
-                {
-                    sb.AppendLine($"{w.Key}\t{w.Value}".Replace("/", "\t"));
-                }
-                edDst.Text = string.Join("\n", sb);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-
-            sw.Stop();
-            lblInfo.Text = $"{sw.Elapsed}s";
-        }
-
         private void btnOCR_Click(object sender, EventArgs e)
         {
             if (Clipboard.ContainsImage())
@@ -728,19 +759,6 @@ namespace HanLP_Utils
                 {
                     MessageBox.Show(ex.ToString());
                 }
-            }
-        }
-
-        private void cmiCustomDictReload_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                AddStopWords();
-                AddCustomDict();
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
             }
         }
     }
