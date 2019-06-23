@@ -195,6 +195,8 @@ namespace HanLP_Utils
                     MessageBox.Show(ex.ToString());
                 }
             }
+
+            var err_count = 0;
             foreach (var w in ss)
             {
                 try
@@ -217,7 +219,11 @@ namespace HanLP_Utils
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.ToString());
+                    if (err_count < 3)
+                    {
+                        MessageBox.Show(ex.ToString());
+                        err_count++;
+                    }
                 }
             }
 
@@ -227,14 +233,15 @@ namespace HanLP_Utils
 
         private void AddStopWords()
         {
+            var err_count = 0;
             try
             {
                 List<string> stopwords = new List<string>();
                 stopwords.AddRange(new string[] { "。", "、", "，", "　", "　　", "□", "□□", "一", "一一" });
 
                 List<string> stopfile = new List<string>() {
-                    Path.Combine( ROOT, "data", "dictionary", "stopwords.txt" ),
-                    Path.Combine( AppPath, "stopwords.txt" ),
+                    Path.Combine( ROOT, "data", "dictionary", "stopwords.txt" ).Replace("\\", "/"),
+                    Path.Combine( AppPath, "stopwords.txt" ).Replace("\\", "/"),
                 };
                 if (!CWD.Equals(AppPath, StringComparison.CurrentCultureIgnoreCase))
                     stopfile.Add(Path.Combine(CWD, "stopwords.txt"));
@@ -256,7 +263,11 @@ namespace HanLP_Utils
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                if (err_count < 3)
+                {
+                    MessageBox.Show(ex.ToString());
+                    err_count++;
+                }
             }
         }
 
