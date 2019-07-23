@@ -90,6 +90,7 @@
             this.edResult.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.edResult.HideSelection = false;
             this.edResult.Name = "edResult";
+            this.edResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.edResult_KeyDown);
             this.edResult.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edResult_KeyUp);
             this.edResult.MouseMove += new System.Windows.Forms.MouseEventHandler(this.edResult_MouseMove);
             // 

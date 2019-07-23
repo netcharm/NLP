@@ -587,6 +587,32 @@ namespace OCR_MS
             tsmiTextStop.Checked = true;
         }
 
+        private double font_size_default = 9;
+        private void FontSizeChange(int action, int max = 48, int min = 9)
+        {
+            var font_old = edResult.Font;
+            double font_size = font_old.SizeInPoints;
+            if (action < 0)
+            {
+                font_size -= .5;
+                font_size = font_size < min ? min : font_size;
+            }
+            else if (action == 0)
+            {
+                font_size = font_size_default;
+            }
+            else if (action > 0)
+            {
+                font_size += .5;
+                font_size = font_size > max ? max : font_size;
+            }
+            if (font_size != font_old.SizeInPoints)
+            {
+                var font_new = new Font(font_old.FontFamily, (float)font_size);
+                edResult.Font = font_new;
+            }
+        }
+
         public MainForm()
         {
             InitializeComponent();
@@ -633,6 +659,8 @@ namespace OCR_MS
             edResult.AcceptsReturn = true;
             edResult.AcceptsTab = true;
             edResult.AllowDrop = false;
+            edResult.MouseWheel += edResult_MouseWheel;
+            font_size_default = edResult.Font.SizeInPoints;
 
             LoadConfig();
         }
@@ -822,6 +850,27 @@ namespace OCR_MS
             }
         }
 
+        private void cbLanguage_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SPEECH_SLOW = true;
+        }
+
+        private void edResult_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.OemMinus)
+            {
+                FontSizeChange(-1);
+            }
+            else if (e.Control && e.KeyCode == Keys.Oemplus)
+            {
+                FontSizeChange(+1);
+            }
+            else if (e.Control && e.KeyCode == Keys.D0)
+            {
+                FontSizeChange(0);
+            }
+        }
+
         private void edResult_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.A)
@@ -836,6 +885,22 @@ namespace OCR_MS
                 //    Result_Lang = ResultHistory.Last().Value;
                 //    edResult.Tag = 
                 //}
+            }
+        }
+
+        private void edResult_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (ModifierKeys == Keys.Control && e.Button == MouseButtons.Left && edResult.SelectionLength > 0)
+            {
+                edResult.DoDragDrop(edResult.SelectedText, DragDropEffects.Copy);
+            }
+        }
+
+        private void edResult_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (ModifierKeys == Keys.Control)
+            {
+                FontSizeChange(e.Delta);
             }
         }
 
@@ -1269,17 +1334,5 @@ namespace OCR_MS
             SPEECH_AUTO = tsmiTextAutoSpeech.Checked;
         }
 
-        private void cbLanguage_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SPEECH_SLOW = true;
-        }
-
-        private void edResult_MouseMove(object sender, MouseEventArgs e)
-        {
-            if(ModifierKeys == Keys.Control && e.Button == MouseButtons.Left && edResult.SelectionLength>0 )
-            {
-                edResult.DoDragDrop(edResult.SelectedText, DragDropEffects.Copy);
-            }
-        }
     }
 }
