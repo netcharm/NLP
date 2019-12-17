@@ -219,11 +219,6 @@ namespace OCR_MS
         private bool TRANSLATING_AUTO = false;
         #endregion
 
-        #region Speech
-        private SpeechSynthesizer synth = null;
-        private string voice_default = string.Empty;
-        #endregion
-
         #region Monitor Clipboard
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
@@ -527,6 +522,7 @@ namespace OCR_MS
             File.WriteAllText(cfg, JsonConvert.SerializeObject(json, Formatting.Indented));
         }
 
+        #region OCR
         private async Task<string> Run_OCR(Bitmap src, string lang = "unk")
         {
             edResult.Text = await MakeRequest_OCR(src, lang);
@@ -543,8 +539,13 @@ namespace OCR_MS
             }
             return (edResult.Text);
         }
+        #endregion
 
-        private void Synth_StateChanged(object sender, StateChangedEventArgs e)
+        #region Speech Synthesis routines
+        private SpeechSynthesizer synth = null;
+        private string voice_default = string.Empty;
+
+        private void Synth_StateChanged(object sender, System.Speech.Synthesis.StateChangedEventArgs e)
         {
             if (synth == null) return;
 
@@ -586,6 +587,7 @@ namespace OCR_MS
             tsmiTextPause.Checked = false;
             tsmiTextStop.Checked = true;
         }
+        #endregion
 
         private double font_size_default = 9;
         private void FontSizeChange(int action, int max = 48, int min = 9)
@@ -622,12 +624,14 @@ namespace OCR_MS
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
+            #region Synthesis
             synth = new SpeechSynthesizer();
             voice_default = synth.Voice.Name;
             synth.SpeakStarted += Synth_SpeakStarted;
             synth.SpeakProgress += Synth_SpeakProgress;
             synth.StateChanged += Synth_StateChanged;
             synth.SpeakCompleted += Synth_SpeakCompleted;
+            #endregion
 
             notify.Icon = Icon;
             notify.BalloonTipTitle = this.Text;
@@ -780,7 +784,7 @@ namespace OCR_MS
                                 var ext = Path.GetExtension(fn).ToLower();
 
                                 StringBuilder sb = new StringBuilder();
-                                if (exts_img.Contains(ext))
+                                if (exts_txt.Contains(ext))
                                 {
                                     try
                                     {
