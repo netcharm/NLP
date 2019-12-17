@@ -118,12 +118,9 @@ namespace SoundToText
 
         public Action IsCompleted { get; set; } = null;
 
-        iFly.SpeechRecognizer iflysr = new iFly.SpeechRecognizer()
-        {
-            APPID = "5df737d3",
-            AppDispather = Application.Current.Dispatcher
-        };
-        //iFly.SpeechRecognizer iflysr = new iFly.SpeechRecognizer() { APPID = "5c6224f9", AppDispather = Application.Current.Dispatcher };
+        private string appid = string.Empty;
+        private string appid_file = "ifly_appid.txt";
+        iFly.SpeechRecognizer iflysr = null;
         #endregion
 
         #region Recognizer Event Handle
@@ -145,28 +142,31 @@ namespace SoundToText
                 }
                 if (IsPausing) lastAudioPos = title.End;
 
-                await Task.Run(async () =>
+                if (iflysr is iFly.SpeechRecognizer)
                 {
-                    using (MemoryStream ms = new MemoryStream())
+                    await Task.Run(async () =>
                     {
-                        e.Result.Audio.WriteToAudioStream(ms);
-                        await ms.FlushAsync();
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            e.Result.Audio.WriteToAudioStream(ms);
+                            await ms.FlushAsync();
 
-                        byte[] buf = new byte[256];
-                        buf = new byte[ms.Length];
-                        ms.Seek(0, SeekOrigin.Begin);
-                        ms.Read(buf, 0, (int)(ms.Length));
-                        var ret = await iflysr.Recognizer(buf);
+                            byte[] buf = new byte[256];
+                            buf = new byte[ms.Length];
+                            ms.Seek(0, SeekOrigin.Begin);
+                            ms.Read(buf, 0, (int)(ms.Length));
+                            var ret = await iflysr.Recognizer(buf);
                         //title.Text += $" [{ret}]";
                         if (!string.IsNullOrEmpty(ret))
-                        {
-                            if(ret.StartsWith("#"))
-                                title.Text += $" [{ret}]";
-                            else
-                                title.Text = ret;
+                            {
+                                if (ret.StartsWith("#"))
+                                    title.Text += $" [{ret}]";
+                                else
+                                    title.Text = ret;
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
                 //using (MemoryStream ms = new MemoryStream())
                 //{
@@ -263,8 +263,10 @@ namespace SoundToText
                     {
                         //WaveFileWriter.CreateWaveFile("_test_.wav", pcmStream);
                         var fmt = pcmStream.WaveFormat;
-                        iflysr.SampleRate = fmt.SampleRate;
+                        if (iflysr is iFly.SpeechRecognizer) iflysr.SampleRate = fmt.SampleRate;
+
                         audioInfo = new SpeechAudioFormatInfo(EncodingFormat.Pcm, fmt.SampleRate, fmt.BitsPerSample, fmt.Channels, fmt.AverageBytesPerSecond, fmt.BlockAlign, new byte[fmt.ExtraSize]);
+
                         _recognizerStream = new MemoryStream();
                         byte[] buf = new byte[pcmStream.Length];
                         pcmStream.Read(buf, 0, buf.Length);
@@ -483,6 +485,16 @@ namespace SoundToText
                 _recognizer.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
                 _recognizer.SpeechHypothesized += Recognizer_SpeechHypothesized;
                 _recognizer.RecognizeCompleted += Recognizer_RecognizeCompleted;
+
+                if (File.Exists(appid_file))
+                {
+                    appid = File.ReadAllText(appid_file).Trim();
+                    iflysr = new iFly.SpeechRecognizer()
+                    {
+                        APPID = $"{appid}",
+                        AppDispather = Application.Current.Dispatcher
+                    };
+                }
             }
             catch (Exception)
             {

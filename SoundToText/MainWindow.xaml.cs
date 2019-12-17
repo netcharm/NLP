@@ -112,6 +112,8 @@ namespace SoundToText
                 lstResult.ItemsSource = s2t.Result;
                 lstResult.UpdateLayout();
 
+                edTitle.Text = string.Empty;
+
                 progressBar.Minimum = 0;
                 progressBar.Maximum = 100;
                 progress.Report(s2t.Progress);
