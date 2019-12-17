@@ -1,0 +1,116 @@
+﻿<Window x:Class="SoundToText.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SoundToText"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        Width="1280" Height="720" 
+        MinWidth="720" MinHeight="405"
+        Loaded="Window_Loaded"
+        AllowDrop="True" DragEnter="Window_DragEnter" Drop="Window_Drop">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Tools Panel -->
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <!-- File Control Panel -->
+            <StackPanel Grid.Column="0" x:Name="FilePanel" 
+                    HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Orientation="Horizontal" Margin="4">
+                <Button x:Name="btnOpen" x:Uid="Open" 
+                    Content="&#xE197;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnOpen_Click" />
+                <Button x:Name="btnSave" x:Uid="Save" 
+                    Content="&#xE105;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnSave_Click"/>
+            </StackPanel>
+            <!-- Media Control Panel -->
+            <StackPanel Grid.Column="2" x:Name="MediaPanel" 
+                    HorizontalAlignment="Right" VerticalAlignment="Center" 
+                    Orientation="Horizontal" Margin="4">
+                <Button x:Name="btnHome" x:Uid="Home" 
+                    Content="&#xE100;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnHome_Click"/>
+                <Button x:Name="btnPrev" x:Uid="Prev" 
+                    Content="&#xEB9E;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnPrev_Click"/>
+                <Button x:Name="btnNext" x:Uid="Next" 
+                    Content="&#xEB9D;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnNext_Click"/>
+                <Button x:Name="btnEnd" x:Uid="End" 
+                    Content="&#xE101;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnEnd_Click"/>
+                <Line Y1 ="0" Y2="48" Stroke="#FF7C7C7C" ClipToBounds="True"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch" 
+                      Margin="4" />
+                <ToggleButton x:Name="btnPlay" x:Uid="Play" 
+                    Content="&#xE102;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    IsChecked="False"
+                    Click="btnPlay_Click"/>
+                <ToggleButton x:Name="btnPause" x:Uid="Pause" 
+                    Content="&#xE103;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    IsChecked="False"
+                    Click="btnPause_Click"/>
+                <ToggleButton x:Name="btnStop" x:Uid="Stop" 
+                    Content="&#xE15B;" FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    IsChecked="True"
+                    Click="btnStop_Click"/>
+            </StackPanel>
+            <!-- Progress Panel -->
+            <ProgressBar Grid.Column="1" x:Name="progressBar" x:Uid="Progress" 
+                         HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                         MinHeight="32" Margin="4"/>
+            <TextBlock Grid.Column="1" x:Name="progressInfo" x:Uid="ProgressInfo" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+        
+        <!-- Text Result List -->
+        <ListBox Grid.Row="0" Grid.Column="0" x:Name="lstResult" x:Uid="ResultList" 
+                 Margin="4"
+                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 SelectionChanged="lstResult_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid x:Name="ListBoxItemLayout" Background="Transparent" Margin="0" ToolTipService.ToolTip="{Binding Text, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Margin="1" 
+                                   Text="{Binding Count, Mode=OneWay}"/>
+                        <TextBlock Grid.Column="1" Margin="1" 
+                                   Text="{Binding Text, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Text Result List -->
+        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="edTitle" x:Uid="subTitle"
+                   Margin="4"/>
+    </Grid>
+</Window>
