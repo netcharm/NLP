@@ -135,9 +135,10 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Margin="1" 
-                                   Text="{Binding Count, Mode=OneWay}"/>
+                                   Text="{Binding Count, Mode=OneWay}" />
                         <TextBlock Grid.Column="1" Margin="1" 
-                                   Text="{Binding Text, Mode=OneWay}"/>
+                                   Text="{Binding Text, Mode=OneWay, IsAsync=True, NotifyOnTargetUpdated=True}"
+                                   TargetUpdated="TitleContent_TargetUpdated" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -145,6 +146,8 @@
 
         <!-- Text Result List -->
         <TextBlock Grid.Row="0" Grid.Column="1" x:Name="edTitle" x:Uid="subTitle"
+                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                   TextWrapping="Wrap"
                    Margin="4"/>
     </Grid>
 </Window>

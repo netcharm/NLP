@@ -369,6 +369,7 @@ namespace SoundToText
         {
             if (string.IsNullOrEmpty(APPID_iFly)) return;
             if (!(title is SRT)) return;
+            if (!culture.IetfLanguageTag.StartsWith("zh", StringComparison.CurrentCultureIgnoreCase)) return;
 
             await Task.Run(async () =>
             {
@@ -437,36 +438,40 @@ namespace SoundToText
 
                     using (var client = new HttpClient())
                     {
-                        Token_Azure = await Recognizer_AzureFetchToken(URL_AzureToken);
-
-                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_Azure);
-                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(@"application/json"));
-                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(@"text/xml"));
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token_Azure);
-
-                        var lang = Culture.IetfLanguageTag;
-                        var content = new StreamContent(ms);
-                        var contentType = new string[] { @"audio/wav", @"codecs=audio/pcm", @"samplerate=16000" };
-                        var ok = content.Headers.TryAddWithoutValidation("Content-Type", contentType);
-                        var response = await client.PostAsync($"{URL_AzureResponse}?language={lang}", content);
-                        string stt_rest = await response.Content.ReadAsStringAsync();
-
-                        if (response.StatusCode == HttpStatusCode.OK)
+                        try
                         {
-                            try
-                            {
-                                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                                var stt = serializer.Deserialize<AzureSpeechRecognizResult>(stt_rest);
+                            Token_Azure = await Recognizer_AzureFetchToken(URL_AzureToken);
 
-                                var text = stt.DisplayText;
-                                if (stt.RecognitionStatus.Equals("Success", StringComparison.CurrentCultureIgnoreCase))
-                                    title.Text = text;
-                                else
-                                    title.Text += $" [{text}]";
-                                Log(text);
+                            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_Azure);
+                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(@"application/json"));
+                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(@"text/xml"));
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token_Azure);
+
+                            var lang = Culture.IetfLanguageTag;
+                            var content = new StreamContent(ms);
+                            var contentType = new string[] { @"audio/wav", @"codecs=audio/pcm", @"samplerate=16000" };
+                            var ok = content.Headers.TryAddWithoutValidation("Content-Type", contentType);
+                            var response = await client.PostAsync($"{URL_AzureResponse}?language={lang}", content);
+                            string stt_rest = await response.Content.ReadAsStringAsync();
+
+                            if (response.StatusCode == HttpStatusCode.OK)
+                            {
+                                try
+                                {
+                                    System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                                    var stt = serializer.Deserialize<AzureSpeechRecognizResult>(stt_rest);
+
+                                    var text = stt.DisplayText;
+                                    if (stt.RecognitionStatus.Equals("Success", StringComparison.CurrentCultureIgnoreCase))
+                                        title.Text = text;
+                                    else
+                                        title.Text += $" [{text}]";
+                                    Log(text);
+                                }
+                                catch (Exception) { }
                             }
-                            catch (Exception) { }
                         }
+                        catch (Exception) { }
                     }
                 }
             });
@@ -775,6 +780,10 @@ namespace SoundToText
                 foreach(var ri in InstalledRecognizers)
                 {
                     var r = new SpeechRecognitionEngine(ri.Culture);
+                    r.InitialSilenceTimeout = TimeSpan.FromMilliseconds(50);
+                    r.EndSilenceTimeout = TimeSpan.FromMilliseconds(50);
+                    r.EndSilenceTimeoutAmbiguous = TimeSpan.FromMilliseconds(50);
+                    r.BabbleTimeout = TimeSpan.FromMilliseconds(50);
                     r.LoadGrammar(new DictationGrammar() { Name = "Dictation Grammar" });
                     r.SpeechDetected += Recognizer_SpeechDetected;
                     r.SpeechRecognized += Recognizer_SpeechRecognized;
@@ -790,6 +799,8 @@ namespace SoundToText
                     _defaultRecognizer = new SpeechRecognitionEngine(CultureInfo.CurrentCulture);
                 else
                     _defaultRecognizer = new SpeechRecognitionEngine();
+                _defaultRecognizer.InitialSilenceTimeout = TimeSpan.FromMilliseconds(50);
+                _defaultRecognizer.BabbleTimeout = TimeSpan.FromMilliseconds(50);
 
                 Grammar dictation = new DictationGrammar();
                 dictation.Name = "Dictation Grammar";
@@ -800,6 +811,8 @@ namespace SoundToText
                 _defaultRecognizer.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
                 _defaultRecognizer.SpeechHypothesized += Recognizer_SpeechHypothesized;
                 _defaultRecognizer.RecognizeCompleted += Recognizer_RecognizeCompleted;
+
+                _recognizer = _defaultRecognizer;
                 #endregion
 
                 #region iFlyTek Speech Recognition

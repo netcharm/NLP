@@ -76,7 +76,7 @@ namespace SoundToText
                 progressBar.Value = total.TotalSeconds > 0 ? received.TotalSeconds / total.TotalSeconds * 100 : 0;
                 var cs = received.ToString(@"hh\:mm\:ss\.fff");
                 var ts = total.ToString(@"hh\:mm\:ss\.fff");
-                progressInfo.Text = $"{cs} / {ts} ({progressBar.Value:0.0}%)";
+                progressInfo.Text = $"{cs}/{ts} ({progressBar.Value:0.0}%)";
             });
 
             s2t = new SpeechRecognizer()
@@ -153,6 +153,18 @@ namespace SoundToText
         private void lstResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (s2t is SpeechRecognizer)
+            {
+                if (lstResult.SelectedItem != null)
+                {
+                    var srt = lstResult.SelectedItem as SRT;
+                    edTitle.Text = srt.Title;
+                }
+            }
+        }
+
+        private void TitleContent_TargetUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
+        {
+            if (e.Property.Name == "Text")
             {
                 if (lstResult.SelectedItem != null)
                 {
@@ -396,5 +408,6 @@ namespace SoundToText
                 if (lstResult.Items.Count > 0) lstResult.SelectedIndex = lstResult.Items.Count - 1;
             }
         }
+
     }
 }
