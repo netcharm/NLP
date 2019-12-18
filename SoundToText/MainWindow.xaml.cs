@@ -1,10 +1,13 @@
 ﻿using Microsoft.Win32;
+using NAudio.Wave;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace SoundToText
 {
@@ -19,6 +22,41 @@ namespace SoundToText
         private IProgress<Tuple<TimeSpan, TimeSpan>> progress = null;
 
         private SpeechRecognizer s2t = null;
+
+        private enum MediaButtonState { Idle, Running, Pausing, Completed };
+        private void SetMediaButtonState(MediaButtonState state)
+        {
+            bool Valid = s2t is SpeechRecognizer;
+            switch (state)
+            {
+                case MediaButtonState.Idle:
+                    btnConvertPlay.IsChecked = Valid && s2t.IsRunning;
+                    btnConvertPause.IsChecked = Valid && s2t.IsPausing;
+                    //btnConvertStop.IsChecked = true;
+                    break;
+                case MediaButtonState.Running:
+                    btnConvertPlay.IsChecked = Valid && s2t.IsRunning;
+                    btnConvertPause.IsChecked = Valid && s2t.IsPausing;
+                    //btnConvertStop.IsChecked = false;
+                    break;
+                case MediaButtonState.Pausing:
+                    btnConvertPlay.IsChecked = Valid && s2t.IsRunning;
+                    btnConvertPause.IsChecked = Valid && s2t.IsPausing;
+                    //btnConvertStop.IsChecked = false;
+                    break;
+                case MediaButtonState.Completed:
+                    btnConvertPlay.IsChecked = Valid && s2t.IsRunning;
+                    btnConvertPause.IsChecked = Valid && s2t.IsPausing;
+                    //btnConvertStop.IsChecked = true;
+                    break;
+                default:
+                    btnConvertPlay.IsChecked = false;
+                    btnConvertPause.IsChecked = false;
+                    //btnConvertStop.IsChecked = false;
+                    break;
+            }
+            MediaPanel.IsEnabled = true;
+        }
 
         public MainWindow()
         {
@@ -36,16 +74,30 @@ namespace SoundToText
                 var received = i.Item1;
                 var total = i.Item2;
                 progressBar.Value = total.TotalSeconds > 0 ? received.TotalSeconds / total.TotalSeconds * 100 : 0;
-                var cs = received.ToString(@"hh\:mm\:ss\,fff");
-                var ts = total.ToString(@"hh\:mm\:ss\,fff");
+                var cs = received.ToString(@"hh\:mm\:ss\.fff");
+                var ts = total.ToString(@"hh\:mm\:ss\.fff");
                 progressInfo.Text = $"{cs} / {ts} ({progressBar.Value:0.0}%)";
             });
 
             s2t = new SpeechRecognizer()
             {
                 ProgressHost = progress,
-                IsCompleted = new Action(() => { btnPlay.IsChecked = false; btnPause.IsChecked = false; btnStop.IsChecked = true; })
+                IsCompleted = new Action(() => {
+                    SetMediaButtonState(MediaButtonState.Completed);
+                })
             };
+
+            cbLanguage.Items.Clear();
+            foreach(var r in SpeechRecognizer.InstalledRecognizers)
+            {
+                cbLanguage.Items.Add(r.Culture.DisplayName);
+                //cbLanguage.Items[cbLanguage.Items.Count-1]
+            }
+            if (cbLanguage.Items.Count > 0) cbLanguage.SelectedIndex = 0;
+
+            miOptEngineSAPI.IsChecked = s2t.SAPIEnabled;
+            miOptEngineiFly.IsChecked = s2t.iFlyEnabled;
+            miOptEngineAzure.IsChecked = s2t.AzureEnabled;
         }
 
         private void Window_DragEnter(object sender, DragEventArgs e)
@@ -70,119 +122,104 @@ namespace SoundToText
 
         private void Window_Drop(object sender, DragEventArgs e)
         {
-            try
-            {
-                var fmts = e.Data.GetFormats();
+            var fmts = e.Data.GetFormats();
 #if DEBUG
-                Console.WriteLine($"{string.Join(", ", fmts)}");
+            Console.WriteLine($"{string.Join(", ", fmts)}");
 #endif
-                if (fmts.Contains("FileName"))
+            if (fmts.Contains("FileName"))
+            {
+                var fns = (string[])e.Data.GetData("FileName");
+                if (fns.Length > 0)
                 {
-                    var fns = (string[])e.Data.GetData("FileName");
-                    if (fns.Length > 0)
-                    {
-                        foreach (var fn in fns)
-                        {
-                            var ext = Path.GetExtension(fn).ToLower();
+                    var fn = fns[0];
+                    var ext = Path.GetExtension(fn).ToLower();
 
-                            if (exts_snd.Contains(ext))
+                    if (s2t is SpeechRecognizer)
+                    {
+                        if (exts_snd.Contains(ext))
+                        {
+                            try
                             {
-                                try
-                                {
-                                    if (s2t is SpeechRecognizer)
-                                    {
-                                        MediaPanel.IsEnabled = true;
-                                        s2t.Start(fn);
-                                    }
-                                }
-                                catch (Exception) { }
+                                s2t.AudioFile = fn;
+                                SetMediaButtonState(MediaButtonState.Idle);
                             }
-                            break;
+                            catch (Exception) { }
                         }
                     }
                 }
             }
-            catch (Exception) { }
         }
 
-        private void btnPlay_Click(object sender, RoutedEventArgs e)
+        private void lstResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (s2t is SpeechRecognizer)
             {
-                lstResult.ItemsSource = s2t.Result;
-                lstResult.UpdateLayout();
-
-                edTitle.Text = string.Empty;
-
-                progressBar.Minimum = 0;
-                progressBar.Maximum = 100;
-                progress.Report(s2t.Progress);
-                s2t.Start();
-
-                btnPlay.IsChecked = s2t.IsRunning;
-                btnPause.IsChecked = s2t.IsPausing;
-                btnStop.IsChecked = !s2t.IsRunning;
+                if (lstResult.SelectedItem != null)
+                {
+                    var srt = lstResult.SelectedItem as SRT;
+                    edTitle.Text = srt.Title;
+                }
             }
         }
 
-        private void btnPause_Click(object sender, RoutedEventArgs e)
+        private void cbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (s2t is SpeechRecognizer)
+            var idx = cbLanguage.SelectedIndex;
+            if (SpeechRecognizer.InstalledRecognizers.Count > 0 && idx >= 0 && idx < SpeechRecognizer.InstalledRecognizers.Count)
             {
-                if (s2t.IsPausing)
-                    s2t.Resume();
-                else
-                    s2t.Pause();
-
-                btnPlay.IsChecked = s2t.IsRunning;
-                btnPause.IsChecked = s2t.IsPausing;
-                btnStop.IsChecked = !s2t.IsRunning;
+                if (s2t is SpeechRecognizer)
+                {
+                    s2t.Culture = SpeechRecognizer.InstalledRecognizers[idx].Culture;
+                }
             }
         }
 
-        private void btnStop_Click(object sender, RoutedEventArgs e)
+        private void miOptEngine_Click(object sender, RoutedEventArgs e)
         {
             if (s2t is SpeechRecognizer)
             {
-                s2t.Stop();
-                btnPlay.IsChecked = s2t.IsRunning;
-                btnPause.IsChecked = s2t.IsPausing;
-                btnStop.IsChecked = !s2t.IsRunning;
+                if (sender == miOptEngineSAPI)
+                {
+                    miOptEngineSAPI.IsChecked = s2t.SAPIEnabled;
+                }
+                else if (sender == miOptEngineiFly)
+                {
+                    s2t.iFlyEnabled = !s2t.iFlyEnabled;
+                    if (s2t.iFlyEnabled)
+                    {
+                        s2t.AzureEnabled = false;
+                        s2t.GoogleEnabled = false;
+                    }
+                }
+                else if (sender == miOptEngineAzure)
+                {
+                    s2t.AzureEnabled = !s2t.AzureEnabled;
+                    if (s2t.AzureEnabled)
+                    {
+                        s2t.iFlyEnabled = false;
+                        s2t.GoogleEnabled = false;
+                    }
+                }
+                else if (sender == miOptEngineGoogle)
+                {
+                    s2t.GoogleEnabled = !s2t.GoogleEnabled;
+                    if (s2t.GoogleEnabled)
+                    {
+                        s2t.iFlyEnabled = false;
+                        s2t.AzureEnabled = false;
+                    }
+                }
+                miOptEngineiFly.IsChecked = s2t.iFlyEnabled;
+                miOptEngineAzure.IsChecked = s2t.AzureEnabled;
+                miOptEngineGoogle.IsChecked = s2t.GoogleEnabled;
             }
         }
 
-        private void btnHome_Click(object sender, RoutedEventArgs e)
+        private void btnOption_Click(object sender, RoutedEventArgs e)
         {
-            if (s2t is SpeechRecognizer)
+            if (btnOption.ContextMenu is ContextMenu)
             {
-                if (lstResult.Items.Count > 0) lstResult.SelectedIndex = 0;
-            }
-        }
-
-        private void btnPrev_Click(object sender, RoutedEventArgs e)
-        {
-            if (s2t is SpeechRecognizer)
-            {
-                if (lstResult.SelectedIndex > 0) lstResult.SelectedIndex -= 1;
-                else lstResult.SelectedIndex = 0;
-            }
-        }
-
-        private void btnNext_Click(object sender, RoutedEventArgs e)
-        {
-            if (s2t is SpeechRecognizer)
-            {
-                lstResult.SelectedIndex += 1;
-                if (lstResult.SelectedIndex < lstResult.Items.Count - 1) lstResult.SelectedIndex += 1;
-                else lstResult.SelectedIndex = lstResult.Items.Count - 1;
-            }
-        }
-
-        private void btnEnd_Click(object sender, RoutedEventArgs e)
-        {
-            if (s2t is SpeechRecognizer)
-            {
-                if (lstResult.Items.Count > 0) lstResult.SelectedIndex = lstResult.Items.Count - 1;
+                btnOption.ContextMenu.IsOpen = true;
             }
         }
 
@@ -201,7 +238,7 @@ namespace SoundToText
                     if (exts_snd.Contains(ext))
                     {
                         s2t.AudioFile = fn;
-                        MediaPanel.IsEnabled = true;
+                        SetMediaButtonState(MediaButtonState.Idle);
                     }
                 }
             }
@@ -231,17 +268,133 @@ namespace SoundToText
             }
         }
 
-        private void lstResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void btnConvertPlay_Click(object sender, RoutedEventArgs e)
         {
             if (s2t is SpeechRecognizer)
             {
-                if (lstResult.SelectedItem != null)
+                if (s2t.IsPausing)
                 {
-                    var srt = lstResult.SelectedItem as SRT;
-                    edTitle.Text = srt.Title;
+                    s2t.Resume();
+                }
+                else
+                {
+                    if (Keyboard.Modifiers == ModifierKeys.Alt || Keyboard.Modifiers == ModifierKeys.Control)
+                    {
+                        s2t.Start(lstResult.SelectedIndex);
+                    }
+                    else if(Keyboard.Modifiers == ModifierKeys.None)
+                    {
+                        lstResult.ItemsSource = s2t.Result;
+                        lstResult.UpdateLayout();
+
+                        edTitle.Text = string.Empty;
+
+                        progressBar.Minimum = 0;
+                        progressBar.Maximum = 100;
+                        progress.Report(s2t.Progress);
+                        s2t.Start();
+                    }
+                }
+                SetMediaButtonState(MediaButtonState.Running);
+            }
+        }
+
+        private void btnConvertPause_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (s2t.IsPausing)
+                    s2t.Resume();
+                else
+                    s2t.Pause();
+
+                SetMediaButtonState(MediaButtonState.Pausing);
+            }
+        }
+
+        private void btnConvertStop_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                s2t.Stop();
+                SetMediaButtonState(MediaButtonState.Idle);
+            }
+        }
+
+        private void btnHome_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (lstResult.Items.Count > 0) lstResult.SelectedIndex = 0;
+            }
+        }
+
+        private void btnPrev_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (lstResult.SelectedIndex > 0) lstResult.SelectedIndex -= 1;
+                else lstResult.SelectedIndex = 0;
+            }
+        }
+
+        private async void btnPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (lstResult.SelectedIndex >= 0 && lstResult.SelectedIndex < s2t.Result.Count)
+                {
+                    var bs = s2t.Result[lstResult.SelectedIndex].Audio;
+                    if(bs is byte[] && bs.Length > 0)
+                    {
+                        try
+                        {
+                            btnPlay.IsEnabled = false;
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                await ms.WriteAsync(bs, 0, bs.Length);
+                                await ms.FlushAsync();
+                                ms.Seek(0, SeekOrigin.Begin);
+                                using (WaveStream ws = new WaveFileReader(ms))
+                                {
+                                    //WaveFileWriter.CreateWaveFile("_test_.wav", ws);
+                                    using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
+                                    {
+                                        waveOut.Init(ws);
+                                        waveOut.Play();
+                                        while (waveOut.PlaybackState == PlaybackState.Playing)
+                                        {
+                                            100.Sleep();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            btnPlay.IsEnabled = true;
+                        }
+                    }
                 }
             }
         }
 
+        private void btnNext_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                lstResult.SelectedIndex += 1;
+                if (lstResult.SelectedIndex < lstResult.Items.Count - 1) lstResult.SelectedIndex += 1;
+                else lstResult.SelectedIndex = lstResult.Items.Count - 1;
+            }
+        }
+
+        private void btnEnd_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (lstResult.Items.Count > 0) lstResult.SelectedIndex = lstResult.Items.Count - 1;
+            }
+        }
     }
 }

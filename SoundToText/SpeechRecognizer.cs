@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using NAudio.MediaFoundation;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,14 +7,15 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Speech.AudioFormat;
 using System.Speech.Recognition;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace SoundToText
 {
@@ -55,7 +57,7 @@ namespace SoundToText
         public List<SimpleTitle> AltTitle { get; set; } = new List<SimpleTitle>();
         internal protected void SetAltText(IEnumerable<RecognizedPhrase> alt)
         {
-            if(!(AltTitle is List<SimpleTitle>))
+            if (!(AltTitle is List<SimpleTitle>))
                 AltTitle = new List<SimpleTitle>();
 
             AltTitle.Clear();
@@ -99,6 +101,8 @@ namespace SoundToText
             }
         }
 
+        public byte[] Audio { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -111,76 +115,182 @@ namespace SoundToText
         #region Speech Recognition routines
 
         #region Recognizer Internal Variable
-        private List<RecognizerInfo> Recognizers = SpeechRecognitionEngine.InstalledRecognizers().ToList();
+        public static List<RecognizerInfo> InstalledRecognizers { get; } = SpeechRecognitionEngine.InstalledRecognizers().ToList();
+        private Dictionary<string, SpeechRecognitionEngine> _recognizers = new Dictionary<string, SpeechRecognitionEngine>();
+        private SpeechRecognitionEngine _defaultRecognizer = null;
         private SpeechRecognitionEngine _recognizer = null;
 
         private MemoryStream _recognizerStream = null;
 
+        private string APPID_iFly = string.Empty;
+        private string APPID_iFly_File = "appid_ifly.txt";
+        iFly.SpeechRecognizer iflysr = null;
+
+        private string APIKEY_Google = string.Empty;
+        private string APIKEY_Google_File = "apikey_google.txt";
+
+        private string APIKEY_Azure = string.Empty;
+        private string APIKEY_Azure_File = "apikey_azure.txt";
+        //private string URL_AzureToken = "https://eastasia.api.cognitive.microsoft.com/sts/v1.0/issueToken";
+        //private string URL_AzureResponse = "https://eastasia.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1";
+        private string URL_AzureToken = "https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken";
+        private string URL_AzureResponse = "https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1";
+        private string Token_Azure = string.Empty;
+        private DateTime Token_Lifetime = DateTime.Now;
+        #endregion
+
+        #region Properties
+        private CultureInfo culture = CultureInfo.CurrentCulture;
+        public CultureInfo Culture
+        {
+            get { return (culture); }
+            set
+            {
+                culture = value;
+                if (_recognizers.Count == InstalledRecognizers.Count)
+                    _recognizer = _recognizers[culture.Name];
+                else
+                    _recognizer = _defaultRecognizer;
+            }
+        }
+
+        public Stream AudioStream
+        {
+            get
+            {
+                return (_recognizerStream);
+            }
+            private set
+            {
+                var pos = value.Position;
+                _recognizerStream.SetLength(value.Length);
+                _recognizerStream.Seek(0, SeekOrigin.Begin);
+                value.Seek(0, SeekOrigin.Begin);
+                value.CopyToAsync(_recognizerStream);
+                _recognizerStream.FlushAsync();
+                _recognizerStream.Seek(pos, SeekOrigin.Begin);
+            }
+        }
+
         public Action IsCompleted { get; set; } = null;
 
-        private string appid = string.Empty;
-        private string appid_file = "ifly_appid.txt";
-        iFly.SpeechRecognizer iflysr = null;
+        public Action<TimeSpan, TimeSpan> AudioLoaded { get; set; } = null;
+
+        private SpeechAudioFormatInfo _audioInfo = null;
+        private string _audiofile = string.Empty;
+        public string AudioFile
+        {
+            get { return (_audiofile); }
+            set
+            {
+                _audiofile = value;
+                new Task(async () =>
+                {
+                    _audioInfo = await LoadAudio(_audiofile);
+                }).Start();
+            }
+        }
+
+        private TimeSpan lastAudioPos = TimeSpan.FromSeconds(0);
+        public TimeSpan AudioLength { get; set; } = TimeSpan.FromSeconds(0);
+        public TimeSpan AudioPos { get; set; } = TimeSpan.FromSeconds(0);
+
+        public IProgress<Tuple<TimeSpan, TimeSpan>> ProgressHost { get; set; } = null;
+        public Tuple<TimeSpan, TimeSpan> Progress
+        {
+            get
+            {
+                if (_recognizer is SpeechRecognitionEngine)
+                    return (Tuple.Create(AudioPos, AudioLength));
+                else
+                    return (Tuple.Create(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(0)));
+            }
+        }
+
+        public string Title
+        {
+            get { return (Path.GetFileNameWithoutExtension(AudioFile)); }
+        }
+
+        private ObservableCollection<SRT> srt = new ObservableCollection<SRT>();
+        public ObservableCollection<SRT> Result { get { return (srt); } }
+        public string Text
+        {
+            get
+            {
+                if (srt is IEnumerable<SRT>)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (SRT s in srt)
+                    {
+                        sb.AppendLine($"{s.Count}");
+                        sb.AppendLine($"{s.Start.ToString(@"hh\:mm\:ss\,fff")} --> {s.End.ToString(@"hh\:mm\:ss\,fff")}");
+                        sb.AppendLine($"{s.Text}");
+                        sb.AppendLine();
+                    }
+                    return (sb.ToString());
+                }
+                else return (string.Empty);
+            }
+        }
+
+        private int ReRecognize = -1;
+
+        public bool SAPIEnabled { get; set; } = true;
+        public bool iFlyEnabled { get; set; } = false;
+        public bool AzureEnabled { get; set; } = false;
+        public bool GoogleEnabled { get; set; } = false;
         #endregion
 
         #region Recognizer Event Handle
-        private TimeSpan lastAudioPos = TimeSpan.FromSeconds(0);
         private async void Recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             if (e.Result is RecognitionResult)
             {
-                var title = srt.Last();
-                title.Start = lastAudioPos + e.Result.Audio.AudioPosition;
-                title.End = title.Start + e.Result.Audio.Duration;
-                title.Text = e.Result.Text.Trim();
-                title.SetAltText(e.Result.Alternates);
+                Log($"Processing : {_recognizer.RecognizerAudioPosition.ToString(@"hh\:mm\:ss\.fff")} - {AudioLength.ToString(@"hh\:mm\:ss\.fff")}");
 
-                AudioPos = title.Start;
-                if (ProgressHost is IProgress<Tuple<TimeSpan, TimeSpan>>)
+                SRT title = null;
+                if (ReRecognize == -1)
                 {
-                    ProgressHost.Report(Progress);
-                }
-                if (IsPausing) lastAudioPos = title.End;
+                    title = srt.Last();
+                    title.Start = lastAudioPos + e.Result.Audio.AudioPosition;
+                    title.End = title.Start + e.Result.Audio.Duration;
+                    title.Text = e.Result.Text.Trim();
+                    title.SetAltText(e.Result.Alternates);
 
-                if (iflysr is iFly.SpeechRecognizer)
-                {
-                    await Task.Run(async () =>
+                    AudioPos = title.Start;
+                    if (ProgressHost is IProgress<Tuple<TimeSpan, TimeSpan>>)
                     {
-                        using (MemoryStream ms = new MemoryStream())
+                        ProgressHost.Report(Progress);
+                    }
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (WaveFileWriter ws = new WaveFileWriter(ms, new WaveFormat(16000, 16, 1)))
                         {
-                            e.Result.Audio.WriteToAudioStream(ms);
-                            await ms.FlushAsync();
-
-                            byte[] buf = new byte[256];
-                            buf = new byte[ms.Length];
+                            e.Result.Audio.WriteToWaveStream(ws);
+                            title.Audio = new byte[ms.Length];
                             ms.Seek(0, SeekOrigin.Begin);
-                            ms.Read(buf, 0, (int)(ms.Length));
-                            var ret = await iflysr.Recognizer(buf);
-                        //title.Text += $" [{ret}]";
-                        if (!string.IsNullOrEmpty(ret))
-                            {
-                                if (ret.StartsWith("#"))
-                                    title.Text += $" [{ret}]";
-                                else
-                                    title.Text = ret;
-                            }
+                            await ms.ReadAsync(title.Audio, 0, title.Audio.Length);
+                            await ms.FlushAsync();
                         }
-                    });
+                    }
                 }
+                else
+                    title = ReRecognize >= 0 && ReRecognize < srt.Count ? srt[ReRecognize] : null;
 
-                //using (MemoryStream ms = new MemoryStream())
-                //{
-                //    e.Result.Audio.WriteToAudioStream(ms);
-                //    ms.Flush();
-
-                //    byte[] buf = new byte[256];
-                //    buf = new byte[ms.Length];
-                //    ms.Seek(0, SeekOrigin.Begin);
-                //    ms.Read(buf, 0, (int)(ms.Length));
-                //    var ret = await iflysr.Recognizer(buf);
-                //    //title.Text += $" [{ret}]";
-                //    title.Text = ret;
-                //}
+                if (iFlyEnabled && iflysr is iFly.SpeechRecognizer)
+                {
+                    Recognizer_iFly(title, e);
+                }
+                else if (AzureEnabled)
+                {
+                    Recognizer_Azure(title, e);
+                }
+                else if (GoogleEnabled)
+                {
+                    Recognizer_Google(title, e);
+                }
             }
         }
 
@@ -214,13 +324,16 @@ namespace SoundToText
 
         private void Recognizer_SpeechDetected(object sender, SpeechDetectedEventArgs e)
         {
-            var title = new SRT()
+            if (ReRecognize == -1)
             {
-                Count = srt.Count + 1,
-                Start = e.AudioPosition,
-                End = e.AudioPosition
-            };
-            srt.Add(title);
+                var title = new SRT()
+                {
+                    Count = srt.Count + 1,
+                    Start = e.AudioPosition,
+                    End = e.AudioPosition
+                };
+                srt.Add(title);
+            }
         }
 
         private void Recognizer_RecognizeCompleted(object sender, RecognizeCompletedEventArgs e)
@@ -234,7 +347,11 @@ namespace SoundToText
                 }
                 else
                 {
-                    AudioPos = AudioLength;
+                    Log($"Completed: {_recognizer.RecognizerAudioPosition.ToString(@"hh\:mm\:ss\.fff")} - {AudioLength.ToString(@"hh\:mm\:ss\.fff")}");
+
+                    if (_recognizerStream.Position >= _recognizerStream.Length)
+                        AudioPos = AudioLength;
+
                     IsRunning = false;
                     IsPausing = false;
                     if (IsCompleted is Action) IsCompleted.Invoke();
@@ -248,113 +365,161 @@ namespace SoundToText
         #endregion
 
         #region Recognizer Helper routines
-        private async Task<SpeechAudioFormatInfo> LoadAudio(string audiofile)
+        private async void Recognizer_iFly(SRT title, SpeechRecognizedEventArgs e)
         {
-            //var ext = Path.GetExtension(audiofile).ToLower();
-            SpeechAudioFormatInfo audioInfo = null;
-            try
+            if (string.IsNullOrEmpty(APPID_iFly)) return;
+            if (!(title is SRT)) return;
+
+            await Task.Run(async () =>
             {
-                //using (AudioFileReader reader = new AudioFileReader(audiofile))
-                using (MediaFoundationReader reader = new MediaFoundationReader(audiofile))
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    var fmt_new = new WaveFormat(16000, 16, 1);
-                    //using (WaveStream pcmStream = WaveFormatConversionStream.CreatePcmStream(reader))
-                    using (WaveStream pcmStream = new WaveFormatConversionStream(fmt_new, reader))
+                    e.Result.Audio.WriteToAudioStream(ms);
+                    await ms.FlushAsync();
+
+                    byte[] buf = new byte[256];
+                    buf = new byte[ms.Length];
+                    ms.Seek(0, SeekOrigin.Begin);
+                    ms.Read(buf, 0, (int)(ms.Length));
+
+                    var ret = await iflysr.Recognizer(buf);
+                    //title.Text += $" [{ret}]";
+                    if (!string.IsNullOrEmpty(ret))
                     {
-                        //WaveFileWriter.CreateWaveFile("_test_.wav", pcmStream);
-                        var fmt = pcmStream.WaveFormat;
-                        if (iflysr is iFly.SpeechRecognizer) iflysr.SampleRate = fmt.SampleRate;
+                        if (ret.StartsWith("#"))
+                            title.Text += $" [{ret}]";
+                        else
+                            title.Text = ret;
+                    }
+                }
+            });
+        }
 
-                        audioInfo = new SpeechAudioFormatInfo(EncodingFormat.Pcm, fmt.SampleRate, fmt.BitsPerSample, fmt.Channels, fmt.AverageBytesPerSecond, fmt.BlockAlign, new byte[fmt.ExtraSize]);
-
-                        _recognizerStream = new MemoryStream();
-                        byte[] buf = new byte[pcmStream.Length];
-                        pcmStream.Read(buf, 0, buf.Length);
-                        await _recognizerStream.WriteAsync(buf, 0, buf.Length);
-                        await _recognizerStream.FlushAsync();
-                        _recognizerStream.Seek(0, SeekOrigin.Begin);
-
-                        AudioPos = reader.CurrentTime;
-                        AudioLength = reader.TotalTime;
+        private async Task<string> Recognizer_AzureFetchToken(string url)
+        {
+            string resuilt = Token_Azure;
+            if (string.IsNullOrEmpty(Token_Azure) || Token_Lifetime + TimeSpan.FromSeconds(600) < DateTime.Now)
+            {
+                using (var client = new HttpClient())
+                {
+                    try
+                    {
+                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_Azure);
+                        //client.DefaultRequestHeaders.Add("Content-type", "application/x-www-form-urlencoded");
+                        //client.DefaultRequestHeaders.Add("Content-Length", "0");
+                        UriBuilder uriToken = new UriBuilder(url);
+                        var result = await client.PostAsync(uriToken.Uri.AbsoluteUri, null);
+                        resuilt = await result.Content.ReadAsStringAsync();
+                        Token_Lifetime = DateTime.Now;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log(ex.Message);
                     }
                 }
             }
-            catch (Exception)
-            {
-                if(_recognizerStream is MemoryStream)
-                    _recognizerStream.Dispose();
-                _recognizerStream = null;
-            }
-            return (audioInfo);
+            return (resuilt);
         }
 
-        private async void Recognizer(string audiofile, bool restart = false)
+        private async void Recognizer_Azure(SRT title, SpeechRecognizedEventArgs e)
         {
-            if (File.Exists(audiofile))
+            if (string.IsNullOrEmpty(APIKEY_Azure)) return;
+            if (!(title is SRT)) return;
+
+            await Task.Run(async () =>
             {
-                if (_recognizer is SpeechRecognitionEngine)
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    if (restart || !IsRunning)
+                    e.Result.Audio.WriteToWaveStream(ms);
+                    await ms.FlushAsync();
+                    ms.Seek(0, SeekOrigin.Begin);
+                    byte[] BA_AudioFile = ms.GetBuffer();
+
+                    using (var client = new HttpClient())
                     {
-                        //_recognizerPause.Release();
-                        //_recognizerRunning.Release();
-                        IsRunning = true;
-                        IsPausing = false;
+                        Token_Azure = await Recognizer_AzureFetchToken(URL_AzureToken);
 
-                        var audioInfo = await LoadAudio(audiofile);
+                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_Azure);
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(@"application/json"));
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(@"text/xml"));
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token_Azure);
 
-                        //_recognizer.SetInputToAudioStream();
-                        _recognizer.SetInputToAudioStream(_recognizerStream, audioInfo);
+                        var lang = Culture.IetfLanguageTag;
+                        var content = new StreamContent(ms);
+                        var contentType = new string[] { @"audio/wav", @"codecs=audio/pcm", @"samplerate=16000" };
+                        var ok = content.Headers.TryAddWithoutValidation("Content-Type", contentType);
+                        var response = await client.PostAsync($"{URL_AzureResponse}?language={lang}", content);
+                        string stt_rest = await response.Content.ReadAsStringAsync();
 
-                        srt.Clear();
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            try
+                            {
+                                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                                var stt = serializer.Deserialize<AzureSpeechRecognizResult>(stt_rest);
+
+                                var text = stt.DisplayText;
+                                if (stt.RecognitionStatus.Equals("Success", StringComparison.CurrentCultureIgnoreCase))
+                                    title.Text = text;
+                                else
+                                    title.Text += $" [{text}]";
+                                Log(text);
+                            }
+                            catch (Exception) { }
+                        }
                     }
-                    _recognizer.RecognizeAsync(RecognizeMode.Multiple);
                 }
-            }
+            });
         }
-        #endregion
 
-        public string AudioFile { get; set; } = string.Empty;
-
-        public TimeSpan AudioLength { get; set; } = TimeSpan.FromSeconds(0);
-        public TimeSpan AudioPos { get; set; } = TimeSpan.FromSeconds(0);
-
-        public IProgress<Tuple<TimeSpan, TimeSpan>> ProgressHost { get; set; } = null;
-        public Tuple<TimeSpan, TimeSpan> Progress
+        private async void Recognizer_Google(SRT title, SpeechRecognizedEventArgs e)
         {
-            get
+            if (string.IsNullOrEmpty(APIKEY_Google)) return;
+            if (!(title is SRT)) return;
+
+            await Task.Run(async () =>
             {
-                if (_recognizer is SpeechRecognitionEngine)
-                    return (Tuple.Create(AudioPos, AudioLength));
-                else
-                    return (Tuple.Create(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(0)));
-            }
-        }
-
-        public string Title
-        {
-            get { return (Path.GetFileNameWithoutExtension(AudioFile)); }
-        }
-        private ObservableCollection<SRT> srt = new ObservableCollection<SRT>();
-        public ObservableCollection<SRT> Result { get { return (srt); } }
-        public string Text
-        {
-            get
-            {
-                if (srt is IEnumerable<SRT>)
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (SRT s in srt)
+                    e.Result.Audio.WriteToWaveStream(ms);
+                    await ms.FlushAsync();
+                    ms.Seek(0, SeekOrigin.Begin);
+                    byte[] BA_AudioFile = ms.GetBuffer();
+
+                    WebRequest _S2T = null;
+                    _S2T = WebRequest.Create($"https://www.google.com/speech-api/v2/recognize?output=json&lang=en-us&key={APIKEY_Google}");
+                    _S2T.Credentials = CredentialCache.DefaultCredentials;
+                    _S2T.Method = "POST";
+                    _S2T.ContentType = "audio/wav; rate=16000";
+                    _S2T.ContentLength = BA_AudioFile.Length;
+                    using (Stream stream = _S2T.GetRequestStream())
                     {
-                        sb.AppendLine($"{s.Count}");
-                        sb.AppendLine($"{s.Start.ToString(@"hh\:mm\:ss\,fff")} --> {s.End.ToString(@"hh\:mm\:ss\,fff")}");
-                        sb.AppendLine($"{s.Text}");
-                        sb.AppendLine();
+                        stream.Write(BA_AudioFile, 0, BA_AudioFile.Length);
                     }
-                    return (sb.ToString());
+
+                    HttpWebResponse _S2T_Response = (HttpWebResponse)_S2T.GetResponse();
+                    if (_S2T_Response.StatusCode == HttpStatusCode.OK)
+                    {
+                        StreamReader SR_Response = new StreamReader(_S2T_Response.GetResponseStream());
+                        var ret = SR_Response.ReadToEnd();
+                        if (!string.IsNullOrEmpty(ret))
+                        {
+                            if (ret.StartsWith("#"))
+                                title.Text += $" [{ret}]";
+                            else
+                                title.Text = ret;
+                        }
+                        Log(ret);
+                    }
                 }
-                else return (string.Empty);
-            }
+            });
+        }
+
+        private void Log(string text)
+        {
+#if DEBUG
+            Console.WriteLine(text);
+#endif
         }
 
         public string ToSSA()
@@ -402,8 +567,136 @@ namespace SoundToText
             return (sb.ToString());
         }
 
+        private async Task<SpeechAudioFormatInfo> LoadAudio(string audiofile)
+        {
+            //var ext = Path.GetExtension(audiofile).ToLower();
+            SpeechAudioFormatInfo audioInfo = null;
+            try
+            {
+                //using (AudioFileReader reader = new AudioFileReader(audiofile))
+                using (MediaFoundationReader reader = new MediaFoundationReader(audiofile))
+                {
+                    var fmt_new = new WaveFormat(16000, 16, 1);
+                    //using (WaveStream pcmStream = WaveFormatConversionStream.CreatePcmStream(reader))
+                    using (WaveStream pcmStream = new WaveFormatConversionStream(fmt_new, reader))
+                    {
+                        //WaveFileWriter.CreateWaveFile("_test_.wav", pcmStream);
+
+                        IsRunning = false;
+                        IsPausing = false;
+
+                        var fmt = pcmStream.WaveFormat;
+                        if (iflysr is iFly.SpeechRecognizer)
+                        {
+                            iflysr.SampleRate = fmt.SampleRate;
+                            iflysr.BitsPerSample = fmt.BitsPerSample;
+                        }
+
+                        AudioPos = TimeSpan.FromSeconds(0);
+                        AudioLength = reader.TotalTime;
+                        lastAudioPos = AudioPos;
+
+                        audioInfo = new SpeechAudioFormatInfo(EncodingFormat.Pcm, fmt.SampleRate, fmt.BitsPerSample, fmt.Channels, fmt.AverageBytesPerSecond, fmt.BlockAlign, new byte[fmt.ExtraSize]);
+
+                        _recognizerStream = new MemoryStream();
+                        byte[] buf = new byte[pcmStream.Length];
+                        pcmStream.Read(buf, 0, buf.Length);
+                        await _recognizerStream.WriteAsync(buf, 0, buf.Length);
+                        await _recognizerStream.FlushAsync();
+                        _recognizerStream.Seek(0, SeekOrigin.Begin);
+
+                        ProgressHost.Report(Progress);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (_recognizerStream is MemoryStream)
+                    _recognizerStream.Dispose();
+                _recognizerStream = null;
+            }
+            return (audioInfo);
+        }
+
+        private void InitAudio()
+        {
+            if (_recognizerStream is MemoryStream)
+            {
+                if (_audioInfo is SpeechAudioFormatInfo && _recognizerStream.Length > 0)
+                {
+                    AudioPos = TimeSpan.FromSeconds(0);
+                    lastAudioPos = AudioPos;
+
+                    _recognizerStream.Seek(0, SeekOrigin.Begin);
+                    //_recognizer.SetInputToAudioStream();
+                    //_recognizer.SetInputToAudioStream(_recognizerStream, _audioInfo);
+                    srt.Clear();
+                }
+            }
+        }
+
+        private async void Recognizer(string audiofile, bool restart = false)
+        {
+            ReRecognize = -1;
+            if (_recognizer is SpeechRecognitionEngine)
+            {
+                if (File.Exists(audiofile))
+                {
+                    if (restart || !IsRunning)
+                    {
+                        IsRunning = true;
+                        IsPausing = false;
+
+                        if (_recognizerStream == null || _recognizerStream.Length <= 0)
+                            _audioInfo = await LoadAudio(audiofile);
+
+                        InitAudio();
+                    }
+                    if (_recognizerStream is MemoryStream)
+                    {
+                        if (_recognizerStream.Position >= _recognizerStream.Length)
+                        {
+                            InitAudio();
+                        }
+                        _recognizer.SetInputToAudioStream(_recognizerStream, _audioInfo);
+                        _recognizer.RecognizeAsync(RecognizeMode.Multiple);
+                    }
+                }
+            }
+        }
+
+        private async void Recognizer(int index)
+        {
+            if (srt.Count > 0 && index >= 0 && index < srt.Count)
+            {
+                ReRecognize = index;
+                var buf = srt[index].Audio;
+                if (buf is byte[] && buf.Length > 0)
+                {
+                    if (_recognizer is SpeechRecognitionEngine)
+                    {
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            await ms.WriteAsync(buf, 0, buf.Length);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            using (WaveFileReader reader = new WaveFileReader(ms))
+                            {
+                                var fmt_new = new WaveFormat(16000, 16, 1);
+                                using (WaveStream pcmStream = new WaveFormatConversionStream(fmt_new, reader))
+                                {
+                                    _recognizer.SetInputToAudioStream(pcmStream, _audioInfo);
+                                    _recognizer.Recognize();
+                                    //_recognizer.RecognizeAsync(RecognizeMode.Single);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region Recognizer Control routines
-        //public bool IsRunning { get { return (_recognizerRunning.CurrentCount > 0); }}
         public bool IsRunning { get; private set; } = false;
         public void Start(string audiofile = default(string))
         {
@@ -421,7 +714,13 @@ namespace SoundToText
             }
         }
 
-        //public bool IsPausing { get { return (_recognizerPause.CurrentCount > 0); } }
+        public void Start(int index)
+        {
+            if (IsRunning) return;
+
+            Recognizer(index);
+        }
+
         private bool is_pausing = false;
         public bool IsPausing
         {
@@ -466,63 +765,103 @@ namespace SoundToText
 
         #endregion
 
-        public SpeechRecognizer()
+        public SpeechRecognizer(CultureInfo culture = default(CultureInfo))
         {
-            #region Recognition
             try
             {
-                if (Recognizers.Count > 0)
-                    _recognizer = new SpeechRecognitionEngine(CultureInfo.CurrentCulture);
+                MediaFoundationApi.Startup();
+
+                #region Microsoft SAPI Recognition
+                foreach(var ri in InstalledRecognizers)
+                {
+                    var r = new SpeechRecognitionEngine(ri.Culture);
+                    r.LoadGrammar(new DictationGrammar() { Name = "Dictation Grammar" });
+                    r.SpeechDetected += Recognizer_SpeechDetected;
+                    r.SpeechRecognized += Recognizer_SpeechRecognized;
+                    r.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
+                    r.SpeechHypothesized += Recognizer_SpeechHypothesized;
+                    r.RecognizeCompleted += Recognizer_RecognizeCompleted;
+                    _recognizers.Add(ri.Culture.Name, r);
+                }
+
+                if (culture is CultureInfo)
+                    _defaultRecognizer = new SpeechRecognitionEngine(culture);
+                else if (InstalledRecognizers.Count > 0)
+                    _defaultRecognizer = new SpeechRecognitionEngine(CultureInfo.CurrentCulture);
                 else
-                    _recognizer = new SpeechRecognitionEngine();
+                    _defaultRecognizer = new SpeechRecognitionEngine();
 
                 Grammar dictation = new DictationGrammar();
                 dictation.Name = "Dictation Grammar";
-                _recognizer.LoadGrammar(dictation);
+                _defaultRecognizer.LoadGrammar(dictation);
                 //_recognizer.SetInputToDefaultAudioDevice();
-                _recognizer.SpeechDetected += Recognizer_SpeechDetected;
-                _recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
-                _recognizer.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
-                _recognizer.SpeechHypothesized += Recognizer_SpeechHypothesized;
-                _recognizer.RecognizeCompleted += Recognizer_RecognizeCompleted;
+                _defaultRecognizer.SpeechDetected += Recognizer_SpeechDetected;
+                _defaultRecognizer.SpeechRecognized += Recognizer_SpeechRecognized;
+                _defaultRecognizer.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
+                _defaultRecognizer.SpeechHypothesized += Recognizer_SpeechHypothesized;
+                _defaultRecognizer.RecognizeCompleted += Recognizer_RecognizeCompleted;
+                #endregion
 
-                if (File.Exists(appid_file))
+                #region iFlyTek Speech Recognition
+                APPID_iFly = File.Exists(APPID_iFly_File) ? File.ReadAllText(APPID_iFly_File).Trim() : string.Empty;
+                if (!string.IsNullOrEmpty(APPID_iFly))
                 {
-                    appid = File.ReadAllText(appid_file).Trim();
                     iflysr = new iFly.SpeechRecognizer()
                     {
-                        APPID = $"{appid}",
+                        APPID = $"{APPID_iFly}",
                         AppDispather = Application.Current.Dispatcher
                     };
                 }
+                #endregion
+
+                #region Azure Cognitive Service
+                APIKEY_Azure = File.Exists(APIKEY_Azure_File) ? File.ReadAllText(APIKEY_Azure_File).Trim() : string.Empty;
+                if (!string.IsNullOrEmpty(APIKEY_Azure))
+                {
+                    var kv = APIKEY_Azure.Split('=');
+                    if (kv.Length >= 2)
+                    {
+                        APIKEY_Azure = kv[0];
+                        URL_AzureToken = string.Join("", kv.Skip(1));
+                        UriBuilder ubt = new UriBuilder(URL_AzureToken);
+                        UriBuilder ubr = new UriBuilder(URL_AzureResponse);
+                        ubr.Host = ubt.Host.Replace("api.cognitive.microsoft.com", "stt.speech.microsoft.com");
+                        URL_AzureResponse = ubr.Uri.AbsoluteUri;
+                    }
+                    Task.Run(async () =>
+                    {
+                        Token_Azure = await Recognizer_AzureFetchToken(URL_AzureToken);
+                    });
+                }
+                #endregion
+
+                #region Google Speech Recognize
+                APIKEY_Google = File.Exists(APIKEY_Google_File) ? File.ReadAllText(APIKEY_Google_File).Trim() : string.Empty;
+                #endregion
             }
             catch (Exception)
             {
                 _recognizer = null;
                 MessageBox.Show("Speech Recognizer not INSTALLED!", "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            #endregion
         }
 
-        public SpeechRecognizer(CultureInfo culture)
+        ~SpeechRecognizer()
         {
-            #region Recognition
-            if(culture is CultureInfo)
-                _recognizer = new SpeechRecognitionEngine(culture);
-            else
-                _recognizer = new SpeechRecognitionEngine(CultureInfo.CurrentCulture);
-
-            Grammar dictation = new DictationGrammar();
-            dictation.Name = "Dictation Grammar";
-            _recognizer.LoadGrammar(dictation);
-            //_recognizer.SetInputToDefaultAudioDevice();
-            _recognizer.SpeechDetected += Recognizer_SpeechDetected;
-            _recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
-            _recognizer.SpeechRecognitionRejected += Recognizer_SpeechRecognitionRejected;
-            _recognizer.SpeechHypothesized += Recognizer_SpeechHypothesized;
-            _recognizer.RecognizeCompleted += Recognizer_RecognizeCompleted;
-            #endregion
+            foreach(var kv in _recognizers)
+            {
+                var r = kv.Value;
+                if (r is SpeechRecognitionEngine) r.Dispose();
+            }
+            if(_recognizer is SpeechRecognitionEngine) _recognizer.Dispose();
         }
+    }
+
+    public class AzureSpeechRecognizResult
+    {
+        public string RecognitionStatus;
+        public string DisplayText;
+        public string Offset;
+        public string Duration;
     }
 }
