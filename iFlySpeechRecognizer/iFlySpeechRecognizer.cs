@@ -20,17 +20,20 @@ namespace iFly
         /// 2. https://www.shijunzh.com/archives/1229
         /// </summary>
 
-        public string APPID { get; set; } = string.Empty;
-        public int SampleRate { get; set; } = 16000;
         public Dispatcher AppDispather { get; set; } = null;
+
+        public string APPID { get; set; } = string.Empty;
+
+        public int SampleRate { get; set; } = 16000;
+        public int BitsPerSample { get; set; } = 16;
 
         public string Text { get; set; } = string.Empty;
         public Action<string> RecognizerResult;
         //public delegate void RecognizerResult(string text);
 
-        private ManualResetEventSlim IsRunning = new ManualResetEventSlim(true);
+        private bool IsLogin = false;
 
-        private static string session_begin_params = $"sub=iat,domain=iat,language=zh_cn,accent=mandarin,sample_rate=16000,result_type=plain,result_encoding=UNICODE,engine_type=local,mixed_type=realtime,mixed_timeout=50,asr_res_path=asr/GrmBuilld";
+        private static string session_begin_params = $"sub=iat,domain=iat,language=zh_cn,accent=mandarin,sample_rate=16000,result_type=plain,result_encoding=UNICODE";
 
         private void Log(string text)
         {
@@ -39,24 +42,88 @@ namespace iFly
 #endif
         }
 
-        private bool IsLogin = false;
-        public bool InitiFlytek(string my_appid, string begin_params)
+        private static object ExitFrame(object state)
         {
-            int res = MscDLL.MSPLogin(null, null, $"appid={my_appid}");//用户名，密码，登陆信息，前两个均为空
+            ((DispatcherFrame)state).Continue = false;
+            return null;
+        }
+
+        public static void DoEvents()
+        {
+            try
+            {
+                //Dispatcher.Yield();
+                DispatcherFrame frame = new DispatcherFrame();
+                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
+                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
+                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
+                Dispatcher.PushFrame(frame);
+            }
+            catch (Exception)
+            {
+                //Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Render, new Action(delegate { }));
+                //Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Send, new Action(delegate { }));
+                //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(delegate { }));
+                //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate { }));
+
+                DispatcherFrame frame = new DispatcherFrame();
+                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
+                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
+                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
+                Dispatcher.PushFrame(frame);
+            }
+        }
+
+        public static void Sleep(int ms)
+        {
+            for (int i = 0; i < ms; i += 10)
+            {
+                Thread.Sleep(5);
+                DoEvents();
+                //Dispatcher.Yield();
+            }
+        }
+
+        ~SpeechRecognizer()
+        {
+            iFlytekQuit();
+        }
+
+        public bool iFlytekInit()
+        {
+            if (IsLogin) return(IsLogin);
+
+            RecognizerResult += iFlytekResult;
+
+            int res = MscDLL.MSPLogin(null, null, $"appid={APPID}");//用户名，密码，登陆信息，前两个均为空
             if (res != (int)Errors.MSP_SUCCESS)
             {
                 //说明登陆失败
                 Log("登陆失败！");
                 Log("错误编号:" + res);
+                IsLogin = false;
                 return false;
             }
             IsLogin = true;
             Log("登陆成功！");
-            session_begin_params = begin_params;
+
+            #region 参数
+            /*
+            *sub:本次识别请求的类型  iat 连续语音识别;   asr 语法、关键词识别,默认为iat
+            *domain:领域      iat：连续语音识别  asr：语法、关键词识别    search：热词   video：视频    poi：地名  music：音乐    默认为iat。 注意：sub=asr时，domain只能为asr
+            *language:语言    zh_cn：简体中文  zh_tw：繁体中文  en_us：英文    默认值：zh_cn
+            *accent:语言区域    mandarin：普通话    cantonese：粤语    lmz：四川话 默认值：mandarin
+            *sample_rate:音频采样率  可取值：16000，8000  默认值：16000   离线识别不支持8000采样率音频
+            *result_type:结果格式   可取值：plain，json  默认值：plain
+            *result_encoding:识别结果字符串所用编码格式  GB2312;UTF-8;UNICODE    不同的格式支持不同的编码：   plain:UTF-8,GB2312  json:UTF-8
+            */
+            session_begin_params = $"sub=iat,domain=iat,language=zh_cn,accent=mandarin,sample_rate={SampleRate},result_type=plain,result_encoding=UNICODE,asr_res_path=fo|iat/common.jet,grm_build_path=asr/GrmBuilld,engine_type=mixed,mixed_type=realtime";
+            #endregion
+
             return true;
         }
 
-        public bool QuitiFlytek()
+        public bool iFlytekQuit()
         {
             int res = MscDLL.MSPLogout();
             if (res != (int)Errors.MSP_SUCCESS)
@@ -71,10 +138,8 @@ namespace iFly
             return true;
         }
 
-        public void StartRecording(byte[] data)
+        public void iFlytekStartRecording(byte[] data)
         {
-            IsRunning.Reset();
-
             string hints = "hiahiahia";
             IntPtr session_id;
             StringBuilder result = new StringBuilder();//存储最终识别的结果
@@ -90,7 +155,7 @@ namespace iFly
             {
                 var e = "#没有读取到任何内容";
                 Log(e);
-                QuitiFlytek();//退出登录
+                iFlytekQuit();//退出登录
                 result.Append(e);
             }
             else
@@ -111,7 +176,7 @@ namespace iFly
                 {
                     var e = "#开始一次语音识别失败！";
                     Log(e);
-                    QuitiFlytek();
+                    iFlytekQuit();
                     result.Append(e);
                 }
                 else
@@ -148,13 +213,13 @@ namespace iFly
                      当epStatus显示已检测到后端点时，MSC已不再接收音频，应及时停止音频写入
                      当rsltStatus显示有识别结果返回时，即可从MSC缓存中获取结果
                     */
-                    var seg = 65536;
-                    for (var i = 0; i < audio_content.Length; i += seg)
+                    var seg = SampleRate*BitsPerSample/8/5;
+                    for (int i = 0; i < audio_content.Length; i += seg)
                     {
                         if (i == 0)
                             aud_stat = AudioStatus.MSP_AUDIO_SAMPLE_FIRST;
-                        else if (i + seg >= audio_content.Length - 1)
-                            aud_stat = AudioStatus.MSP_AUDIO_SAMPLE_LAST;
+                        //else if (i + seg >= audio_content.Length - 1)
+                        //    aud_stat = AudioStatus.MSP_AUDIO_SAMPLE_LAST;
                         else
                             aud_stat = AudioStatus.MSP_AUDIO_SAMPLE_CONTINUE;
 
@@ -165,16 +230,26 @@ namespace iFly
                             var e = $"#写入识别的音频失败: {r} : {Enum.GetName(typeof(Errors), r)}";
                             Log(e);
                             MscDLL.QISRSessionEnd(session_id, hints);
-                            QuitiFlytek();
+                            iFlytekQuit();
                             result.Append(e);
                             break;
                         }
                     }
+                    aud_stat = AudioStatus.MSP_AUDIO_SAMPLE_LAST;
+                    int res = MscDLL.QISRAudioWrite(session_id, null, 0, aud_stat, ref ep_stat, ref rec_stat);
+                    if (res != (int)Errors.MSP_SUCCESS)
+                    {
+                        var e = $"#写入识别的音频失败: {res} : {Enum.GetName(typeof(Errors), res)}";
+                        Log(e);
+                        MscDLL.QISRSessionEnd(session_id, hints);
+                        iFlytekQuit();
+                        result.Append(e);
+                    }
                     #endregion
 
-                    #region Get Result
                     while (IsLogin && RecogStatus.MSP_REC_STATUS_COMPLETE != rec_stat)
                     {
+                        #region Get Result
                         //如果没有完成就一直继续获取结果
                         /*
                          QISRGetResult（）；
@@ -195,7 +270,8 @@ namespace iFly
                         }
                         if (now_result != IntPtr.Zero)
                         {
-                            int length = now_result.ToString().Length;
+                            var s = Marshal.PtrToStringAnsi(now_result);
+                            int length = s.Length;
                             totalLength += length;
                             if (totalLength > 4096)
                             {
@@ -204,100 +280,30 @@ namespace iFly
                                 result.Append(e);
                                 break;
                             }
-                            result.Append(Marshal.PtrToStringAnsi(now_result));
+                            result.Append(s);
                         }
                         //Thread.Sleep(150);//防止频繁占用cpu
-                        Thread.Sleep(10);
+                        Sleep(150);
+                        #endregion
                     }
-                    #endregion
 
-                    #region QISRSessionEnd
-                    var res = MscDLL.QISRSessionEnd(session_id, hints);
-                    if (res != (int)Errors.MSP_SUCCESS)
+                    if (IsLogin)
                     {
-                        QuitiFlytek();
-                        var e = $"#会话结束失败: {res} : {Enum.GetName(typeof(Errors), res)}";
-                        Log(e);
-                        result.Append(e);
+                        #region QISRSessionEnd
+                        res = MscDLL.QISRSessionEnd(session_id, hints);
+                        if (res != (int)Errors.MSP_SUCCESS)
+                        {
+                            iFlytekQuit();
+                            var e = $"#会话结束失败: {res} : {Enum.GetName(typeof(Errors), res)}";
+                            Log(e);
+                            result.Append(e);
+                        }
+                        else
+                        {
+                            Log("#成功结束会话！");
+                        }
+                        #endregion
                     }
-                    else
-                    {
-                        Log("#成功结束会话！");
-                    }
-                    #endregion
-
-                    #region
-                    ////int res = MscDLL.QISRAudioWrite(session_id, audio_content, (uint)audio_content.Length, aud_stat, ref ep_stat, ref rec_stat);
-                    //int res = MscDLL.QISRAudioWrite(session_id, audio_content, (uint)audio_content.Length, AudioStatus.MSP_AUDIO_SAMPLE_FIRST, ref ep_stat, ref rec_stat);
-                    //if (res != (int)Errors.MSP_SUCCESS)
-                    //{
-                    //    Log($"写入识别的音频失败: {res} : {Enum.GetName(typeof(Errors), res)}");
-                    //    MscDLL.QISRSessionEnd(session_id, hints);
-                    //    QuitiFlytek();
-                    //    result.Append($"#写入识别的音频失败: {res} : {Enum.GetName(typeof(Errors), res)}");
-                    //}
-                    //else
-                    //{
-                    //    res = MscDLL.QISRAudioWrite(session_id, null, 0, AudioStatus.MSP_AUDIO_SAMPLE_LAST, ref ep_stat, ref rec_stat);
-                    //    if (res != (int)Errors.MSP_SUCCESS)
-                    //    {
-                    //        Log($"写入音频失败: {res} : {Enum.GetName(typeof(Errors), res)}");
-                    //        result.Append($"#写入音频失败: {res} : {Enum.GetName(typeof(Errors), res)}");
-                    //    }
-                    //    else
-                    //    {
-                    //        #region Get Result
-                    //        while (RecogStatus.MSP_REC_STATUS_COMPLETE != rec_stat)
-                    //        {
-                    //            //如果没有完成就一直继续获取结果
-                    //            /*
-                    //             QISRGetResult（）；
-                    //             功能：获取识别结果
-                    //             参数1：session，之前已获得
-                    //             参数2：识别结果的状态
-                    //             参数3：waitTime[in]	此参数做保留用
-                    //             参数4：错误编码||成功
-                    //             返回值：函数执行成功且有识别结果时，返回结果字符串指针；其他情况(失败或无结果)返回NULL。
-                    //            */
-                    //            IntPtr now_result = MscDLL.QISRGetResult(session_id, ref rec_stat, 0, ref errcode);
-                    //            if (errcode != (int)Errors.MSP_SUCCESS)
-                    //            {
-                    //                Log($"获取结果失败：{errcode} : {Enum.GetName(typeof(Errors), errcode)}");
-                    //                result.Append($"#获取结果失败：{errcode} : {Enum.GetName(typeof(Errors), errcode)}");
-                    //                break;
-                    //            }
-                    //            if (now_result != IntPtr.Zero)
-                    //            {
-                    //                int length = now_result.ToString().Length;
-                    //                totalLength += length;
-                    //                if (totalLength > 4096)
-                    //                {
-                    //                    Log($"缓存空间不够 {totalLength}");
-                    //                    result.Append($"#缓存空间不够 {totalLength}");
-                    //                    break;
-                    //                }
-                    //                result.Append(Marshal.PtrToStringAnsi(now_result));
-                    //            }
-                    //            //Thread.Sleep(150);//防止频繁占用cpu
-                    //            Thread.Sleep(10);
-                    //        }
-                    //        #endregion
-                    //    }
-                    //    #region QISRSessionEnd
-                    //    res = MscDLL.QISRSessionEnd(session_id, hints);
-                    //    if (res != (int)Errors.MSP_SUCCESS)
-                    //    {
-                    //        Log($"会话结束失败: {res} : {Enum.GetName(typeof(Errors), res)}");
-                    //        result.Append($"#会话结束失败: {res} : {Enum.GetName(typeof(Errors), res)}");
-                    //        MscDLL.MSPLogout();
-                    //    }
-                    //    else
-                    //    {
-                    //        Log("#成功结束会话！");
-                    //    }
-                    //    #endregion
-                    //}
-                    #endregion
                 }
                 Log("#语音听写结束");
                 #endregion
@@ -308,46 +314,13 @@ namespace iFly
             {
                 RecognizerResult.Invoke(result.ToString());
             }
-            IsRunning.Set();
         }
 
-        #region 参数
-        /*
-        *sub:本次识别请求的类型  iat 连续语音识别;   asr 语法、关键词识别,默认为iat
-        *domain:领域      iat：连续语音识别  asr：语法、关键词识别    search：热词   video：视频    poi：地名  music：音乐    默认为iat。 注意：sub=asr时，domain只能为asr
-        *language:语言    zh_cn：简体中文  zh_tw：繁体中文  en_us：英文    默认值：zh_cn
-        *accent:语言区域    mandarin：普通话    cantonese：粤语    lmz：四川话 默认值：mandarin
-        *sample_rate:音频采样率  可取值：16000，8000  默认值：16000   离线识别不支持8000采样率音频
-        *result_type:结果格式   可取值：plain，json  默认值：plain
-        *result_encoding:识别结果字符串所用编码格式  GB2312;UTF-8;UNICODE    不同的格式支持不同的编码：   plain:UTF-8,GB2312  json:UTF-8
-        */
-        #endregion
         // Start is called before the first frame update
-        private bool isLogin = false;
-        void Start()
-        {
-            if (isLogin) return;
-
-            var session_params = $"sub=iat,domain=iat,language=zh_cn,accent=mandarin,sample_rate={SampleRate},result_type=plain,result_encoding=UNICODE,engine_type=mixed,mixed_type=realtime,mixed_timeout=50,asr_res_path=fo|iat/common.jet,grm_build_path=asr/GrmBuilld";
-            //var session_params = $"sub = iat, domain = iat, language = zh_cn, accent = mandarin, sample_rate = {SampleRate}, result_type = json, result_encoding = UTF-8";
-            isLogin = InitiFlytek(APPID, session_params);
-            RecognizerResult += Result;
-        }
-
-        void Stop()
-        {
-
-        }
-
-        public void Result(string result)
+        public void iFlytekResult(string result)
         {
             Log(result);
             Text = result;
-        }
-
-        private void OnApplicationQuit()
-        {
-            QuitiFlytek();
         }
 
         public async Task<string> Recognizer(byte[] buf)
@@ -360,8 +333,8 @@ namespace iFly
             {
                 if (!string.IsNullOrEmpty(APPID))
                 {
-                    Start();
-                    StartRecording(buf);
+                    iFlytekInit();
+                    iFlytekStartRecording(buf);
                     result = Text;
                 }
             });
