@@ -1,13 +1,18 @@
 ﻿using Microsoft.Win32;
 using NAudio.Wave;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using WPFSoundVisualizationLib;
 
 namespace SoundToText
 {
@@ -58,15 +63,57 @@ namespace SoundToText
             MediaPanel.IsEnabled = true;
         }
 
+        #region NAudio Engine Events
+        private void NAudioEngine_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            NAudioEngine engine = NAudioEngine.Instance;
+            switch (e.PropertyName)
+            {
+                case "FileTag":
+                    if (engine.FileTag != null)
+                    {
+                        TagLib.Tag tag = engine.FileTag.Tag;
+                    }
+                    else
+                    {
+                        //albumArtPanel.AlbumArtImage = null;
+                    }
+                    break;
+                case "ChannelPosition":
+                    WaveTime.Time = TimeSpan.FromSeconds(engine.ChannelPosition);
+                    break;
+                default:
+                    // Do Nothing
+                    break;
+            }
+
+        }
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
+
+            NAudioEngine soundEngine = NAudioEngine.Instance;
+            soundEngine.PropertyChanged += NAudioEngine_PropertyChanged;
+            WaveformViewer.RegisterSoundPlayer(soundEngine);
+            //WaveformViewer.AutoScaleWaveformCache = true;
+            //WaveformViewer.AllowRepeatRegions = false;
+
+            UIHelper.Bind(soundEngine, "CanPlay", btnPlay, IsEnabledProperty);
+            UIHelper.Bind(soundEngine, "CanPause", btnPause, IsEnabledProperty);
+            UIHelper.Bind(soundEngine, "CanStop", btnStop, IsEnabledProperty);
+            UIHelper.Bind(soundEngine, "SelectionBegin", repeatStartTimeEdit, TimeEditor.ValueProperty, BindingMode.TwoWay);
+            UIHelper.Bind(soundEngine, "SelectionEnd", repeatStopTimeEdit, TimeEditor.ValueProperty, BindingMode.TwoWay);
+
+            //Resources.MergedDictionaries.Clear();
+            ResourceDictionary themeResources = Application.LoadComponent(new Uri("ExpressionDark.xaml", UriKind.Relative)) as ResourceDictionary;
+            Resources.MergedDictionaries.Add(themeResources);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            DataContext = this;
-
             MediaPanel.IsEnabled = false;
 
             progress = new Progress<Tuple<TimeSpan, TimeSpan>>(i =>
@@ -82,13 +129,14 @@ namespace SoundToText
             s2t = new SpeechRecognizer()
             {
                 ProgressHost = progress,
-                IsCompleted = new Action(() => {
+                IsCompleted = new Action(() =>
+                {
                     SetMediaButtonState(MediaButtonState.Completed);
                 })
             };
 
             cbLanguage.Items.Clear();
-            foreach(var r in SpeechRecognizer.InstalledRecognizers)
+            foreach (var r in SpeechRecognizer.InstalledRecognizers)
             {
                 cbLanguage.Items.Add(r.Culture.DisplayName);
                 //cbLanguage.Items[cbLanguage.Items.Count-1]
@@ -98,6 +146,11 @@ namespace SoundToText
             miOptEngineSAPI.IsChecked = s2t.SAPIEnabled;
             miOptEngineiFly.IsChecked = s2t.iFlyEnabled;
             miOptEngineAzure.IsChecked = s2t.AzureEnabled;
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            NAudioEngine.Instance.Dispose();
         }
 
         private void Window_DragEnter(object sender, DragEventArgs e)
@@ -154,22 +207,33 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                if (lstResult.SelectedItem != null)
+                if (lstResult.SelectedItem is SRT)
                 {
                     var srt = lstResult.SelectedItem as SRT;
                     edTitle.Text = srt.Title;
+
+                    NAudioEngine.Instance.ChannelPosition = srt.Start.TotalSeconds;
+                    NAudioEngine.Instance.SelectionBegin = srt.Start;
+                    NAudioEngine.Instance.SelectionEnd = srt.End;
+                    //repeatStartTimeEdit.Value = srt.Start;
+                    //repeatStopTimeEdit.Value = srt.End;
                 }
             }
         }
 
         private void TitleContent_TargetUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
         {
-            if (e.Property.Name == "Text")
+            if (e.Property.Name == "Text" && e.TargetObject is TextBlock)
             {
-                if (lstResult.SelectedItem != null)
+                var tb = e.TargetObject as TextBlock;
+                //                if (tb.Tag is int && (int)(tb.Tag) == lstResult.SelectedIndex + 1)
                 {
-                    var srt = lstResult.SelectedItem as SRT;
-                    edTitle.Text = srt.Title;
+                    if (lstResult.SelectedItem != null)
+                    {
+                        var srt = lstResult.SelectedItem as SRT;
+                        edTitle.Text = srt.Title;
+                        $"{srt.Index}:{srt.Text}, {tb.Text}".Log();
+                    }
                 }
             }
         }
@@ -251,6 +315,7 @@ namespace SoundToText
                     {
                         s2t.AudioFile = fn;
                         SetMediaButtonState(MediaButtonState.Idle);
+                        NAudioEngine.Instance.OpenFile(fn);
                     }
                 }
             }
@@ -290,11 +355,24 @@ namespace SoundToText
                 }
                 else
                 {
-                    if (Keyboard.Modifiers == ModifierKeys.Alt || Keyboard.Modifiers == ModifierKeys.Control)
+                    if (Keyboard.Modifiers == ModifierKeys.Control)
                     {
                         s2t.Start(lstResult.SelectedIndex);
                     }
-                    else if(Keyboard.Modifiers == ModifierKeys.None)
+                    else if (Keyboard.Modifiers == ModifierKeys.Shift)
+                    {
+                        if (lstResult.SelectedItem is SRT)
+                        {
+                            var start = NAudioEngine.Instance.SelectionBegin;
+                            var end = NAudioEngine.Instance.SelectionEnd;
+                            if (start.TotalSeconds < 0)
+                                start = TimeSpan.FromSeconds(0);
+                            if (end.TotalSeconds > NAudioEngine.Instance.ActiveStream.TotalTime.TotalSeconds)
+                                end = NAudioEngine.Instance.ActiveStream.TotalTime;
+                            s2t.Start(lstResult.SelectedIndex, start, end);
+                        }
+                    }
+                    else if (Keyboard.Modifiers == ModifierKeys.None)
                     {
                         lstResult.ItemsSource = s2t.Result;
                         lstResult.UpdateLayout();
@@ -337,7 +415,8 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                if (lstResult.Items.Count > 0) lstResult.SelectedIndex = 0;
+                //if (lstResult.Items.Count > 0) lstResult.SelectedIndex = 0;
+                NAudioEngine.Instance.ChannelPosition = 0;
             }
         }
 
@@ -345,49 +424,18 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                if (lstResult.SelectedIndex > 0) lstResult.SelectedIndex -= 1;
-                else lstResult.SelectedIndex = 0;
+                //if (lstResult.SelectedIndex > 0) lstResult.SelectedIndex -= 1;
+                //else lstResult.SelectedIndex = 0;
+                NAudioEngine.Instance.ChannelPosition -= 0.01;
             }
         }
 
-        private async void btnPlay_Click(object sender, RoutedEventArgs e)
+        private void WaveformViewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (s2t is SpeechRecognizer)
             {
-                if (lstResult.SelectedIndex >= 0 && lstResult.SelectedIndex < s2t.Result.Count)
-                {
-                    var bs = s2t.Result[lstResult.SelectedIndex].Audio;
-                    if(bs is byte[] && bs.Length > 0)
-                    {
-                        try
-                        {
-                            btnPlay.IsEnabled = false;
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                await ms.WriteAsync(bs, 0, bs.Length);
-                                await ms.FlushAsync();
-                                ms.Seek(0, SeekOrigin.Begin);
-                                using (WaveStream ws = new WaveFileReader(ms))
-                                {
-                                    //WaveFileWriter.CreateWaveFile("_test_.wav", ws);
-                                    using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
-                                    {
-                                        waveOut.Init(ws);
-                                        waveOut.Play();
-                                        while (waveOut.PlaybackState == PlaybackState.Playing)
-                                        {
-                                            100.Sleep();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            btnPlay.IsEnabled = true;
-                        }
-                    }
-                }
+                if (e.Delta < 0) NAudioEngine.Instance.ChannelPosition -= 0.01;
+                else if (e.Delta > 0) NAudioEngine.Instance.ChannelPosition += 0.01;
             }
         }
 
@@ -395,9 +443,10 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                lstResult.SelectedIndex += 1;
-                if (lstResult.SelectedIndex < lstResult.Items.Count - 1) lstResult.SelectedIndex += 1;
-                else lstResult.SelectedIndex = lstResult.Items.Count - 1;
+                //lstResult.SelectedIndex += 1;
+                //if (lstResult.SelectedIndex < lstResult.Items.Count - 1) lstResult.SelectedIndex += 1;
+                //else lstResult.SelectedIndex = lstResult.Items.Count - 1;
+                NAudioEngine.Instance.ChannelPosition += 0.01;
             }
         }
 
@@ -405,7 +454,70 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                if (lstResult.Items.Count > 0) lstResult.SelectedIndex = lstResult.Items.Count - 1;
+                //if (lstResult.Items.Count > 0) lstResult.SelectedIndex = lstResult.Items.Count - 1;
+                NAudioEngine.Instance.ChannelPosition = NAudioEngine.Instance.ChannelLength;
+            }
+        }
+
+        private void btnPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (NAudioEngine.Instance.CanPlay)
+                    NAudioEngine.Instance.Play();
+
+                //if (lstResult.SelectedIndex >= 0 && lstResult.SelectedIndex < s2t.Result.Count)
+                //{
+                //    var bs = s2t.Result[lstResult.SelectedIndex].Audio;
+                //    if(bs is byte[] && bs.Length > 0)
+                //    {
+                //        try
+                //        {
+                //            btnPlay.IsEnabled = false;
+                //            using (MemoryStream ms = new MemoryStream())
+                //            {
+                //                await ms.WriteAsync(bs, 0, bs.Length);
+                //                await ms.FlushAsync();
+                //                ms.Seek(0, SeekOrigin.Begin);
+                //                using (WaveStream ws = new WaveFileReader(ms))
+                //                {
+                //                    //WaveFileWriter.CreateWaveFile("_test_.wav", ws);
+                //                    using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
+                //                    {
+                //                        waveOut.Init(ws);
+                //                        waveOut.Play();
+                //                        while (waveOut.PlaybackState == PlaybackState.Playing)
+                //                        {
+                //                            100.Sleep();
+                //                        }
+                //                    }
+                //                }
+                //            }
+                //        }
+                //        finally
+                //        {
+                //            btnPlay.IsEnabled = true;
+                //        }
+                //    }
+                //}
+            }
+        }
+
+        private void btnPause_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (NAudioEngine.Instance.CanPause)
+                    NAudioEngine.Instance.Pause();
+            }
+        }
+
+        private void btnStop_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (NAudioEngine.Instance.CanStop)
+                    NAudioEngine.Instance.Stop();
             }
         }
 

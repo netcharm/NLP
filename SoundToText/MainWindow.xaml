@@ -4,19 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SoundToText"
+        xmlns:svl="clr-namespace:WPFSoundVisualizationLib;assembly=WPFSoundVisualizationLib"
         mc:Ignorable="d"
+        Icon="pack://application:,,,/SoundToText;component/SoundToText.ico"
         Title="Sound File To Subtitle" 
         Width="1280" Height="720" 
-        MinWidth="1024" MinHeight="400"
-        Loaded="Window_Loaded"
+        MinWidth="1280" MinHeight="400"
+        Loaded="Window_Loaded" Closing="Window_Closing"
         AllowDrop="True" DragEnter="Window_DragEnter" Drop="Window_Drop">
-    <Grid>
+    
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="300" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -30,7 +33,7 @@
             <!-- File Control Panel -->
             <StackPanel 
                 Grid.Column="0" x:Name="FilePanel" 
-                Width="240"
+                Width="300"
                 HorizontalAlignment="Left" VerticalAlignment="Center" 
                 Orientation="Horizontal" Margin="4">
                 <Button 
@@ -43,10 +46,9 @@
                     Content="&#xE105;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnSave_Click"/>
-                <!--<Rectangle x:Name="fill" Width="72"/>-->
                 <ComboBox x:Name="cbLanguage" x:Uid="Language" 
                           HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
-                          Margin="4" Width="64" MaxWidth="72" SelectionChanged="cbLanguage_SelectionChanged"
+                          Margin="4" Width="124" SelectionChanged="cbLanguage_SelectionChanged"
                           />
                 <Button 
                     x:Name="btnOption" x:Uid="Option" 
@@ -73,40 +75,61 @@
             <StackPanel Grid.Column="2" x:Name="MediaPanel" 
                     HorizontalAlignment="Right" VerticalAlignment="Center" 
                     Orientation="Horizontal" Margin="4">
-                <Button x:Name="btnHome" x:Uid="Home" 
+                <Button 
+                    x:Name="btnHome" x:Uid="Home" 
                     Content="&#xE100;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnHome_Click"/>
-                <Button x:Name="btnPrev" x:Uid="Prev" 
+                <Button 
+                    x:Name="btnPrev" x:Uid="Prev" 
                     Content="&#xEB9E;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnPrev_Click"/>
-                <Button x:Name="btnPlay" x:Uid="Next" 
-                    Content="&#xE15D;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
-                    MinWidth="48" MinHeight="48" Margin="4"
-                    Click="btnPlay_Click"/>
-                <Button x:Name="btnNext" x:Uid="Next" 
+                <Button 
+                    x:Name="btnNext" x:Uid="Next" 
                     Content="&#xEB9D;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnNext_Click"/>
-                <Button x:Name="btnEnd" x:Uid="End" 
+                <Button 
+                    x:Name="btnEnd" x:Uid="End" 
                     Content="&#xE101;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnEnd_Click"/>
                 <Line Y1 ="0" Y2="48" Stroke="#FF7C7C7C" ClipToBounds="True"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" 
                       Margin="4" />
-                <ToggleButton x:Name="btnConvertPlay" x:Uid="Convert" 
+                <Button 
+                    x:Name="btnPlay" x:Uid="Next" 
+                    Content="&#xE15D;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnPlay_Click"/>
+                <Button 
+                    x:Name="btnPause" x:Uid="Pause" 
+                    Content="&#xE103;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnPause_Click"/>
+                <Button 
+                    x:Name="btnStop" x:Uid="Stop" 
+                    Content="&#xE15B;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnStop_Click"/>
+                <Line Y1 ="0" Y2="48" Stroke="#FF7C7C7C" ClipToBounds="True"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch" 
+                      Margin="4" />
+                <ToggleButton 
+                    x:Name="btnConvertPlay" x:Uid="Convert" 
                     Content="&#xE134;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     IsChecked="False"
                     Click="btnConvertPlay_Click"/>
-                <ToggleButton x:Name="btnConvertPause" x:Uid="Pause" 
+                <ToggleButton 
+                    x:Name="btnConvertPause" x:Uid="Pause" 
                     Content="&#xE103;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     IsChecked="False"
                     Click="btnConvertPause_Click"/>
-                <ToggleButton x:Name="btnConvertStop" x:Uid="Stop" 
+                <ToggleButton 
+                    x:Name="btnConvertStop" x:Uid="Stop" 
                     Content="&#xE15B;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     IsChecked="True"
@@ -135,9 +158,11 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Margin="1" 
-                                   Text="{Binding Count, Mode=OneWay}" />
-                        <TextBlock Grid.Column="1" Margin="1" 
+                                   Text="{Binding Index, Mode=OneWay, IsAsync=True}" />
+                        <TextBlock Grid.Column="1" Margin="1" Width="260"
+                                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                    Text="{Binding Text, Mode=OneWay, IsAsync=True, NotifyOnTargetUpdated=True}"
+                                   Tag="{Binding Index, Mode=OneWay, IsAsync=True}"
                                    TargetUpdated="TitleContent_TargetUpdated" />
                     </Grid>
                 </DataTemplate>
@@ -145,9 +170,48 @@
         </ListBox>
 
         <!-- Text Result List -->
-        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="edTitle" x:Uid="subTitle"
-                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                   TextWrapping="Wrap"
-                   Margin="4"/>
+        <Grid Grid.Row="0" Grid.Column="1" Margin="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="160" MinHeight="160" MaxHeight="160"/>
+            </Grid.RowDefinitions>
+            <TextBlock 
+                Grid.Row="0" x:Name="edTitle" x:Uid="subTitle"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                Foreground="{DynamicResource TextBrush}"
+                FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, Simun"
+                TextWrapping="Wrap" Margin="4"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+                <svl:WaveformTimeline Grid.Column="0"
+                 x:Name="WaveformViewer" x:Uid="WaveformViewer"
+                BorderThickness ="1"
+                Margin="4" MouseWheel="WaveformViewer_MouseWheel" />
+                <StackPanel Grid.Column="1"
+                            Orientation="Vertical"
+                            VerticalAlignment="Center" >
+                    <svl:DigitalClock 
+                        x:Name="WaveTime"
+                        Margin="4"
+                        HorizontalAlignment="Center"
+                        ShowSubSeconds="True" />
+                    <svl:TimeEditor 
+                        x:Name="repeatStartTimeEdit"
+                        Margin="4"
+                        HorizontalAlignment="Center" HorizontalContentAlignment="Center"
+                        FontSize="14" FontFamily="Iosevke, Sarasa Term SC, Segeo UI, 宋体, Simun"
+                        IsReadOnly="True" />
+                    <svl:TimeEditor 
+                        x:Name="repeatStopTimeEdit"
+                        Margin="4"
+                        HorizontalAlignment="Center" HorizontalContentAlignment="Center"
+                        FontSize="14" FontFamily="Iosevke, Sarasa Term SC, Segeo UI, 宋体, Simun"
+                        IsReadOnly="True" />
+                </StackPanel>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
