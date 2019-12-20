@@ -33,6 +33,7 @@ namespace SoundToText
     public class SRT : INotifyPropertyChanged
     {
         public int Index { get; set; } = 0;
+        public int DisplayIndex { get { return (Index + 1); } }
         public TimeSpan Start { get; set; } = TimeSpan.FromSeconds(0);
         public TimeSpan End { get; set; } = TimeSpan.FromSeconds(0);
 
@@ -64,7 +65,7 @@ namespace SoundToText
 
         public override string ToString()
         {
-            return ($"[{Index}]:{Text}");
+            return ($"[{DisplayIndex}]:{Text}");
         }
 
         public string Title
@@ -72,8 +73,8 @@ namespace SoundToText
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($"{Index}");
-                sb.AppendLine($"{Start.ToString(@"hh\:mm\:ss\,fff")} --> {End.ToString(@"hh\:mm\:ss\,fff")}");
+                sb.AppendLine($"{Index + 1}");
+                sb.AppendLine($"{NewStart.ToString(@"hh\:mm\:ss\,fff")} --> {NewEnd.ToString(@"hh\:mm\:ss\,fff")}");
                 sb.AppendLine($"{Text}");
                 sb.AppendLine();
                 return (sb.ToString());
@@ -85,13 +86,17 @@ namespace SoundToText
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($"[{Start.ToString(@"hh\:mm\:ss\.fff")}] {Text}");
-                sb.AppendLine($"[{End.ToString(@"hh\:mm\:ss\.fff")}]");
+                sb.AppendLine($"[{NewStart.ToString(@"hh\:mm\:ss\.fff")}] {Text}");
+                sb.AppendLine($"[{NewEnd.ToString(@"hh\:mm\:ss\.fff")}]");
                 return (sb.ToString());
             }
         }
 
         public byte[] Audio { get; set; }
+
+        public TimeSpan NewStart { get; set; } = TimeSpan.FromSeconds(0);
+        public TimeSpan NewEnd { get; set; } = TimeSpan.FromSeconds(0);
+        public byte[] NewAudio { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

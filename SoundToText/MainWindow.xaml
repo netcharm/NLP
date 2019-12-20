@@ -151,11 +151,11 @@
                         <ContextMenu FontFamily="Segoe UI, 微软雅黑">
                             <MenuItem 
                                 x:Name="btnReConvertPlay" x:Uid="ReConvert"
-                                Header="Re-Recognizing Selected"
+                                Header="Re-Recognizing Original Region"
                                 Click="btnConvertPlay_Click"/>
                             <MenuItem 
                                 x:Name="btnForceConvertPlay" x:Uid="ForceConvert"                                 
-                                Header="Force Recognizing Selected"
+                                Header="Recognizing Selected Region via thirdparty"
                                 Click="btnConvertPlay_Click"/>
                         </ContextMenu>
                     </Button.ContextMenu>
@@ -194,7 +194,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Margin="1" 
-                                   Text="{Binding Index, Mode=OneWay, IsAsync=True}" />
+                                   Text="{Binding DisplayIndex, Mode=OneWay, IsAsync=True}" />
                         <TextBlock Grid.Column="1" Margin="1" Width="260"
                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                    Text="{Binding Text, Mode=OneWay, IsAsync=True, NotifyOnTargetUpdated=True}"

@@ -38,27 +38,27 @@ namespace SoundToText
                 switch (state)
                 {
                     case MediaButtonState.Idle:
-                        btnConvertPlay.IsEnabled = Valid && !s2t.IsRunning;
-                        btnConvertPause.IsEnabled = Valid && s2t.IsPausing;
-                        btnConvertStop.IsEnabled = false;
+                        btnConvertPlay.IsEnabled = Valid && true;
+                        btnConvertPause.IsEnabled = Valid && false;
+                        btnConvertStop.IsEnabled = Valid && false;
                         break;
                     case MediaButtonState.Running:
-                        btnConvertPlay.IsEnabled = false;
-                        btnConvertPause.IsEnabled = Valid && !s2t.IsPausing;
-                        btnConvertStop.IsEnabled = true;
+                        btnConvertPlay.IsEnabled = Valid && false;
+                        btnConvertPause.IsEnabled = Valid && true;
+                        btnConvertStop.IsEnabled = Valid && true;
                         break;
                     case MediaButtonState.Pausing:
-                        btnConvertPlay.IsEnabled = Valid && s2t.IsRunning;
-                        btnConvertPause.IsEnabled = Valid && !s2t.IsPausing;
-                        btnConvertStop.IsEnabled = true;
+                        btnConvertPlay.IsEnabled = Valid && true;
+                        btnConvertPause.IsEnabled = Valid && false;
+                        btnConvertStop.IsEnabled = Valid && true;
                         break;
                     case MediaButtonState.Completed:
-                        btnConvertPlay.IsEnabled = Valid && !s2t.IsRunning;
+                        btnConvertPlay.IsEnabled = Valid && true;
                         btnConvertPause.IsEnabled = false;
                         btnConvertStop.IsEnabled = false;
                         break;
                     default:
-                        btnConvertPlay.IsEnabled = false;
+                        btnConvertPlay.IsEnabled = true;
                         btnConvertPause.IsEnabled = false;
                         btnConvertStop.IsEnabled = false;
                         break;
@@ -137,6 +137,16 @@ namespace SoundToText
             }
         }
 
+        private void LoadAudio(string file)
+        {
+            if (File.Exists(file))
+            {
+                s2t.AudioFile = file;
+                SetMediaButtonState(MediaButtonState.Idle);
+                NAudioEngine.Instance.OpenFile(file);
+            }
+        }
+
         #region NAudio Engine Events
         private void NAudioEngine_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -207,7 +217,7 @@ namespace SoundToText
                 ProgressHost = progress,
                 IsCompleted = new Action(() =>
                 {
-                    if (Dispatcher.CheckAccess())
+                    if (Application.Current.Dispatcher.CheckAccess())
                     {
                         SetMediaButtonState(MediaButtonState.Completed);
                     }
@@ -217,7 +227,7 @@ namespace SoundToText
             t2s = new SpeechTTS()
             {
                 IsCompleted = new Action(() => {
-                    if (Dispatcher.CheckAccess())
+                    if (Application.Current.Dispatcher.CheckAccess())
                     {
                         SetTtsButtonState(MediaButtonState.Completed);
                     }
@@ -228,7 +238,6 @@ namespace SoundToText
             foreach (var r in SpeechRecognizer.InstalledRecognizers)
             {
                 cbLanguage.Items.Add(r.Culture.DisplayName);
-                //cbLanguage.Items[cbLanguage.Items.Count-1]
             }
             if (cbLanguage.Items.Count > 0) cbLanguage.SelectedIndex = 0;
 
@@ -282,8 +291,7 @@ namespace SoundToText
                         {
                             try
                             {
-                                s2t.AudioFile = fn;
-                                SetMediaButtonState(MediaButtonState.Idle);
+                                LoadAudio(fn);
                             }
                             catch (Exception) { }
                         }
@@ -317,7 +325,7 @@ namespace SoundToText
                     NAudioEngine.Instance.SelectionBegin = srt.Start;
                     NAudioEngine.Instance.SelectionEnd = srt.End;
 
-                    titleIndex.Time = TimeSpan.FromSeconds((srt.Index / 100 * 60) + (srt.Index % 100));
+                    titleIndex.Time = TimeSpan.FromSeconds((srt.DisplayIndex / 100 * 60) + (srt.DisplayIndex % 100));
 
                     SetTtsButtonState(MediaButtonState.Idle);
                 }
@@ -328,23 +336,20 @@ namespace SoundToText
             }
         }
 
-        private void TitleContent_TargetUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
+        private void TitleContent_TargetUpdated(object sender, DataTransferEventArgs e)
         {
             if (e.Property.Name == "Text" && e.TargetObject is TextBlock)
             {
                 var tb = e.TargetObject as TextBlock;
-                //                if (tb.Tag is int && (int)(tb.Tag) == lstResult.SelectedIndex + 1)
+                if (lstResult.SelectedItem != null)
                 {
-                    if (lstResult.SelectedItem != null)
-                    {
-                        var srt = lstResult.SelectedItem as SRT;
-                        lblTitle.Text = srt.Title;
-                        edTitle.Text = srt.Text;
-                        edStartTime.Value = srt.Start;
-                        edEndTime.Value = srt.End;
+                    var srt = lstResult.SelectedItem as SRT;
+                    lblTitle.Text = srt.Title;
+                    edTitle.Text = srt.Text;
+                    edStartTime.Value = srt.NewStart;
+                    edEndTime.Value = srt.NewEnd;
 
-                        $"{srt.Index}:{srt.Text}, {tb.Text}".Log();
-                    }
+                    $"{srt.Index}:{srt.Text}, {tb.Text}".Log();
                 }
             }
         }
@@ -428,9 +433,7 @@ namespace SoundToText
                     var ext = Path.GetExtension(fn).ToLower();
                     if (exts_snd.Contains(ext))
                     {
-                        s2t.AudioFile = fn;
-                        SetMediaButtonState(MediaButtonState.Idle);
-                        NAudioEngine.Instance.OpenFile(fn);
+                        LoadAudio(fn);
                     }
                 }
             }
@@ -474,19 +477,36 @@ namespace SoundToText
 
                     if (Keyboard.Modifiers == ModifierKeys.Control || sender == btnReConvertPlay)
                     {
-                        s2t.Start(lstResult.SelectedIndex);
+                        foreach (var item in lstResult.SelectedItems)
+                        {
+                            if (item is SRT)
+                            {
+                                var srt = item as SRT;
+                                srt.NewStart = srt.Start;
+                                srt.NewEnd = srt.End;
+                                s2t.Start(srt);
+                            }
+                        }
                     }
                     else if (Keyboard.Modifiers == ModifierKeys.Shift || sender == btnForceConvertPlay)
                     {
-                        if (lstResult.SelectedItem is SRT)
+                        var engine = NAudioEngine.Instance;
+                        foreach (var item in lstResult.SelectedItems)
                         {
-                            var start = NAudioEngine.Instance.SelectionBegin;
-                            var end = NAudioEngine.Instance.SelectionEnd;
-                            if (start.TotalSeconds < 0)
-                                start = TimeSpan.FromSeconds(0);
-                            if (end.TotalSeconds > NAudioEngine.Instance.ActiveStream.TotalTime.TotalSeconds)
-                                end = NAudioEngine.Instance.ActiveStream.TotalTime;
-                            s2t.Start(lstResult.SelectedIndex, start, end);
+                            if (item is SRT)
+                            {
+                                var srt = item as SRT;
+                                var start = srt == lstResult.SelectedItem ? engine.SelectionBegin : srt.Start;
+                                var end = srt == lstResult.SelectedItem ? engine.SelectionEnd : srt.End;
+                                if (start.TotalSeconds < 0)
+                                    start = TimeSpan.FromSeconds(0);
+                                if (end.TotalSeconds > engine.ActiveStream.TotalTime.TotalSeconds)
+                                    end = engine.ActiveStream.TotalTime;
+                                srt.NewStart = start;
+                                srt.NewEnd = end;
+                                s2t.Start(srt, true);
+                                //s2t.Start(srt.Index, start, end);
+                            }
                         }
                     }
                     else if (Keyboard.Modifiers == ModifierKeys.None)
