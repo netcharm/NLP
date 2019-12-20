@@ -141,9 +141,17 @@ namespace SoundToText
         {
             if (File.Exists(file))
             {
-                s2t.AudioFile = file;
-                SetMediaButtonState(MediaButtonState.Idle);
-                NAudioEngine.Instance.OpenFile(file);
+                if (s2t is SpeechRecognizer)
+                {
+                    s2t.AudioFile = file;
+                    SetMediaButtonState(MediaButtonState.Idle);
+                    NAudioEngine.Instance.OpenFile(file);
+                    s2t.Result.Clear();
+                    lblTitle.Text = string.Empty;
+                    edTitle.Text = string.Empty;
+                    edStartTime.Value = TimeSpan.FromSeconds(0);
+                    edEndTime.Value = TimeSpan.FromSeconds(0);
+                }
             }
         }
 
@@ -220,6 +228,7 @@ namespace SoundToText
                     if (Application.Current.Dispatcher.CheckAccess())
                     {
                         SetMediaButtonState(MediaButtonState.Completed);
+                        if (lstResult.Items.Count > 0 && lstResult.SelectedItem == null) lstResult.SelectedIndex = 0;
                     }
                 })
             };

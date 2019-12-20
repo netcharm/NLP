@@ -302,7 +302,12 @@ namespace SoundToText
                         }
                     }
                 }
-                if (_ReRecognize >= 0 && IsCompleted is Action) IsCompleted.InvokeAsync();
+                if (_ReRecognize >= 0 && IsCompleted is Action)
+                {
+                    IsRunning = false;
+                    IsPausing = false;
+                    IsCompleted.InvokeAsync();
+                }
             });
         }
 
@@ -389,7 +394,12 @@ namespace SoundToText
                         }
                     }
                 }
-                if (_ReRecognize >= 0 && IsCompleted is Action) IsCompleted.InvokeAsync();
+                if (_ReRecognize >= 0 && IsCompleted is Action)
+                {
+                    IsRunning = false;
+                    IsPausing = false;
+                    IsCompleted.InvokeAsync();
+                }
             });
         }
 
@@ -432,7 +442,12 @@ namespace SoundToText
                         }
                     }
                 }
-                if (_ReRecognize >= 0 && IsCompleted is Action) IsCompleted.InvokeAsync();
+                if (_ReRecognize >= 0 && IsCompleted is Action)
+                {
+                    IsRunning = false;
+                    IsPausing = false;
+                    IsCompleted.InvokeAsync();
+                }
             });
         }
         #endregion
@@ -498,6 +513,69 @@ namespace SoundToText
                 }
             }
 
+            return (result);
+        }
+
+        private async Task<byte[]> GetPcmBytes(byte[] audio, WaveFormat fmt)
+        {
+            byte[] result = null;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                await ms.WriteAsync(audio, 0, audio.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                using (WaveFileReader reader = new WaveFileReader(ms))
+                {
+                    var wave = new WaveFormatConversionStream(defaultWaveFmt, reader);
+                    wave.CurrentTime = TimeSpan.FromSeconds(0);
+                    wave.Seek(0, SeekOrigin.Begin);
+                    result = new byte[wave.Length];
+                    await wave.ReadAsync(result, 0, result.Length);
+                    await wave.FlushAsync();
+                }
+            }
+            return (result);
+        }
+
+        private async Task<Stream> GetStream(byte[] bytes)
+        {
+            MemoryStream result = new MemoryStream();
+            await result.WriteAsync(bytes, 0, bytes.Length);
+            await result.FlushAsync();
+            result.Seek(0, SeekOrigin.Begin);
+            return (result);
+        }
+
+        private async Task<WaveStream> GetWaveStream(byte[] audio, WaveFormat fmt)
+        {
+            WaveStream result = null;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                await ms.WriteAsync(audio, 0, audio.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                using (WaveFileReader reader = new WaveFileReader(ms))
+                {
+                    result = new WaveFormatConversionStream(defaultWaveFmt, reader);
+                    result.CurrentTime = TimeSpan.FromSeconds(0);
+                    result.Seek(0, SeekOrigin.Begin);
+                    //await result.FlushAsync();
+                }
+            }
+            return (result);
+        }
+
+        private async Task<MemoryStream> GetMemoryStream(WaveStream stream)
+        {
+            MemoryStream result = new MemoryStream();
+            try
+            {
+                byte[] buf = new byte[stream.Length];
+                //stream.Seek(0, SeekOrigin.Begin);
+                await stream.ReadAsync(buf, 0, buf.Length);
+                await result.WriteAsync(buf, 0, buf.Length);
+                await result.FlushAsync();
+                result.Seek(0, SeekOrigin.Begin);
+            }
+            catch (Exception) { }
             return (result);
         }
 
@@ -715,21 +793,18 @@ namespace SoundToText
                 }
                 else
                 {
-                    using (MemoryStream ms = new MemoryStream())
+                    await Task.Run(async () =>
                     {
-                        await ms.WriteAsync(title.Audio, 0, title.Audio.Length);
-                        ms.Seek(0, SeekOrigin.Begin);
-                        using (WaveFileReader reader = new WaveFileReader(ms))
+                        try
                         {
-                            using (WaveStream pcmStream = new WaveFormatConversionStream(defaultWaveFmt, reader))
-                            {
-                                _ReRecognize = title.Index;
-                                _recognizer.SetInputToAudioStream(pcmStream, _audioInfo);
-                                _recognizer.Recognize();
-                                //_recognizer.RecognizeAsync(RecognizeMode.Single);
-                            }
+                            _ReRecognize = title.Index;
+                            var bytes = await GetPcmBytes(title.Audio, defaultWaveFmt);
+                            var pcm = await GetStream(bytes);
+                            _recognizer.SetInputToAudioStream(pcm, _audioInfo);
+                            _recognizer.Recognize();
                         }
-                    }
+                        catch (Exception) { }
+                    });
                 }
             }
         }
