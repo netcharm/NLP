@@ -41,26 +41,31 @@ namespace SoundToText
                         btnConvertPlay.IsEnabled = Valid && true;
                         btnConvertPause.IsEnabled = Valid && false;
                         btnConvertStop.IsEnabled = Valid && false;
+                        btnOpen.IsEnabled = true;
                         break;
                     case MediaButtonState.Running:
                         btnConvertPlay.IsEnabled = Valid && false;
                         btnConvertPause.IsEnabled = Valid && true;
                         btnConvertStop.IsEnabled = Valid && true;
+                        btnOpen.IsEnabled = false;
                         break;
                     case MediaButtonState.Pausing:
                         btnConvertPlay.IsEnabled = Valid && true;
                         btnConvertPause.IsEnabled = Valid && false;
                         btnConvertStop.IsEnabled = Valid && true;
+                        btnOpen.IsEnabled = false;
                         break;
                     case MediaButtonState.Completed:
                         btnConvertPlay.IsEnabled = Valid && true;
                         btnConvertPause.IsEnabled = false;
                         btnConvertStop.IsEnabled = false;
+                        btnOpen.IsEnabled = true;
                         break;
                     default:
                         btnConvertPlay.IsEnabled = true;
                         btnConvertPause.IsEnabled = false;
                         btnConvertStop.IsEnabled = false;
+                        btnOpen.IsEnabled = true;
                         break;
                 }
                 if (state == MediaButtonState.Invalid)
@@ -79,8 +84,9 @@ namespace SoundToText
                 btnConvertPlay.IsEnabled = true;
                 btnConvertPause.IsEnabled = false;
                 btnConvertStop.IsEnabled = false;
+                btnOpen.IsEnabled = true;
                 MediaPanel.IsEnabled = true;
-                WaveformPanel.IsEnabled = true;
+                WaveformPanel.IsEnabled = true;            
             }
         }
 
@@ -143,6 +149,8 @@ namespace SoundToText
             {
                 if (s2t is SpeechRecognizer)
                 {
+                    if (s2t.IsRunning) return;
+
                     s2t.AudioFile = file;
                     SetMediaButtonState(MediaButtonState.Idle);
                     NAudioEngine.Instance.OpenFile(file);
@@ -432,6 +440,8 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
+                if (s2t.IsRunning) return;
+
                 OpenFileDialog dlgOpen = new OpenFileDialog();
                 dlgOpen.DefaultExt = ".mp3";
                 //dlgOpen.Filter = "All Supported Audio Files|*.mp1;*.mp2;*.mp3;*.mp4;*.m4a;*.aac;*.ogg;*.oga;*.flac;*.wav;*.wma";
