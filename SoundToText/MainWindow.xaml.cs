@@ -27,40 +27,114 @@ namespace SoundToText
         private IProgress<Tuple<TimeSpan, TimeSpan>> progress = null;
 
         private SpeechRecognizer s2t = null;
+        private SpeechTTS t2s = null;
 
-        private enum MediaButtonState { Idle, Running, Pausing, Completed };
+        private enum MediaButtonState { Invalid, Idle, Running, Pausing, Completed };
         private void SetMediaButtonState(MediaButtonState state)
         {
-            bool Valid = s2t is SpeechRecognizer;
-            switch (state)
+            try
             {
-                case MediaButtonState.Idle:
-                    btnConvertPlay.IsChecked = Valid && s2t.IsRunning;
-                    btnConvertPause.IsChecked = Valid && s2t.IsPausing;
-                    //btnConvertStop.IsChecked = true;
-                    break;
-                case MediaButtonState.Running:
-                    btnConvertPlay.IsChecked = Valid && s2t.IsRunning;
-                    btnConvertPause.IsChecked = Valid && s2t.IsPausing;
-                    //btnConvertStop.IsChecked = false;
-                    break;
-                case MediaButtonState.Pausing:
-                    btnConvertPlay.IsChecked = Valid && s2t.IsRunning;
-                    btnConvertPause.IsChecked = Valid && s2t.IsPausing;
-                    //btnConvertStop.IsChecked = false;
-                    break;
-                case MediaButtonState.Completed:
-                    btnConvertPlay.IsChecked = Valid && s2t.IsRunning;
-                    btnConvertPause.IsChecked = Valid && s2t.IsPausing;
-                    //btnConvertStop.IsChecked = true;
-                    break;
-                default:
-                    btnConvertPlay.IsChecked = false;
-                    btnConvertPause.IsChecked = false;
-                    //btnConvertStop.IsChecked = false;
-                    break;
+                bool Valid = s2t is SpeechRecognizer;
+                switch (state)
+                {
+                    case MediaButtonState.Idle:
+                        btnConvertPlay.IsEnabled = Valid && !s2t.IsRunning;
+                        btnConvertPause.IsEnabled = Valid && s2t.IsPausing;
+                        btnConvertStop.IsEnabled = false;
+                        break;
+                    case MediaButtonState.Running:
+                        btnConvertPlay.IsEnabled = false;
+                        btnConvertPause.IsEnabled = Valid && !s2t.IsPausing;
+                        btnConvertStop.IsEnabled = true;
+                        break;
+                    case MediaButtonState.Pausing:
+                        btnConvertPlay.IsEnabled = Valid && s2t.IsRunning;
+                        btnConvertPause.IsEnabled = Valid && !s2t.IsPausing;
+                        btnConvertStop.IsEnabled = true;
+                        break;
+                    case MediaButtonState.Completed:
+                        btnConvertPlay.IsEnabled = Valid && !s2t.IsRunning;
+                        btnConvertPause.IsEnabled = false;
+                        btnConvertStop.IsEnabled = false;
+                        break;
+                    default:
+                        btnConvertPlay.IsEnabled = false;
+                        btnConvertPause.IsEnabled = false;
+                        btnConvertStop.IsEnabled = false;
+                        break;
+                }
+                if (state == MediaButtonState.Invalid)
+                {
+                    MediaPanel.IsEnabled = false;
+                    WaveformPanel.IsEnabled = false;
+                }
+                else
+                {
+                    MediaPanel.IsEnabled = true;
+                    WaveformPanel.IsEnabled = true;
+                }
             }
-            MediaPanel.IsEnabled = true;
+            catch (Exception)
+            {
+                btnConvertPlay.IsEnabled = true;
+                btnConvertPause.IsEnabled = false;
+                btnConvertStop.IsEnabled = false;
+                MediaPanel.IsEnabled = true;
+                WaveformPanel.IsEnabled = true;
+            }
+        }
+
+        private void SetTtsButtonState(MediaButtonState state)
+        {
+            try
+            {
+                switch (state)
+                {
+                    case MediaButtonState.Idle:
+                        btnTtsPlay.IsEnabled = true;
+                        btnTtsPause.IsEnabled = false;
+                        btnTtsStop.IsEnabled = false;
+                        break;
+                    case MediaButtonState.Running:
+                        btnTtsPlay.IsEnabled = false;
+                        btnTtsPause.IsEnabled = true;
+                        btnTtsStop.IsEnabled = true;
+                        break;
+                    case MediaButtonState.Pausing:
+                        btnTtsPlay.IsEnabled = true;
+                        btnTtsPause.IsEnabled = false;
+                        btnTtsStop.IsEnabled = true;
+                        break;
+                    case MediaButtonState.Completed:
+                        btnTtsPlay.IsEnabled = true;
+                        btnTtsPause.IsEnabled = false;
+                        btnTtsStop.IsEnabled = false;
+                        break;
+                    default:
+                        btnTtsPlay.IsEnabled = false;
+                        btnTtsPause.IsEnabled = false;
+                        btnTtsStop.IsEnabled = false;
+                        break;
+                }
+                if (state == MediaButtonState.Invalid)
+                {
+                    btnCommit.IsEnabled = false;
+                    edTitle.IsEnabled = false;
+                    TtsPanel.IsEnabled = false;
+                }
+                else
+                {
+                    btnCommit.IsEnabled = true;
+                    edTitle.IsEnabled = true;
+                    TtsPanel.IsEnabled = true;
+                }
+            }
+            catch (Exception)
+            {
+                btnTtsPlay.IsEnabled = true;
+                btnTtsPause.IsEnabled = false;
+                btnTtsStop.IsEnabled = false;
+            }
         }
 
         #region NAudio Engine Events
@@ -86,7 +160,6 @@ namespace SoundToText
                     // Do Nothing
                     break;
             }
-
         }
         #endregion
 
@@ -98,8 +171,8 @@ namespace SoundToText
             NAudioEngine soundEngine = NAudioEngine.Instance;
             soundEngine.PropertyChanged += NAudioEngine_PropertyChanged;
             WaveformViewer.RegisterSoundPlayer(soundEngine);
-            //WaveformViewer.AutoScaleWaveformCache = true;
-            //WaveformViewer.AllowRepeatRegions = false;
+            WaveformViewer.AutoScaleWaveformCache = true;
+            WaveformViewer.AllowRepeatRegions = true;
 
             UIHelper.Bind(soundEngine, "CanPlay", btnPlay, IsEnabledProperty);
             UIHelper.Bind(soundEngine, "CanPause", btnPause, IsEnabledProperty);
@@ -110,6 +183,9 @@ namespace SoundToText
             //Resources.MergedDictionaries.Clear();
             ResourceDictionary themeResources = Application.LoadComponent(new Uri("ExpressionDark.xaml", UriKind.Relative)) as ResourceDictionary;
             Resources.MergedDictionaries.Add(themeResources);
+
+            SetMediaButtonState(MediaButtonState.Invalid);
+            SetTtsButtonState(MediaButtonState.Invalid);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -131,7 +207,20 @@ namespace SoundToText
                 ProgressHost = progress,
                 IsCompleted = new Action(() =>
                 {
-                    SetMediaButtonState(MediaButtonState.Completed);
+                    if (Dispatcher.CheckAccess())
+                    {
+                        SetMediaButtonState(MediaButtonState.Completed);
+                    }
+                })
+            };
+
+            t2s = new SpeechTTS()
+            {
+                IsCompleted = new Action(() => {
+                    if (Dispatcher.CheckAccess())
+                    {
+                        SetTtsButtonState(MediaButtonState.Completed);
+                    }
                 })
             };
 
@@ -203,6 +292,15 @@ namespace SoundToText
             }
         }
 
+        private void WaveformViewer_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (s2t is SpeechRecognizer)
+            {
+                if (e.Delta < 0) NAudioEngine.Instance.ChannelPosition -= 0.01;
+                else if (e.Delta > 0) NAudioEngine.Instance.ChannelPosition += 0.01;
+            }
+        }
+
         private void lstResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (s2t is SpeechRecognizer)
@@ -210,13 +308,22 @@ namespace SoundToText
                 if (lstResult.SelectedItem is SRT)
                 {
                     var srt = lstResult.SelectedItem as SRT;
-                    edTitle.Text = srt.Title;
+                    lblTitle.Text = srt.Title;
+                    edTitle.Text = srt.Text;
+                    edStartTime.Value = srt.Start;
+                    edEndTime.Value = srt.End;
 
                     NAudioEngine.Instance.ChannelPosition = srt.Start.TotalSeconds;
                     NAudioEngine.Instance.SelectionBegin = srt.Start;
                     NAudioEngine.Instance.SelectionEnd = srt.End;
-                    //repeatStartTimeEdit.Value = srt.Start;
-                    //repeatStopTimeEdit.Value = srt.End;
+
+                    titleIndex.Time = TimeSpan.FromSeconds((srt.Index / 100 * 60) + (srt.Index % 100));
+
+                    SetTtsButtonState(MediaButtonState.Idle);
+                }
+                else
+                {
+                    SetTtsButtonState(MediaButtonState.Invalid);
                 }
             }
         }
@@ -231,7 +338,11 @@ namespace SoundToText
                     if (lstResult.SelectedItem != null)
                     {
                         var srt = lstResult.SelectedItem as SRT;
-                        edTitle.Text = srt.Title;
+                        lblTitle.Text = srt.Title;
+                        edTitle.Text = srt.Text;
+                        edStartTime.Value = srt.Start;
+                        edEndTime.Value = srt.End;
+
                         $"{srt.Index}:{srt.Text}, {tb.Text}".Log();
                     }
                 }
@@ -245,7 +356,11 @@ namespace SoundToText
             {
                 if (s2t is SpeechRecognizer)
                 {
-                    s2t.Culture = SpeechRecognizer.InstalledRecognizers[idx].Culture;
+                    s2t.Culture = SpeechRecognizer.InstalledRecognizers[idx].Culture;                    
+                }
+                if (t2s is SpeechTTS)
+                {
+                    t2s.Culture = s2t.Culture;
                 }
             }
         }
@@ -355,11 +470,13 @@ namespace SoundToText
                 }
                 else
                 {
-                    if (Keyboard.Modifiers == ModifierKeys.Control)
+                    SetMediaButtonState(MediaButtonState.Running);
+
+                    if (Keyboard.Modifiers == ModifierKeys.Control || sender == btnReConvertPlay)
                     {
                         s2t.Start(lstResult.SelectedIndex);
                     }
-                    else if (Keyboard.Modifiers == ModifierKeys.Shift)
+                    else if (Keyboard.Modifiers == ModifierKeys.Shift || sender == btnForceConvertPlay)
                     {
                         if (lstResult.SelectedItem is SRT)
                         {
@@ -377,7 +494,7 @@ namespace SoundToText
                         lstResult.ItemsSource = s2t.Result;
                         lstResult.UpdateLayout();
 
-                        edTitle.Text = string.Empty;
+                        lblTitle.Text = string.Empty;
 
                         progressBar.Minimum = 0;
                         progressBar.Maximum = 100;
@@ -385,7 +502,6 @@ namespace SoundToText
                         s2t.Start();
                     }
                 }
-                SetMediaButtonState(MediaButtonState.Running);
             }
         }
 
@@ -415,7 +531,6 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                //if (lstResult.Items.Count > 0) lstResult.SelectedIndex = 0;
                 NAudioEngine.Instance.ChannelPosition = 0;
             }
         }
@@ -424,18 +539,7 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                //if (lstResult.SelectedIndex > 0) lstResult.SelectedIndex -= 1;
-                //else lstResult.SelectedIndex = 0;
                 NAudioEngine.Instance.ChannelPosition -= 0.01;
-            }
-        }
-
-        private void WaveformViewer_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (s2t is SpeechRecognizer)
-            {
-                if (e.Delta < 0) NAudioEngine.Instance.ChannelPosition -= 0.01;
-                else if (e.Delta > 0) NAudioEngine.Instance.ChannelPosition += 0.01;
             }
         }
 
@@ -443,9 +547,6 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                //lstResult.SelectedIndex += 1;
-                //if (lstResult.SelectedIndex < lstResult.Items.Count - 1) lstResult.SelectedIndex += 1;
-                //else lstResult.SelectedIndex = lstResult.Items.Count - 1;
                 NAudioEngine.Instance.ChannelPosition += 0.01;
             }
         }
@@ -454,7 +555,6 @@ namespace SoundToText
         {
             if (s2t is SpeechRecognizer)
             {
-                //if (lstResult.Items.Count > 0) lstResult.SelectedIndex = lstResult.Items.Count - 1;
                 NAudioEngine.Instance.ChannelPosition = NAudioEngine.Instance.ChannelLength;
             }
         }
@@ -465,41 +565,6 @@ namespace SoundToText
             {
                 if (NAudioEngine.Instance.CanPlay)
                     NAudioEngine.Instance.Play();
-
-                //if (lstResult.SelectedIndex >= 0 && lstResult.SelectedIndex < s2t.Result.Count)
-                //{
-                //    var bs = s2t.Result[lstResult.SelectedIndex].Audio;
-                //    if(bs is byte[] && bs.Length > 0)
-                //    {
-                //        try
-                //        {
-                //            btnPlay.IsEnabled = false;
-                //            using (MemoryStream ms = new MemoryStream())
-                //            {
-                //                await ms.WriteAsync(bs, 0, bs.Length);
-                //                await ms.FlushAsync();
-                //                ms.Seek(0, SeekOrigin.Begin);
-                //                using (WaveStream ws = new WaveFileReader(ms))
-                //                {
-                //                    //WaveFileWriter.CreateWaveFile("_test_.wav", ws);
-                //                    using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
-                //                    {
-                //                        waveOut.Init(ws);
-                //                        waveOut.Play();
-                //                        while (waveOut.PlaybackState == PlaybackState.Playing)
-                //                        {
-                //                            100.Sleep();
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //        }
-                //        finally
-                //        {
-                //            btnPlay.IsEnabled = true;
-                //        }
-                //    }
-                //}
             }
         }
 
@@ -518,6 +583,45 @@ namespace SoundToText
             {
                 if (NAudioEngine.Instance.CanStop)
                     NAudioEngine.Instance.Stop();
+            }
+        }
+
+        private void btnTtsPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if(t2s is SpeechTTS)
+            {
+                SetTtsButtonState(MediaButtonState.Running);
+                t2s.Play(edTitle.Text);
+            }
+        }
+
+        private void btnTtsPause_Click(object sender, RoutedEventArgs e)
+        {
+            if (t2s is SpeechTTS)
+            {
+                SetTtsButtonState(MediaButtonState.Pausing);
+                t2s.Pause();
+            }
+        }
+
+        private void btnTtsStop_Click(object sender, RoutedEventArgs e)
+        {
+            if (t2s is SpeechTTS)
+            {
+                SetTtsButtonState(MediaButtonState.Invalid);
+                t2s.Stop();
+            }
+        }
+
+        private void btnCommit_Click(object sender, RoutedEventArgs e)
+        {
+            if (lstResult.SelectedItem is SRT)
+            {
+                var srt = lstResult.SelectedItem as SRT;
+                if (!edTitle.Text.Equals(srt.Text))
+                {
+                    srt.Text = edTitle.Text;
+                }
             }
         }
 

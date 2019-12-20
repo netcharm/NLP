@@ -79,6 +79,9 @@
   <PropertyGroup>
     <ApplicationIcon>SoundToText.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SoundToText.App</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="NAudio, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.9.0\lib\net35\NAudio.dll</HintPath>
@@ -137,6 +140,7 @@
     <Compile Include="Utils\SampleAggregator.cs" />
     <Compile Include="Utils\SpeechRecognizer.cs" />
     <Compile Include="Utils\SRT.cs" />
+    <Compile Include="Utils\SpeechTTS.cs" />
     <Compile Include="Utils\UIHelper.cs" />
     <Page Include="ExpressionDark.xaml">
       <Generator>MSBuild:Compile</Generator>

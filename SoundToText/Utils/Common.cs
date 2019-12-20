@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace SoundToText
@@ -15,29 +16,36 @@ namespace SoundToText
             return null;
         }
 
-        public static void DoEvents(this object obj)
+        public static async void DoEvents(this object obj)
         {
             try
             {
-                //Dispatcher.Yield();
-                DispatcherFrame frame = new DispatcherFrame();
-                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
-                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
-                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
-                Dispatcher.PushFrame(frame);
+                if (Application.Current.Dispatcher.CheckAccess())
+                {
+                    //Dispatcher.Yield();
+                    DispatcherFrame frame = new DispatcherFrame();
+                    //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
+                    //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
+                    await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
+                    Dispatcher.PushFrame(frame);
+                }
             }
             catch (Exception)
             {
-                //Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Render, new Action(delegate { }));
-                //Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Send, new Action(delegate { }));
-                //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(delegate { }));
-                //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate { }));
+                if (Dispatcher.CurrentDispatcher.CheckAccess())
+                {
+                    await Dispatcher.Yield();
+                    //Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Render, new Action(delegate { }));
+                    //Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Send, new Action(delegate { }));
+                    //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(delegate { }));
+                    //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate { }));
 
-                DispatcherFrame frame = new DispatcherFrame();
-                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
-                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
-                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
-                Dispatcher.PushFrame(frame);
+                    //DispatcherFrame frame = new DispatcherFrame();
+                    ////await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
+                    ////await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
+                    //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
+                    //Dispatcher.PushFrame(frame);
+                }
             }
         }
 
@@ -57,6 +65,11 @@ namespace SoundToText
 #if DEBUG
             Console.WriteLine(text);
 #endif
+        }
+
+        public static async void InvokeAsync(this Action action)
+        {
+            await Application.Current.Dispatcher.BeginInvoke(action);
         }
 
     }

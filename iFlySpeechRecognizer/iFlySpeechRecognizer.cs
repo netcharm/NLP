@@ -28,8 +28,10 @@ namespace iFly
         public int BitsPerSample { get; set; } = 16;
 
         public string Text { get; set; } = string.Empty;
-        public Action<string> RecognizerResult;
+        public Action<string> RecognizerResult = null;
         //public delegate void RecognizerResult(string text);
+
+        public Action iFlyIsCompleted = null;
 
         private bool IsLogin = false;
 
@@ -42,46 +44,56 @@ namespace iFly
 #endif
         }
 
-        private static object ExitFrame(object state)
+        private object ExitFrame(object state)
         {
             ((DispatcherFrame)state).Continue = false;
             return null;
         }
 
-        public static void DoEvents()
+        public async void DoEvents()
         {
             try
             {
-                //Dispatcher.Yield();
-                DispatcherFrame frame = new DispatcherFrame();
-                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
-                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
-                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
-                Dispatcher.PushFrame(frame);
+                if (AppDispather.CheckAccess())
+                {
+                    //Dispatcher.Yield();
+                    DispatcherFrame frame = new DispatcherFrame();
+                    //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
+                    //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
+                    //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
+                    await AppDispather.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
+                    Dispatcher.PushFrame(frame);
+                }
             }
             catch (Exception)
             {
-                //Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Render, new Action(delegate { }));
-                //Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Send, new Action(delegate { }));
-                //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(delegate { }));
-                //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate { }));
-
-                DispatcherFrame frame = new DispatcherFrame();
-                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
-                //await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
-                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
-                Dispatcher.PushFrame(frame);
+                if (Dispatcher.CurrentDispatcher.CheckAccess())
+                {
+                    await Dispatcher.Yield(DispatcherPriority.Background);
+                    //DispatcherFrame frame = new DispatcherFrame();
+                    ////await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(ExitFrame), frame);
+                    ////await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Send, new DispatcherOperationCallback(ExitFrame), frame);
+                    //AppDispather.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), frame);
+                    //Dispatcher.PushFrame(frame);
+                }
             }
         }
 
-        public static void Sleep(int ms)
+        public void Sleep(int ms)
         {
             for (int i = 0; i < ms; i += 10)
             {
-                Thread.Sleep(5);
+                Thread.Sleep(10);
                 DoEvents();
-                //Dispatcher.Yield();
             }
+        }
+
+        public SpeechRecognizer()
+        {
+            RecognizerResult = new Action<string>((text) =>
+            {
+                iFlytekResult(text);
+            });
         }
 
         ~SpeechRecognizer()
@@ -93,7 +105,7 @@ namespace iFly
         {
             if (IsLogin) return(IsLogin);
 
-            RecognizerResult += iFlytekResult;
+//            RecognizerResult += iFlytekResult;
 
             int res = MscDLL.MSPLogin(null, null, $"appid={APPID}");//用户名，密码，登陆信息，前两个均为空
             if (res != (int)Errors.MSP_SUCCESS)
@@ -327,27 +339,22 @@ namespace iFly
         {
             string result = string.Empty;
 
-            //IsRunning.Wait(150);
-
-            var act = new Action(() =>
+            await Task.Run(() =>
             {
                 if (!string.IsNullOrEmpty(APPID))
                 {
-                    iFlytekInit();
-                    iFlytekStartRecording(buf);
-                    result = Text;
+                    try
+                    {
+                        iFlytekInit();
+                        iFlytekStartRecording(buf);
+                        result = Text;
+                    }
+                    catch (Exception) { }
                 }
             });
 
-            if (AppDispather is Dispatcher)
-                await AppDispather.InvokeAsync(act);
-            else
-                act.Invoke();
-            
-            //act.Invoke();
             return (result);
         }
-
     }
 
 }
