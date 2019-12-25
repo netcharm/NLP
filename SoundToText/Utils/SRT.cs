@@ -41,10 +41,35 @@ namespace SoundToText
         public string Text
         {
             get { return (text); }
-            set { text = value; NotifyPropertyChanged("Text"); }
+            set
+            {
+                text = value;
+                NotifyPropertyChanged("Text");
+                NotifyPropertyChanged("MultiLingoText");
+            }
         }
         public double Confidence { get; set; } = 100.0;
 
+        private string translated = string.Empty;
+        public string TranslatedText
+        {
+            get { return (translated); }
+            set
+            {
+                translated = value;
+                NotifyPropertyChanged("Text");
+                NotifyPropertyChanged("TranslatedText");
+            }
+        }
+
+        public string MultiLingoText
+        {
+            get
+            {
+                var translated = string.IsNullOrEmpty(TranslatedText) ? string.Empty : $"\\n{TranslatedText}";
+                return ($"{Text}{translated}");
+            }
+        }
         public List<SimpleTitle> AltTitle { get; set; } = new List<SimpleTitle>();
         internal protected void SetAltText(IEnumerable<RecognizedPhrase> alt)
         {
@@ -65,7 +90,8 @@ namespace SoundToText
 
         public override string ToString()
         {
-            return ($"[{DisplayIndex}]:{Text}");
+            var translated = string.IsNullOrEmpty(TranslatedText) ? string.Empty : $"\n{TranslatedText}";
+            return ($"[{DisplayIndex}]:{Text}{translated}");
         }
 
         public string Title
@@ -73,7 +99,7 @@ namespace SoundToText
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($"{Index + 1}");
+                sb.AppendLine($"{DisplayIndex}");
                 sb.AppendLine($"{NewStart.ToString(@"hh\:mm\:ss\,fff")} --> {NewEnd.ToString(@"hh\:mm\:ss\,fff")}");
                 sb.AppendLine($"{Text}");
                 sb.AppendLine();
@@ -81,12 +107,27 @@ namespace SoundToText
             }
         }
 
+        public string TranslatedTitle
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"{DisplayIndex}");
+                sb.AppendLine($"{NewStart.ToString(@"hh\:mm\:ss\,fff")} --> {NewEnd.ToString(@"hh\:mm\:ss\,fff")}");
+                sb.AppendLine($"{MultiLingoText}");
+                sb.AppendLine();
+                return (sb.ToString());
+            }
+        }
+
+        public string Language { get; set; }
+
         public string LRC
         {
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($"[{NewStart.ToString(@"hh\:mm\:ss\.fff")}] {Text}");
+                sb.AppendLine($"[{NewStart.ToString(@"hh\:mm\:ss\.fff")}] {MultiLingoText}");
                 sb.AppendLine($"[{NewEnd.ToString(@"hh\:mm\:ss\.fff")}]");
                 return (sb.ToString());
             }

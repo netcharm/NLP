@@ -126,12 +126,14 @@ namespace SoundToText
                 {
                     btnCommit.IsEnabled = false;
                     edTitle.IsEnabled = false;
+                    edTranslated.IsEnabled = false;
                     TtsPanel.IsEnabled = false;
                 }
                 else
                 {
                     btnCommit.IsEnabled = true;
                     edTitle.IsEnabled = true;
+                    edTranslated.IsEnabled = true;
                     TtsPanel.IsEnabled = true;
                 }
             }
@@ -335,12 +337,13 @@ namespace SoundToText
                     var srt = lstResult.SelectedItem as SRT;
                     lblTitle.Text = srt.Title;
                     edTitle.Text = srt.Text;
-                    edStartTime.Value = srt.Start;
-                    edEndTime.Value = srt.End;
+                    edTranslated.Text = srt.TranslatedText;
+                    edStartTime.Value = srt.NewStart;
+                    edEndTime.Value = srt.NewEnd;
 
-                    NAudioEngine.Instance.ChannelPosition = srt.Start.TotalSeconds;
-                    NAudioEngine.Instance.SelectionBegin = srt.Start;
-                    NAudioEngine.Instance.SelectionEnd = srt.End;
+                    NAudioEngine.Instance.ChannelPosition = srt.NewStart.TotalSeconds;
+                    NAudioEngine.Instance.SelectionBegin = srt.NewStart;
+                    NAudioEngine.Instance.SelectionEnd = srt.NewEnd;
 
                     titleIndex.Time = TimeSpan.FromSeconds((srt.DisplayIndex / 100 * 60) + (srt.DisplayIndex % 100));
 
@@ -355,7 +358,7 @@ namespace SoundToText
 
         private void TitleContent_TargetUpdated(object sender, DataTransferEventArgs e)
         {
-            if (e.Property.Name == "Text" && e.TargetObject is TextBlock)
+            if ((e.Property.Name.Equals("Text") || e.Property.Name.Equals("TranslatedText")) && e.TargetObject is TextBlock)
             {
                 var tb = e.TargetObject as TextBlock;
                 if (lstResult.SelectedItem != null)
@@ -363,6 +366,7 @@ namespace SoundToText
                     var srt = lstResult.SelectedItem as SRT;
                     lblTitle.Text = srt.Title;
                     edTitle.Text = srt.Text;
+                    edTranslated.Text = srt.TranslatedText;
                     edStartTime.Value = srt.NewStart;
                     edEndTime.Value = srt.NewEnd;
 
@@ -477,7 +481,7 @@ namespace SoundToText
                     else if (ext.Equals(".lrc"))
                         File.WriteAllText(fn, s2t.ToLRC(), Encoding.UTF8);
                     else
-                        File.WriteAllText(fn, s2t.Text, Encoding.UTF8);
+                        File.WriteAllText(fn, s2t.ToSRT(), Encoding.UTF8);
                 }
             }
         }
@@ -494,7 +498,7 @@ namespace SoundToText
                 {
                     SetMediaButtonState(MediaButtonState.Running);
 
-                    if (Keyboard.Modifiers == ModifierKeys.Control || sender == btnReConvertPlay)
+                    if (sender == miRecognizing || sender == btnReConvertPlay || (sender == btnConvertPlay && Keyboard.Modifiers == ModifierKeys.Control))
                     {
                         foreach (var item in lstResult.SelectedItems)
                         {
@@ -507,7 +511,18 @@ namespace SoundToText
                             }
                         }
                     }
-                    else if (Keyboard.Modifiers == ModifierKeys.Shift || sender == btnForceConvertPlay)
+                    else if (sender == miTranslating)
+                    {
+                        foreach (var item in lstResult.SelectedItems)
+                        {
+                            if (item is SRT)
+                            {
+                                var srt = item as SRT;
+                                s2t.Translate(srt);
+                            }
+                        }
+                    }
+                    else if (sender == btnForceConvertPlay || (sender == btnConvertPlay && Keyboard.Modifiers == ModifierKeys.Control))
                     {
                         var engine = NAudioEngine.Instance;
                         foreach (var item in lstResult.SelectedItems)
@@ -528,12 +543,22 @@ namespace SoundToText
                             }
                         }
                     }
-                    else if (Keyboard.Modifiers == ModifierKeys.None)
+                    else if (sender == btnConvertPlay && Keyboard.Modifiers == ModifierKeys.None)
                     {
+                        if (s2t.Result.Count > 0)
+                        {
+                            var result = MessageBox.Show("Current subtitle results will be lost, continue?", "Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
+                            if (result == MessageBoxResult.Cancel) return;
+                        }
+
                         lstResult.ItemsSource = s2t.Result;
                         lstResult.UpdateLayout();
 
                         lblTitle.Text = string.Empty;
+                        edTitle.Text = string.Empty;
+                        edTranslated.Text = string.Empty;
+                        edStartTime.Value = default(TimeSpan);
+                        edEndTime.Value = default(TimeSpan);                        
 
                         progressBar.Minimum = 0;
                         progressBar.Maximum = 100;

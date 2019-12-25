@@ -9,7 +9,7 @@
         Icon="pack://application:,,,/SoundToText;component/SoundToText.ico"
         Title="Sound File To Subtitle" 
         Width="1280" Height="720" 
-        MinWidth="1280" MinHeight="400"
+        MinWidth="1280" MinHeight="720"
         Loaded="Window_Loaded" Closing="Window_Closing"
         AllowDrop="True" DragEnter="Window_DragEnter" Drop="Window_Drop">
 
@@ -83,7 +83,7 @@
                     MinWidth="48" MinHeight="48" Margin="4,4,0,4"
                     Click="btnOption_Click" >
                     <Button.ContextMenu>
-                        <ContextMenu FontFamily="Segoe UI, 微软雅黑">
+                        <ContextMenu FontFamily="Segoe UI, 微软雅黑" FontSize="16">
                             <MenuItem x:Name="miOptEngineSAPI" x:Uid="OptEngineSAPI" Header="Microsoft SAPI"
                                       Click="miOptEngine_Click"/>
                             <Separator/>
@@ -148,7 +148,7 @@
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnConvertPlay_Click">
                     <Button.ContextMenu>
-                        <ContextMenu FontFamily="Segoe UI, 微软雅黑">
+                        <ContextMenu FontFamily="Segoe UI, 微软雅黑" FontSize="16">
                             <MenuItem 
                                 x:Name="btnReConvertPlay" x:Uid="ReConvert"
                                 Header="Re-Recognizing Original Region"
@@ -203,13 +203,20 @@
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.ContextMenu>
+                <ContextMenu FontFamily="Segoe UI, 微软雅黑" FontSize="16">
+                    <MenuItem x:Name="miRecognizing" x:Uid="Recognizing" Header="Recognizing via third party service" Click="btnConvertPlay_Click"/>
+                    <MenuItem x:Name="miTranslating" x:Uid="Translating" Header="Translating via third party service" Click="btnConvertPlay_Click"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
         </ListBox>
 
         <!-- Subtitle Display & Edit Panel -->
         <Grid Grid.Row="0" Grid.Column="1" Margin="4">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height=".4*"/>
+                <RowDefinition Height="*" MinHeight="128"/>
+                <RowDefinition Height=".5*" MinHeight="72"/>
+                <RowDefinition Height=".5*" MinHeight="72"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="160" MinHeight="160" MaxHeight="160"/>
             </Grid.RowDefinitions>
@@ -220,12 +227,18 @@
                 FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, Simun"
                 TextWrapping="Wrap" Margin="4"/>
             <TextBox
-                Grid.Row="1" x:Name="edTitle" x:Uid="subTitle"
+                Grid.Row="1" x:Name="edTitle" x:Uid="Subtitle"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 Foreground="{DynamicResource TextBrush}"
                 FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, Simun"
                 TextWrapping="Wrap" Margin="4"/>
-            <Grid Grid.Row="2" MaxHeight="56">
+            <TextBox
+                Grid.Row="2" x:Name="edTranslated" x:Uid="TranslatedSubtitle"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                Foreground="{DynamicResource TextBrush}"
+                FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, Simun"
+                TextWrapping="Wrap" Margin="4"/>
+            <Grid Grid.Row="3" MaxHeight="56">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
@@ -305,7 +318,7 @@
                 </StackPanel>
             </Grid>
             <!-- Waveform Panel -->
-            <Grid Grid.Row="3">
+            <Grid Grid.Row="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="auto"/>

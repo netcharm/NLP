@@ -15,6 +15,9 @@ using System.Web.Script.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Web;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace SoundToText
 {
@@ -36,12 +39,16 @@ namespace SoundToText
         private string APIKEY_Google = string.Empty;
         private string APIKEY_Google_File = "apikey_google.txt";
 
-        private string APIKEY_Azure = string.Empty;
-        private string APIKEY_Azure_File = "apikey_azure.txt";
-        private string URL_AzureToken = "https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken";
-        private string URL_AzureResponse = "https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1";
-        private string Token_Azure = string.Empty;
-        private DateTime Token_Lifetime = DateTime.Now;
+        private string APIKEY_AzureTranslate = string.Empty;
+        private string APIKEY_AzureTranslate_File = "apikey_azure_translate.txt";
+        private string URL_AzureTranslate = "https://api.cognitive.microsofttranslator.com/translate";
+
+        private string APIKEY_AzureSpeech = string.Empty;
+        private string APIKEY_AzureSpeech_File = "apikey_azure_speech.txt";
+        private string URL_AzureSpeechToken = "https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken";
+        private string URL_AzureSpeechResponse = "https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1";
+        private string Token_AzureSpeech = string.Empty;
+        private DateTime Token_AzureSpeech_Lifetime = DateTime.Now;
         #endregion
 
         #region Properties
@@ -130,7 +137,7 @@ namespace SoundToText
                     {
                         sb.AppendLine($"{s.DisplayIndex}");
                         sb.AppendLine($"{s.NewStart.ToString(@"hh\:mm\:ss\,fff")} --> {s.NewEnd.ToString(@"hh\:mm\:ss\,fff")}");
-                        sb.AppendLine($"{s.Text}");
+                        sb.AppendLine($"{s.MultiLingoText}");
                         sb.AppendLine();
                     }
                     return (sb.ToString());
@@ -170,10 +177,10 @@ namespace SoundToText
             {
                 Log($"Processing : {_recognizer.RecognizerAudioPosition.ToString(@"hh\:mm\:ss\.fff")} - {AudioLength.ToString(@"hh\:mm\:ss\.fff")}");
 
-                var index = IndexOf(e.Result.Audio.AudioPosition, e.Result.Audio.AudioPosition + e.Result.Audio.Duration);
+                var index = _ReRecognize >= 0 ? _ReRecognize : IndexOf(e.Result.Audio.AudioPosition, e.Result.Audio.AudioPosition + e.Result.Audio.Duration);
                 SRT title = index == -1 ? srt.Last() : srt[index];
                 UpdateTitleInfo(title, e.Result);
-                if (ProgressHost is IProgress<Tuple<TimeSpan, TimeSpan>>)
+                if (_ReRecognize < 0 && ProgressHost is IProgress<Tuple<TimeSpan, TimeSpan>>)
                 {
                     ProgressHost.Report(Progress);
                 }
@@ -218,6 +225,7 @@ namespace SoundToText
             {
                 var title = new SRT()
                 {
+                    Language = culture is CultureInfo ? culture.IetfLanguageTag : CultureInfo.CurrentCulture.IetfLanguageTag,
                     Index = srt.Count,
                     Start = e.AudioPosition,
                     End = e.AudioPosition,
@@ -277,6 +285,32 @@ namespace SoundToText
                     IsCompleted.InvokeAsync();
                 }
             }
+            //ThirdPartyTranslate(title, CultureInfo.CurrentCulture.IetfLanguageTag);
+        }
+
+        private void ThirdPartyTranslate(SRT title, string langDst = "zh-Hans")
+        {
+            if (iFlyEnabled && iflysr is iFly.SpeechRecognizer)
+            {
+                //
+            }
+            else if (AzureEnabled)
+            {
+                Translate_Azure(title, title.Language, langDst);
+            }
+            else if (GoogleEnabled)
+            {
+                //
+            }
+            else
+            {
+                if (_ReRecognize >= 0 && IsCompleted is Action)
+                {
+                    IsRunning = false;
+                    IsPausing = false;
+                    IsCompleted.InvokeAsync();
+                }
+            }
         }
 
         private async void Recognizer_iFly(SRT title, bool force = false)
@@ -313,20 +347,20 @@ namespace SoundToText
 
         private async Task<string> Recognizer_AzureFetchToken(string url)
         {
-            string resuilt = Token_Azure;
-            if (string.IsNullOrEmpty(Token_Azure) || Token_Lifetime + TimeSpan.FromSeconds(600) < DateTime.Now)
+            string resuilt = Token_AzureSpeech;
+            if (string.IsNullOrEmpty(Token_AzureSpeech) || Token_AzureSpeech_Lifetime + TimeSpan.FromSeconds(600) < DateTime.Now)
             {
                 using (var client = new HttpClient())
                 {
                     try
                     {
-                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_Azure);
+                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_AzureSpeech);
                         //client.DefaultRequestHeaders.Add("Content-type", "application/x-www-form-urlencoded");
                         //client.DefaultRequestHeaders.Add("Content-Length", "0");
                         UriBuilder uriToken = new UriBuilder(url);
                         var result = await client.PostAsync(uriToken.Uri.AbsoluteUri, null);
                         resuilt = await result.Content.ReadAsStringAsync();
-                        Token_Lifetime = DateTime.Now;
+                        Token_AzureSpeech_Lifetime = DateTime.Now;
                     }
                     catch (Exception ex)
                     {
@@ -339,7 +373,7 @@ namespace SoundToText
 
         private async void Recognizer_Azure(SRT title, bool force = false)
         {
-            if (string.IsNullOrEmpty(APIKEY_Azure)) return;
+            if (string.IsNullOrEmpty(APIKEY_AzureSpeech)) return;
             if (!(title is SRT)) return;
 
             await Task.Run(async () =>
@@ -358,18 +392,18 @@ namespace SoundToText
                             {
                                 try
                                 {
-                                    Token_Azure = await Recognizer_AzureFetchToken(URL_AzureToken);
+                                    Token_AzureSpeech = await Recognizer_AzureFetchToken(URL_AzureSpeechToken);
 
-                                    client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_Azure);
+                                    client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_AzureSpeech);
                                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(@"application/json"));
                                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(@"text/xml"));
-                                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token_Azure);
+                                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token_AzureSpeech);
 
                                     var lang = Culture.IetfLanguageTag;
                                     var content = new StreamContent(ms);
                                     var contentType = new string[] { @"audio/wav", @"codecs=audio/pcm", @"samplerate=16000" };
                                     var ok = content.Headers.TryAddWithoutValidation("Content-Type", contentType);
-                                    var response = await client.PostAsync($"{URL_AzureResponse}?language={lang}", content);
+                                    var response = await client.PostAsync($"{URL_AzureSpeechResponse}?language={lang}", content);
                                     string stt_rest = await response.Content.ReadAsStringAsync();
 
                                     if (response.StatusCode == HttpStatusCode.OK)
@@ -385,6 +419,7 @@ namespace SoundToText
                                             else
                                                 title.Text += $" [{text}]";
                                             Log(text);
+                                            Translate_Azure(title, title.Language, CultureInfo.CurrentCulture.IetfLanguageTag);
                                         }
                                         catch (Exception) { }
                                     }
@@ -401,6 +436,77 @@ namespace SoundToText
                     IsCompleted.InvokeAsync();
                 }
             });
+        }
+
+        private async Task<string> Translate_Azure(string text, string langSrc, string langDst = "zh-Hans")
+        {
+            string result = "";
+            try
+            {
+                if (string.IsNullOrEmpty(APIKEY_AzureTranslate)) throw(new Exception());
+                if (langSrc.Equals(langDst)) throw (new Exception());
+                if (string.IsNullOrEmpty(text)) throw (new Exception());
+
+                var queryString = HttpUtility.ParseQueryString(string.Empty);
+                // Request parameters
+                queryString["api-version"] = "3.0";
+                queryString["textType"] = "html";
+                if (!string.IsNullOrEmpty(langSrc)) queryString["from"] = langSrc;
+                if (!string.IsNullOrEmpty(langDst)) queryString["to"] = langDst;
+                queryString["toScript"] = "Latn";
+                //queryString["allowFallback"] = "true";
+
+                // Global      : api.cognitive.microsofttranslator.com
+                // North       : America: api-nam.cognitive.microsofttranslator.com
+                // Europe      : api-eur.cognitive.microsofttranslator.com
+                // Asia Pacific: api-apc.cognitive.microsofttranslator.com
+                var uri = $"{URL_AzureTranslate}?{queryString}";
+
+                var content = new StringContent($"[{{'Text':'{text.Replace("'", "\\'").Replace("\"", "\\\"")}'}}]");
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                var client = new HttpClient();
+                // Request headers
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIKEY_AzureTranslate);
+
+                HttpResponseMessage response = await client.PostAsync(uri, content);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    string translate_result = await response.Content.ReadAsStringAsync();
+
+                    JToken token = JToken.Parse( translate_result);
+                    var Result_JSON = JsonConvert.SerializeObject(token, Formatting.Indented);
+                    Result_JSON = Result_JSON.Replace("\\\"", "\"");
+
+                    StringBuilder sb = new StringBuilder();
+                    IEnumerable<JToken> translations = token.SelectTokens( "$..translations", false );
+                    foreach (var translation in translations)
+                    {
+                        IEnumerable<JToken> translate_text = translation.SelectTokens( "$..text", false ).First();
+                        IEnumerable<JToken> translate_latn = translation.SelectTokens( "$..transliteration.text", false ).First();
+                        IEnumerable<JToken> translate_to = translation.SelectTokens( "$..to", false ).First();
+
+                        sb.AppendLine(translate_text.Value<string>());
+                    }
+                    result = sb.ToString().Trim();
+                }
+            }
+            catch (Exception) { }
+            finally
+            {
+                if (_ReRecognize >= 0 && IsCompleted is Action)
+                {
+                    IsRunning = false;
+                    IsPausing = false;
+                    IsCompleted.InvokeAsync();
+                }
+            }
+            return (result);
+    }
+
+        private async void Translate_Azure(SRT title, string langSrc, string langDst = "zh-Hans")
+        {
+            title.TranslatedText = await Translate_Azure(title.Text, langSrc, langDst);
         }
 
         private async void Recognizer_Google(SRT title, bool force = false)
@@ -638,7 +744,12 @@ namespace SoundToText
             return (result);
         }
 
-        public string ToSSA()
+        public string ToSRT()
+        {
+            return (Text);
+        }
+
+        public string ToASS()
         {
             StringBuilder sb = new StringBuilder();
 
@@ -657,15 +768,15 @@ namespace SoundToText
 
             foreach (var t in srt)
             {
-                sb.AppendLine($"Dialogue: 0,{t.NewStart.ToString(@"hh\:mm\:ss\.ff")},{t.NewEnd.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{t.Text}");
+                sb.AppendLine($"Dialogue: 0,{t.NewStart.ToString(@"hh\:mm\:ss\.ff")},{t.NewEnd.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{t.MultiLingoText}");
             }
 
             return (sb.ToString());
         }
 
-        public string ToASS()
+        public string ToSSA()
         {
-            return (ToSSA());
+            return (ToASS());
         }
 
         public string ToLRC()
@@ -676,7 +787,8 @@ namespace SoundToText
             sb.AppendLine();
             foreach (var t in srt)
             {
-                sb.AppendLine($"[{t.NewStart.ToString(@"hh\:mm\:ss\.fff")}] {t.Text}");
+
+                sb.AppendLine($"[{t.NewStart.ToString(@"hh\:mm\:ss\.fff")}] {t.MultiLingoText}");
                 sb.AppendLine($"[{t.NewEnd.ToString(@"hh\:mm\:ss\.fff")}]");
             }
 
@@ -807,6 +919,12 @@ namespace SoundToText
                     });
                 }
             }
+        }
+        
+        public void Translate(SRT title, string langDst = "zh-Hans")
+        {
+            _ReRecognize = title.Index;
+            ThirdPartyTranslate(title, langDst);
         }
         #endregion
 
@@ -942,23 +1060,34 @@ namespace SoundToText
                 #endregion
 
                 #region Azure Cognitive Service
-                APIKEY_Azure = File.Exists(APIKEY_Azure_File) ? File.ReadAllText(APIKEY_Azure_File).Trim() : string.Empty;
-                if (!string.IsNullOrEmpty(APIKEY_Azure))
+                APIKEY_AzureSpeech = File.Exists(APIKEY_AzureSpeech_File) ? File.ReadAllText(APIKEY_AzureSpeech_File).Trim() : string.Empty;
+                if (!string.IsNullOrEmpty(APIKEY_AzureSpeech))
                 {
-                    var kv = APIKEY_Azure.Split('=');
+                    var kv = APIKEY_AzureSpeech.Split('=');
                     if (kv.Length >= 2)
                     {
-                        APIKEY_Azure = kv[0];
-                        URL_AzureToken = string.Join("", kv.Skip(1));
-                        UriBuilder ubt = new UriBuilder(URL_AzureToken);
-                        UriBuilder ubr = new UriBuilder(URL_AzureResponse);
+                        APIKEY_AzureSpeech = kv[0];
+                        URL_AzureSpeechToken = string.Join("", kv.Skip(1));
+                        UriBuilder ubt = new UriBuilder(URL_AzureSpeechToken);
+                        UriBuilder ubr = new UriBuilder(URL_AzureSpeechResponse);
                         ubr.Host = ubt.Host.Replace("api.cognitive.microsoft.com", "stt.speech.microsoft.com");
-                        URL_AzureResponse = ubr.Uri.AbsoluteUri;
+                        URL_AzureSpeechResponse = ubr.Uri.AbsoluteUri;
                     }
                     Task.Run(async () =>
                     {
-                        Token_Azure = await Recognizer_AzureFetchToken(URL_AzureToken);
+                        Token_AzureSpeech = await Recognizer_AzureFetchToken(URL_AzureSpeechToken);
                     });
+                }
+
+                APIKEY_AzureTranslate = File.Exists(APIKEY_AzureTranslate_File) ? File.ReadAllText(APIKEY_AzureTranslate_File).Trim() : string.Empty;
+                if (!string.IsNullOrEmpty(APIKEY_AzureTranslate))
+                {
+                    var kv = APIKEY_AzureTranslate.Split('=');
+                    if (kv.Length >= 2)
+                    {
+                        APIKEY_AzureTranslate = kv[0];
+                        URL_AzureTranslate = string.Join("", kv.Skip(1));
+                    }
                 }
                 #endregion
 
