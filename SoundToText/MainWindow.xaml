@@ -54,7 +54,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <!-- File Control Panel -->
             <StackPanel 
@@ -87,7 +87,9 @@
                             <MenuItem x:Name="miOptEngineSAPI" x:Uid="OptEngineSAPI" Header="Microsoft SAPI"
                                       Click="miOptEngine_Click"/>
                             <Separator/>
-                            <MenuItem x:Name="miOptEngineiFly" x:Uid="OptEngineiFly" Header="iFlyTek IAT"
+                            <MenuItem x:Name="miOptEngineiFlySDK" x:Uid="OptEngineiFlySDK" Header="iFlyTek IAT (SDK)"
+                                      Click="miOptEngine_Click"/>
+                            <MenuItem x:Name="miOptEngineiFlyWebAPI" x:Uid="OptEngineiFlyOnline" Header="iFlyTek IAT (WebAPI)"
                                       Click="miOptEngine_Click"/>
                             <MenuItem x:Name="miOptEngineAzure" x:Uid="OptEngineAzure" Header="Microsoft Cognitive"
                                       Click="miOptEngine_Click"/>
@@ -157,6 +159,15 @@
                                 x:Name="btnForceConvertPlay" x:Uid="ForceConvert"                                 
                                 Header="Recognizing Selected Region via thirdparty"
                                 Click="btnConvertPlay_Click"/>
+                            <Separator/>
+                            <MenuItem 
+                                x:Name="btnTranslateAll" x:Uid="TranslateAll"
+                                Header="Translating all via thirdparty"
+                                Click="btnConvertPlay_Click"/>
+                            <MenuItem 
+                                x:Name="btnTranslateSelected" x:Uid="TranslateSelected"
+                                Header="Translating Selected via thirdparty"
+                                Click="btnConvertPlay_Click"/>
                         </ContextMenu>
                     </Button.ContextMenu>
                 </Button>
@@ -176,8 +187,18 @@
                          HorizontalAlignment="Stretch" VerticalAlignment="Center"
                          MinHeight="32" Margin="4"/>
             <TextBlock Grid.Column="1" x:Name="progressInfo" x:Uid="ProgressInfo" 
+                       TextAlignment="Center"
                        HorizontalAlignment="Center" VerticalAlignment="Center" 
-                       FontSize="16" FontFamily="Iosevka, Monaco, Inconsolata, Consolas, Segoe UI" />
+                       FontSize="16" FontFamily="Iosevka, Monaco, Inconsolata, Consolas, Segoe UI">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush x:Name="progressInfoLinear" StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" Offset="0"></GradientStop>
+                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" Offset="0" x:Name="progressInfoLeft"></GradientStop>
+                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" Offset="0" x:Name="progressInfoRight"></GradientStop>
+                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" Offset="1"></GradientStop>
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
         </Grid>
         
         <!-- Subtitle Result List -->
@@ -224,19 +245,19 @@
                 Grid.Row="0" x:Name="lblTitle" x:Uid="subTitle"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 Foreground="{DynamicResource TextBrush}"
-                FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, Simun"
+                FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, SimSun"
                 TextWrapping="Wrap" Margin="4"/>
             <TextBox
                 Grid.Row="1" x:Name="edTitle" x:Uid="Subtitle"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 Foreground="{DynamicResource TextBrush}"
-                FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, Simun"
+                FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, SimSun"
                 TextWrapping="Wrap" Margin="4"/>
             <TextBox
                 Grid.Row="2" x:Name="edTranslated" x:Uid="TranslatedSubtitle"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 Foreground="{DynamicResource TextBrush}"
-                FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, Simun"
+                FontSize="24" FontFamily="等距更纱黑体 SC, 更纱黑体 SC, Sarasa Term SC, Noto Sans CJK, 微软雅黑, Segeo, 宋体, SimSun"
                 TextWrapping="Wrap" Margin="4"/>
             <Grid Grid.Row="3" MaxHeight="56">
                 <Grid.ColumnDefinitions>

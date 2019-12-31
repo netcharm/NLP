@@ -103,9 +103,9 @@ namespace iFly
 
         public bool iFlytekInit()
         {
-            if (IsLogin) return(IsLogin);
+            if (IsLogin) return (IsLogin);
 
-//            RecognizerResult += iFlytekResult;
+            //RecognizerResult += iFlytekResult;
 
             int res = MscDLL.MSPLogin(null, null, $"appid={APPID}");//用户名，密码，登陆信息，前两个均为空
             if (res != (int)Errors.MSP_SUCCESS)
@@ -131,22 +131,25 @@ namespace iFly
             */
             session_begin_params = $"sub=iat,domain=iat,language=zh_cn,accent=mandarin,sample_rate={SampleRate},result_type=plain,result_encoding=UNICODE,asr_res_path=fo|iat/common.jet,grm_build_path=asr/GrmBuilld,engine_type=mixed,mixed_type=realtime";
             #endregion
-
-            return true;
+            return (IsLogin);
         }
 
         public bool iFlytekQuit()
         {
-            int res = MscDLL.MSPLogout();
-            if (res != (int)Errors.MSP_SUCCESS)
+            try
             {
-                //说明登陆失败
-                Log("退出登录失败！");
-                Log("错误编号:" + res);
-                return false;
+                int res = MscDLL.MSPLogout();
+                if (res != (int)Errors.MSP_SUCCESS)
+                {
+                    //说明登陆失败
+                    Log("#退出登录失败！");
+                    Log($"#错误编号:{res} : {Enum.GetName(typeof(Errors), res)}");
+                    return false;
+                }
+                IsLogin = false;
+                Log("#退出登录成功！");
             }
-            IsLogin = false;
-            Log("退出登录成功！");
+            catch (Exception) { }
             return true;
         }
 

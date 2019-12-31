@@ -22,7 +22,8 @@ namespace SoundToText
     public partial class MainWindow : Window
     {
         //private static string[] exts_snd = new string[] { ".wav", ".mp1", ".mp2", ".mp3", ".mp4", ".aac", ".ogg", ".m4a", ".flac", ".wma", ".amr" };
-        private static string[] exts_snd = new string[] { ".wav", ".mp3", ".mp4", ".m3a", ".m4a" };
+        private static string[] exts_snd = new string[] { ".wav", ".mp3", ".mp4", ".m3a", ".m4a", ".aac" };
+        private static string[] exts_srt = new string[] { ".srt", ".ass", ".ssa", ".lrc" };
 
         private IProgress<Tuple<TimeSpan, TimeSpan>> progress = null;
 
@@ -224,10 +225,23 @@ namespace SoundToText
             {
                 var received = i.Item1;
                 var total = i.Item2;
-                progressBar.Value = total.TotalSeconds > 0 ? received.TotalSeconds / total.TotalSeconds * 100 : 0;
+                #region Update ProgressBar
+                var percent = total.TotalSeconds > 0 ? received.TotalSeconds / total.TotalSeconds : 0;
+                progressBar.Value = percent * 100;
+                #endregion
+                #region Update Progress Info Text
                 var cs = received.ToString(@"hh\:mm\:ss\.fff");
                 var ts = total.ToString(@"hh\:mm\:ss\.fff");
                 progressInfo.Text = $"{cs}/{ts} ({progressBar.Value:0.0}%)";
+                #endregion
+                #region Update Progress Info Text Color Gradient
+                var factor = progressBar.ActualWidth / progressInfo.ActualWidth;
+                var offset = Math.Abs((factor - 1) / 2);
+                progressInfoLinear.StartPoint = new Point(0 - offset, 0);
+                progressInfoLinear.EndPoint = new Point(1 + offset, 0);
+                progressInfoLeft.Offset = percent;
+                progressInfoRight.Offset = percent;
+                #endregion
             });
 
             s2t = new SpeechRecognizer()
@@ -261,7 +275,7 @@ namespace SoundToText
             if (cbLanguage.Items.Count > 0) cbLanguage.SelectedIndex = 0;
 
             miOptEngineSAPI.IsChecked = s2t.SAPIEnabled;
-            miOptEngineiFly.IsChecked = s2t.iFlyEnabled;
+            miOptEngineiFlySDK.IsChecked = s2t.iFlyEnabledSDK;
             miOptEngineAzure.IsChecked = s2t.AzureEnabled;
         }
 
@@ -399,11 +413,22 @@ namespace SoundToText
                 {
                     miOptEngineSAPI.IsChecked = s2t.SAPIEnabled;
                 }
-                else if (sender == miOptEngineiFly)
+                else if (sender == miOptEngineiFlySDK)
                 {
-                    s2t.iFlyEnabled = !s2t.iFlyEnabled;
-                    if (s2t.iFlyEnabled)
+                    s2t.iFlyEnabledSDK = !s2t.iFlyEnabledSDK;
+                    if (s2t.iFlyEnabledSDK)
                     {
+                        s2t.iFlyEnabledWebAPI = false;
+                        s2t.AzureEnabled = false;
+                        s2t.GoogleEnabled = false;
+                    }
+                }
+                else if (sender == miOptEngineiFlyWebAPI)
+                {
+                    s2t.iFlyEnabledWebAPI = !s2t.iFlyEnabledWebAPI;
+                    if (s2t.iFlyEnabledWebAPI)
+                    {
+                        s2t.iFlyEnabledSDK = false;
                         s2t.AzureEnabled = false;
                         s2t.GoogleEnabled = false;
                     }
@@ -413,7 +438,8 @@ namespace SoundToText
                     s2t.AzureEnabled = !s2t.AzureEnabled;
                     if (s2t.AzureEnabled)
                     {
-                        s2t.iFlyEnabled = false;
+                        s2t.iFlyEnabledSDK = false;
+                        s2t.iFlyEnabledWebAPI = false;
                         s2t.GoogleEnabled = false;
                     }
                 }
@@ -422,11 +448,13 @@ namespace SoundToText
                     s2t.GoogleEnabled = !s2t.GoogleEnabled;
                     if (s2t.GoogleEnabled)
                     {
-                        s2t.iFlyEnabled = false;
+                        s2t.iFlyEnabledSDK = false;
+                        s2t.iFlyEnabledWebAPI = false;
                         s2t.AzureEnabled = false;
                     }
                 }
-                miOptEngineiFly.IsChecked = s2t.iFlyEnabled;
+                miOptEngineiFlySDK.IsChecked = s2t.iFlyEnabledSDK;
+                miOptEngineiFlyWebAPI.IsChecked = s2t.iFlyEnabledWebAPI;
                 miOptEngineAzure.IsChecked = s2t.AzureEnabled;
                 miOptEngineGoogle.IsChecked = s2t.GoogleEnabled;
             }
@@ -449,7 +477,7 @@ namespace SoundToText
                 OpenFileDialog dlgOpen = new OpenFileDialog();
                 dlgOpen.DefaultExt = ".mp3";
                 //dlgOpen.Filter = "All Supported Audio Files|*.mp1;*.mp2;*.mp3;*.mp4;*.m4a;*.aac;*.ogg;*.oga;*.flac;*.wav;*.wma";
-                dlgOpen.Filter = "All Supported Audio Files|*.mp3;*.mp4;*.m3a,*.m4a;*.wav";
+                dlgOpen.Filter = "All Supported Audio Files|*.mp3;*.mp4;*.m3a,*.m4a;*.wav;*.aac;*.srt";
                 if (dlgOpen.ShowDialog(this).Value)
                 {
                     var fn = dlgOpen.FileName;
@@ -457,6 +485,10 @@ namespace SoundToText
                     if (exts_snd.Contains(ext))
                     {
                         LoadAudio(fn);
+                    }
+                    else if (exts_srt.Contains(ext))
+                    {
+
                     }
                 }
             }
@@ -511,7 +543,7 @@ namespace SoundToText
                             }
                         }
                     }
-                    else if (sender == miTranslating)
+                    else if (sender == miTranslating || sender == btnTranslateSelected)
                     {
                         foreach (var item in lstResult.SelectedItems)
                         {
@@ -521,6 +553,10 @@ namespace SoundToText
                                 s2t.Translate(srt);
                             }
                         }
+                    }
+                    else if (sender == btnTranslateAll)
+                    {
+
                     }
                     else if (sender == btnForceConvertPlay || (sender == btnConvertPlay && Keyboard.Modifiers == ModifierKeys.Control))
                     {
