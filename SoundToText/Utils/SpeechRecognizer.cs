@@ -19,6 +19,7 @@ using System.Web;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace SoundToText
 {
@@ -314,7 +315,7 @@ namespace SoundToText
             //ThirdPartyTranslate(title, CultureInfo.CurrentCulture.IetfLanguageTag);
         }
 
-        private void ThirdPartyTranslate(SRT title, string langDst = "zh-Hans")
+        private void ThirdPartyTranslate(SRT title, string langDst = "zh-CN")
         {
             if (iFlyEnabledSDK && iflysr is iFly.SpeechRecognizer)
             {
@@ -515,7 +516,7 @@ namespace SoundToText
             });
         }
 
-        private async Task<string> Translate_Azure(string text, string langSrc, string langDst = "zh-Hans")
+        private async Task<string> Translate_Azure(string text, string langSrc, string langDst = "zh-CN")
         {
             string result = "";
 
@@ -591,7 +592,7 @@ namespace SoundToText
             return (result);
         }
 
-        private async void Translate_Azure(SRT title, string langSrc, string langDst = "zh-Hans")
+        private async void Translate_Azure(SRT title, string langSrc, string langDst = "zh-CN")
         {
             title.TranslatedText = await Translate_Azure(title.Text, langSrc, langDst);
         }
@@ -893,7 +894,99 @@ namespace SoundToText
 
         public void LoadSRT(string file)
         {
+            if (File.Exists(file))
+            {
+                var contents = File.ReadAllLines(file);
+                if (contents.Length > 3)
+                {
+                    srt.Clear();
+                    var index = -1;
+                    var text = string.Empty;
+                    TimeSpan start = default(TimeSpan);
+                    TimeSpan end = default(TimeSpan);
+                    string line = string.Empty;
 
+                    for (var i = 0; i < contents.Length; i++)
+                    {
+                        try
+                        {
+                            if (Regex.IsMatch(contents[i], @"^\d+$"))
+                            {
+                                line = contents[i];
+                                index = int.Parse((line.Trim())) - 1;
+                                i++;
+
+                                line = contents[i];
+                                var time = Regex.Replace(line, @"-->", "-", RegexOptions.IgnoreCase).Split('-');
+                                start = TimeSpan.Parse(time[0].Trim().Replace(",", "."));
+                                end = TimeSpan.Parse(time[1].Trim().Replace(",", "."));
+                            }
+                            else if (index >= 0 && string.IsNullOrEmpty(contents[i].Trim()))
+                            {
+                                var title = new SRT()
+                                {
+                                    Index = index,
+                                    Language = culture.IetfLanguageTag,
+                                    Audio = null,
+                                    Start = start,
+                                    End = end,
+                                    NewAudio = null,
+                                    NewStart = start,
+                                    NewEnd = end,
+                                    Text = text.Trim()
+                                };
+                                srt.Add(title);
+                                index = -1;
+                                text = string.Empty;
+                                start = default(TimeSpan);
+                                end = default(TimeSpan);
+                            }
+                            else if(index > 0)
+                            {
+                                text += $"\r\n{contents[i].Trim()}";
+                            }
+                        }
+                        catch (Exception) { }
+                    }
+                }
+            }
+        }
+
+        public void LoadCSV(string file)
+        {
+            if (File.Exists(file))
+            {
+                var contents = File.ReadAllLines(file);
+                if (contents.Length > 2)
+                {
+                    srt.Clear();
+                    foreach (var line in contents.Skip(1))
+                    {
+                        try
+                        {
+                            var content = line.Split(',');
+                            if (content.Length >= 4)
+                            {
+                                var title = new SRT()
+                                {
+                                    Index = int.Parse(content[0].Trim()) - 1,
+                                    Language = culture.IetfLanguageTag,
+                                    Text = content[3].Trim(),
+                                    Audio = null,
+                                    Start = TimeSpan.Parse(content[1].Trim()),
+                                    End = TimeSpan.Parse(content[2].Trim()),
+                                    NewAudio = null,
+                                    NewStart = TimeSpan.Parse(content[1].Trim()),
+                                    NewEnd = TimeSpan.Parse(content[2].Trim())
+                                };
+                                srt.Add(title);
+                            }
+                        }
+                        catch (Exception) { }
+                        //await Task.Delay(1);
+                    }
+                }
+            }
         }
 
         private async Task<SpeechAudioFormatInfo> LoadAudio(string audiofile)
@@ -1035,13 +1128,13 @@ namespace SoundToText
             }
         }
         
-        public void Translate(SRT title, string langDst = "zh-Hans")
+        public void Translate(SRT title, string langDst = "zh-CN")
         {
             _ReRecognize = title.Index;
             ThirdPartyTranslate(title, langDst);
         }
         
-        public void Translate(IEnumerable<SRT> titles, string langDst = "zh-Hans")
+        public void Translate(IEnumerable<SRT> titles, string langDst = "zh-CN")
         {
             _ReRecognize = -1;
             foreach (var srt in titles)

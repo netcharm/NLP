@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Speech.Recognition;
@@ -32,10 +33,22 @@ namespace SoundToText
 
     public class SRT : INotifyPropertyChanged
     {
-        public int Index { get; set; } = 0;
-        public int DisplayIndex { get { return (Index + 1); } }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public byte[] Audio { get; set; }
         public TimeSpan Start { get; set; } = TimeSpan.FromSeconds(0);
         public TimeSpan End { get; set; } = TimeSpan.FromSeconds(0);
+
+        public byte[] NewAudio { get; set; }
+        public TimeSpan NewStart { get; set; } = TimeSpan.FromSeconds(0);
+        public TimeSpan NewEnd { get; set; } = TimeSpan.FromSeconds(0);
+
+        public int Index { get; set; } = 0;
+        public int DisplayIndex { get { return (Index + 1); } }
 
         private string text = string.Empty;
         public string Text
@@ -131,18 +144,6 @@ namespace SoundToText
                 sb.AppendLine($"[{NewEnd.ToString(@"hh\:mm\:ss\.fff")}]");
                 return (sb.ToString());
             }
-        }
-
-        public byte[] Audio { get; set; }
-
-        public TimeSpan NewStart { get; set; } = TimeSpan.FromSeconds(0);
-        public TimeSpan NewEnd { get; set; } = TimeSpan.FromSeconds(0);
-        public byte[] NewAudio { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 

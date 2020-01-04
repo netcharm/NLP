@@ -23,7 +23,9 @@ namespace SoundToText
     {
         //private static string[] exts_snd = new string[] { ".wav", ".mp1", ".mp2", ".mp3", ".mp4", ".aac", ".ogg", ".m4a", ".flac", ".wma", ".amr" };
         private static string[] exts_snd = new string[] { ".wav", ".mp3", ".mp4", ".m3a", ".m4a", ".aac" };
-        private static string[] exts_srt = new string[] { ".srt", ".ass", ".ssa", ".lrc" };
+        private static string[] exts_srt = new string[] { ".srt", ".ass", ".ssa", ".lrc", ".csv" };
+
+        private string lastSaveFile = string.Empty;
 
         private IProgress<Tuple<TimeSpan, TimeSpan>> progress = null;
 
@@ -277,6 +279,9 @@ namespace SoundToText
             miOptEngineSAPI.IsChecked = s2t.SAPIEnabled;
             miOptEngineiFlySDK.IsChecked = s2t.iFlyEnabledSDK;
             miOptEngineAzure.IsChecked = s2t.AzureEnabled;
+
+            lstResult.ItemsSource = s2t.Result;
+            lstResult.UpdateLayout();
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -329,6 +334,52 @@ namespace SoundToText
                             catch (Exception) { }
                         }
                     }
+                }
+            }
+        }
+
+        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if(Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if(e.Key == Key.S)
+                {
+                    if (string.IsNullOrEmpty(lastSaveFile) || !File.Exists(lastSaveFile))
+                    {
+                        btnSave_Click(btnSave, e);
+                    }
+                    else
+                    {
+                        var ext = Path.GetExtension(lastSaveFile).ToLower();
+                        if (ext.Equals(".ssa"))
+                            File.WriteAllText(lastSaveFile, s2t.ToSSA(), Encoding.UTF8);
+                        else if (ext.Equals(".ass"))
+                            File.WriteAllText(lastSaveFile, s2t.ToASS(), Encoding.UTF8);
+                        else if (ext.Equals(".lrc"))
+                            File.WriteAllText(lastSaveFile, s2t.ToLRC(), Encoding.UTF8);
+                        else
+                            File.WriteAllText(lastSaveFile, s2t.ToSRT(), Encoding.UTF8);
+                    }
+                }
+                else if(e.Key == Key.O)
+                {
+                    btnOpen_Click(btnOpen, e);
+                }
+                else if(e.Key == Key.Enter)
+                {
+                    btnCommit_Click(btnCommit, e);
+                }
+                else if(e.Key == Key.R)
+                {
+                    btnConvertPlay_Click(miRecognizing, e);
+                }
+                else if (e.Key == Key.T)
+                {
+                    btnConvertPlay_Click(miTranslating, e);
+                }
+                else if (e.Key == Key.P)
+                {
+                    btnTtsPlay_Click(btnTtsPlay, e);
                 }
             }
         }
@@ -477,7 +528,7 @@ namespace SoundToText
                 OpenFileDialog dlgOpen = new OpenFileDialog();
                 dlgOpen.DefaultExt = ".mp3";
                 //dlgOpen.Filter = "All Supported Audio Files|*.mp1;*.mp2;*.mp3;*.mp4;*.m4a;*.aac;*.ogg;*.oga;*.flac;*.wav;*.wma";
-                dlgOpen.Filter = "All Supported Audio Files|*.mp3;*.mp4;*.m3a,*.m4a;*.wav;*.aac;*.srt";
+                dlgOpen.Filter = "All Supported Audio Files|*.mp3;*.mp4;*.m3a;*.m4a;*.wav;*.aac;*.srt;*.csv";
                 if (dlgOpen.ShowDialog(this).Value)
                 {
                     var fn = dlgOpen.FileName;
@@ -488,7 +539,10 @@ namespace SoundToText
                     }
                     else if (exts_srt.Contains(ext))
                     {
-
+                        if (ext.Equals(".csv"))
+                            s2t.LoadCSV(fn);
+                        else if (ext.Equals(".srt"))
+                            s2t.LoadSRT(fn);
                     }
                 }
             }
@@ -514,6 +568,8 @@ namespace SoundToText
                         File.WriteAllText(fn, s2t.ToLRC(), Encoding.UTF8);
                     else
                         File.WriteAllText(fn, s2t.ToSRT(), Encoding.UTF8);
+
+                    lastSaveFile = fn;
                 }
             }
         }
@@ -539,7 +595,7 @@ namespace SoundToText
                                 var srt = item as SRT;
                                 srt.NewStart = srt.Start;
                                 srt.NewEnd = srt.End;
-                                s2t.Start(srt);
+                                s2t.Start(srt, srt.Audio == null ? true : false);
                             }
                         }
                     }

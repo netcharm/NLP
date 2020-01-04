@@ -7,8 +7,8 @@
     <ProjectGuid>{CBB8A97F-FA72-4269-9E71-FD0404171F3C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>iFlySpeechRecognizer</RootNamespace>
-    <AssemblyName>iFlySpeechRecognizer</AssemblyName>
+    <RootNamespace>iFlySpeech</RootNamespace>
+    <AssemblyName>iFlySpeech</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
