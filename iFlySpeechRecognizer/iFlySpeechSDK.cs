@@ -138,22 +138,25 @@ namespace iFly
         {
             try
             {
-                int res = MscDLL.MSPLogout();
-                if (res != (int)Errors.MSP_SUCCESS)
+                //if (IsLogin)
                 {
-                    //说明登陆失败
-                    Log("#退出登录失败！");
-                    Log($"#错误编号:{res} : {Enum.GetName(typeof(Errors), res)}");
-                    return false;
+                    int res = MscDLL.MSPLogout();
+                    if (res != (int)Errors.MSP_SUCCESS)
+                    {
+                        //说明登陆失败
+                        Log("#退出登录失败！");
+                        Log($"#错误编号:{res} : {Enum.GetName(typeof(Errors), res)}");
+                        return false;
+                    }
+                    IsLogin = false;
+                    Log("#退出登录成功！");
                 }
-                IsLogin = false;
-                Log("#退出登录成功！");
             }
             catch (Exception) { }
             return true;
         }
 
-        public void iFlytekStartRecording(byte[] data)
+        public void iFlySendData(byte[] data)
         {
             string hints = "hiahiahia";
             IntPtr session_id;
@@ -261,7 +264,6 @@ namespace iFly
                         result.Append(e);
                     }
                     #endregion
-
                     while (IsLogin && RecogStatus.MSP_REC_STATUS_COMPLETE != rec_stat)
                     {
                         #region Get Result
@@ -338,23 +340,27 @@ namespace iFly
             Text = result;
         }
 
+        //public async Task<string> Recognizer(byte[] buf)
         public async Task<string> Recognizer(byte[] buf)
         {
             string result = string.Empty;
 
-            await Task.Run(() =>
+            //await Task.Run(() =>
+            var action = new Action(() =>
             {
                 if (!string.IsNullOrEmpty(APPID))
                 {
                     try
                     {
                         iFlytekInit();
-                        iFlytekStartRecording(buf);
+                        iFlySendData(buf);
                         result = Text;
                     }
                     catch (Exception) { }
                 }
             });
+            await Task.Delay(1);
+            await Application.Current.Dispatcher.BeginInvoke(action);
 
             return (result);
         }

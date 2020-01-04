@@ -72,6 +72,7 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -91,7 +92,7 @@
   <ItemGroup>
     <Compile Include="iFlySpeechOnline.cs" />
     <Compile Include="iFlySDK.cs" />
-    <Compile Include="iFlySpeechRecognizer.cs" />
+    <Compile Include="iFlySpeechSDK.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanLP_Utils_Portable", "Han
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCR_MS", "OCR_MS\OCR_MS.csproj", "{09EFEB30-5C1A-4578-AB9E-3AE105473FB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iFlySpeechRecognizer", "iFlySpeechRecognizer\iFlySpeechRecognizer.csproj", "{CBB8A97F-FA72-4269-9E71-FD0404171F3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iFlySpeech", "iFlySpeechRecognizer\iFlySpeech.csproj", "{CBB8A97F-FA72-4269-9E71-FD0404171F3C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundToText", "SoundToText\SoundToText.csproj", "{1C21AED5-F3BB-482E-BB96-6E106BAA1E32}"
 EndProject

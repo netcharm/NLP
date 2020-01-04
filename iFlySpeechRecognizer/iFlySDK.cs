@@ -16,14 +16,25 @@ namespace iFly
 #endif
         [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
         public static extern int MSPLogin(string usr, string pwd, string parameters);
+
         [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
         public static extern int MSPLogout();
+
+        [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int QISRGetParam(string sessionID, string paramName, string paramValue, ref uint valueLen);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int QISRGrammarActivate(string sessionID, string grammar, string type, int weight);
+
         [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
         public static extern IntPtr QISRSessionBegin(string grammarList, string _params, ref int errorCode);
+
         [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
         public static extern int QISRAudioWrite(IntPtr sessionID, byte[] waveData, uint waveLen, AudioStatus audioStatus, ref EpStatus epStatus, ref RecogStatus recogStatus);
+
         [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
         public static extern IntPtr QISRGetResult(IntPtr sessionID, ref RecogStatus rsltStatus, int waitTime, ref int errorCode);
+
         [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
         public static extern int QISRSessionEnd(IntPtr sessionID, string hints);
     }

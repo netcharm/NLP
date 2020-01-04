@@ -49,16 +49,16 @@ namespace SoundToText
             //throw new NotImplementedException();
         }
 
-        private void Synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
+        private async void Synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
         {
-            if (IsCompleted is Action) IsCompleted.InvokeAsync();
+            if (IsCompleted is Action) await IsCompleted.InvokeAsync();
         }
         #endregion
 
         public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
         public Action IsCompleted { get; set; } = null;
 
-        public void Play(string text, CultureInfo locale = null)
+        public void Play(string text, CultureInfo locale = null, bool auto = false)
         {
             if (!(synth is SpeechSynthesizer)) return;
 
@@ -71,6 +71,7 @@ namespace SoundToText
             List<string> lang_cn = new List<string>() { "zh-hans", "zh-cn", "zh" };
             List<string> lang_tw = new List<string>() { "zh-hant", "zh-tw" };
             List<string> lang_jp = new List<string>() { "ja-jp", "ja", "jp" };
+            List<string> lang_ko = new List<string>() { "ko-kr", "ko", "kr" };
             List<string> lang_en = new List<string>() { "en-us", "us", "en" };
 
             try
@@ -78,7 +79,7 @@ namespace SoundToText
                 if (!(locale is CultureInfo)) locale = Culture;
 
                 synth.SelectVoice(voice_default);
-                string lang = locale.IetfLanguageTag;
+                string lang = auto ? "unk" : locale.IetfLanguageTag;
                 if (lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase))
                 {
                     lang = CultureInfo.CurrentCulture.IetfLanguageTag;
@@ -94,6 +95,10 @@ namespace SoundToText
                     {
                         lang = "ja";
                     }
+                    else if (Regex.Matches(text, @"[\uac00-\ud7ff]", RegexOptions.Multiline).Count > 0)
+                    {
+                        lang = "ko";
+                    }                    
                     else if (Regex.Matches(text, @"[\u4e00-\u9fbb]", RegexOptions.Multiline).Count > 0)
                     {
                         lang = "zh";
@@ -120,6 +125,13 @@ namespace SoundToText
                         synth.SelectVoice(voice.VoiceInfo.Name);
                         break;
                     }
+                    else if (lang_jp.Contains(vl.ToLower()) &&
+                        lang.StartsWith("ko", StringComparison.CurrentCultureIgnoreCase) &&
+                        voice.VoiceInfo.Name.ToLower().Contains("heami"))
+                    {
+                        synth.SelectVoice(voice.VoiceInfo.Name);
+                        break;
+                    }                    
                     else if (lang_en.Contains(vl.ToLower()) &&
                         lang.StartsWith("en", StringComparison.CurrentCultureIgnoreCase) &&
                         voice.VoiceInfo.Name.ToLower().Contains("zira"))

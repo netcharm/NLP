@@ -171,9 +171,11 @@ namespace SoundToText
             {
                 IsRunning = false;
                 IsPausing = false;
-                if (iFlyEnabledWebAPI && iflyIAT is iFly.iFlySpeechOnline)
-                    await iflyIAT.Disconnect();
-                IsCompleted.InvokeAsync();
+                //if (iFlyEnabledWebAPI && iflyIAT is iFly.iFlySpeechOnline)
+                //    iflyIAT.Disconnect();
+                if (iFlyEnabledSDK && iflysr is iFly.SpeechRecognizer)
+                    iflysr.iFlytekQuit();
+                await IsCompleted.InvokeAsync();
             }
         }
         #endregion
@@ -342,7 +344,8 @@ namespace SoundToText
             if (!(title is SRT)) return;
             if (!culture.IetfLanguageTag.StartsWith("zh", StringComparison.CurrentCultureIgnoreCase)) return;
 
-            await Task.Run(async () =>
+            //await new Task(async () =>
+            await new Action(async () =>
             {
                 taskCount.AddCount();
                 using (MemoryStream ms = new MemoryStream())
@@ -372,7 +375,8 @@ namespace SoundToText
                     }
                 }
                 CheckCompleted(true);
-            });
+            //});
+            }).InvokeAsync();
         }
 
         private async void Recognizer_iFlyOnline(SRT title, bool force = false)
@@ -400,10 +404,10 @@ namespace SoundToText
                         {
                             if (iflyIAT is iFly.iFlySpeechOnline)
                             {
-                                await iflyIAT.Connect();
-                                await iflyIAT.Recognizer(BA_AudioFile);
+                                var t = await iflyIAT.Recognizer(BA_AudioFile);
                                 //await iflyIAT.Disconnect();
-
+                                if(!string.IsNullOrEmpty(t.Trim()))
+                                    title.Text = t.Trim();
                                 //await iflyIAT.Connect();
                                 //title.Text = await iflyIAT.Recognizer(BA_AudioFile);
                                 //await iflyIAT.Disconnect();

@@ -192,9 +192,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\iFlySpeechRecognizer\iFlySpeechRecognizer.csproj">
+    <ProjectReference Include="..\iFlySpeechRecognizer\iFlySpeech.csproj">
       <Project>{cbb8a97f-fa72-4269-9e71-fd0404171f3c}</Project>
-      <Name>iFlySpeechRecognizer</Name>
+      <Name>iFlySpeech</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
