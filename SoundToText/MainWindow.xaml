@@ -8,8 +8,8 @@
         mc:Ignorable="d"
         Icon="pack://application:,,,/SoundToText;component/SoundToText.ico"
         Title="Sound File To Subtitle" 
-        Width="1280" Height="720" 
-        MinWidth="1280" MinHeight="720"
+        Width="1366" Height="720" 
+        MinWidth="1366" MinHeight="720"
         Loaded="Window_Loaded" Closing="Window_Closing"
         PreviewKeyUp="Window_PreviewKeyUp"
         AllowDrop="True" DragEnter="Window_DragEnter" Drop="Window_Drop">
@@ -68,19 +68,19 @@
                 Width="300"
                 HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Button 
-                    x:Name="btnOpen" x:Uid="Open" 
+                    x:Name="btnOpen" x:Uid="Open" ToolTip="Open Audio/Import Subtitle File"
                     Content="&#xE197;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="0,4,4,4"                    
                     Click="btnOpen_Click" />
                 <Button 
-                    x:Name="btnSave" x:Uid="Save" 
+                    x:Name="btnSave" x:Uid="Save" ToolTip="Save Subtitle File"
                     Content="&#xE105;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4" 
                     Click="btnSave_Click"/>
-                <ComboBox x:Name="cbLanguage" x:Uid="Language" 
+                <ComboBox x:Name="cbLanguage" x:Uid="Language" ToolTip="Select Target Language"
                           HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
                           Margin="4" Width="124" SelectionChanged="cbLanguage_SelectionChanged" />
-                <Button x:Name="btnOption" x:Uid="Option" 
+                <Button x:Name="btnOption" x:Uid="Option" ToolTip="Select Recognizer Engine"
                     HorizontalAlignment="Right"
                     Content="&#xE115;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4,4,0,4"
@@ -124,23 +124,23 @@
                     HorizontalAlignment="Right" VerticalAlignment="Center" 
                     Orientation="Horizontal" Margin="4">
                 <Button 
-                    x:Name="btnHome" x:Uid="Home" 
-                    Content="&#xE100;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                    x:Name="btnHome" x:Uid="Home" ToolTip="Goto First Subtitle"
+                    Content="&#xE11C;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnHome_Click"/>
                 <Button 
-                    x:Name="btnPrev" x:Uid="Prev" 
-                    Content="&#xEB9E;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                    x:Name="btnPrev" x:Uid="Prev" ToolTip="Goto Prev Subtitle"
+                    Content="&#xE110;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnPrev_Click"/>
                 <Button 
-                    x:Name="btnNext" x:Uid="Next" 
-                    Content="&#xEB9D;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                    x:Name="btnNext" x:Uid="Next" ToolTip="Goto Next Subtitle"
+                    Content="&#xE1FD;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnNext_Click"/>
                 <Button 
-                    x:Name="btnEnd" x:Uid="End" 
-                    Content="&#xE101;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                    x:Name="btnEnd" x:Uid="End" ToolTip="Goto Last Subtitle"
+                    Content="&#xE118;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnEnd_Click"/>
                 <Line Y1 ="0" Y2="48" Stroke="#FF7C7C7C" ClipToBounds="True"
@@ -152,12 +152,12 @@
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnPlay_Click"/>
                 <Button 
-                    x:Name="btnPause" x:Uid="Pause" 
+                    x:Name="btnPause" x:Uid="Pause" ToolTip="Pause Playing"
                     Content="&#xE103;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnPause_Click"/>
                 <Button 
-                    x:Name="btnStop" x:Uid="Stop" 
+                    x:Name="btnStop" x:Uid="Stop" ToolTip="Stop Playing"
                     Content="&#xE15B;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnStop_Click"/>
@@ -165,7 +165,7 @@
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" 
                       Margin="4" />
                 <Button 
-                    x:Name="btnSlice" x:Uid="Slicer" 
+                    x:Name="btnSlice" x:Uid="Slicer" ToolTip="Slicing Audio"
                     Content="&#xE8C6;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnSlice_Click"/>
@@ -197,12 +197,12 @@
                     </Button.ContextMenu>
                 </Button>
                 <Button 
-                    x:Name="btnConvertPause" x:Uid="Pause" 
+                    x:Name="btnConvertPause" x:Uid="Pause" ToolTip="Pause Recognizing"
                     Content="&#xE103;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnConvertPause_Click"/>
                 <Button 
-                    x:Name="btnConvertStop" x:Uid="Stop" 
+                    x:Name="btnConvertStop" x:Uid="Stop" ToolTip="Stop Recognizing"
                     Content="&#xE15B;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnConvertStop_Click"/>
@@ -325,17 +325,17 @@
                 <!-- TTS & Commit Subtitle Control Panel -->
                 <StackPanel Grid.Column="3" Orientation="Horizontal">
                     <Button 
-                        x:Name="btnTtsPlay" x:Uid="TtsPlay" ToolTip="Speech"
+                        x:Name="btnTtsPlay" x:Uid="TtsPlay" ToolTip="Speech TTS Play"
                         Content="&#xEA91;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                         MinWidth="48" MinHeight="48" Margin="4"
                         Click="btnTtsPlay_Click"/>
                     <Button 
-                        x:Name="btnTtsPause" x:Uid="TtsPause" 
+                        x:Name="btnTtsPause" x:Uid="TtsPause" ToolTip="Speech TTS Pause"
                         Content="&#xE103;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                         MinWidth="48" MinHeight="48" Margin="4"
                         Click="btnTtsPause_Click"/>
                     <Button 
-                        x:Name="btnTtsStop" x:Uid="TtsStop" 
+                        x:Name="btnTtsStop" x:Uid="TtsStop" ToolTip="Speech TTS Stop"
                         Content="&#xE15B;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                         MinWidth="48" MinHeight="48" Margin="4"
                         Click="btnTtsStop_Click"/>
@@ -343,7 +343,16 @@
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" 
                       Margin="4" />
                     <Button 
-                        Grid.Column="5"
+                        x:Name="btnPrevTitle" x:Uid="PrevTitle"  ToolTip="Prev Subtitle"
+                        Content="&#xE110;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                        MinWidth="48" MinHeight="48" Margin="4"
+                        Click="btnPrevTitle_Click"/>
+                    <Button 
+                        x:Name="btnNextTitle" x:Uid="NextTitle"  ToolTip="Next Subtitle"
+                        Content="&#xE1FD;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                        MinWidth="48" MinHeight="48" Margin="4"
+                        Click="btnNextTitle_Click"/>                    
+                    <Button 
                         x:Name="btnCommit" x:Uid="Commit"  ToolTip="Commit Change"
                         Content="&#xE10B;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                         MinWidth="48" MinHeight="48" Margin="4"

@@ -129,6 +129,8 @@ namespace SoundToText
                 if (state == MediaButtonState.Invalid)
                 {
                     btnCommit.IsEnabled = false;
+                    btnPrevTitle.IsEnabled = false;
+                    btnNextTitle.IsEnabled = false;
                     edTitle.IsEnabled = false;
                     edTranslated.IsEnabled = false;
                     TtsPanel.IsEnabled = false;
@@ -136,6 +138,8 @@ namespace SoundToText
                 else
                 {
                     btnCommit.IsEnabled = true;
+                    btnPrevTitle.IsEnabled = true;
+                    btnNextTitle.IsEnabled = true;
                     edTitle.IsEnabled = true;
                     edTranslated.IsEnabled = true;
                     TtsPanel.IsEnabled = true;
@@ -344,7 +348,7 @@ namespace SoundToText
         {
             if(Keyboard.Modifiers == ModifierKeys.Control)
             {
-                if(e.Key == Key.S)
+                if (e.Key == Key.S)
                 {
                     if (string.IsNullOrEmpty(lastSaveFile) || !File.Exists(lastSaveFile))
                     {
@@ -369,12 +373,12 @@ namespace SoundToText
                     btnOpen_Click(btnOpen, e);
                     e.Handled = true;
                 }
-                else if(e.Key == Key.Enter)
+                else if (e.Key == Key.Enter)
                 {
                     btnCommit_Click(btnCommit, e);
                     e.Handled = true;
                 }
-                else if(e.Key == Key.R)
+                else if (e.Key == Key.R)
                 {
                     btnConvertPlay_Click(miRecognizing, e);
                     e.Handled = true;
@@ -389,7 +393,17 @@ namespace SoundToText
                     btnTtsPlay_Click(btnTtsPlay, e);
                     e.Handled = true;
                 }
-                else if(e.Key == Key.Divide)
+                else if (e.Key == Key.Up)
+                {
+                    btnPrevTitle_Click(btnPrevTitle, e);
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Down)
+                {
+                    btnNextTitle_Click(btnNextTitle, e);
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Divide)
                 {
                     btnSlice_Click(btnSlice, e);
                 }
@@ -423,6 +437,7 @@ namespace SoundToText
                     NAudioEngine.Instance.SelectionEnd = srt.NewEnd;
 
                     titleIndex.Time = TimeSpan.FromSeconds((srt.DisplayIndex / 100 * 60) + (srt.DisplayIndex % 100));
+                    titleIndex.ToolTip = $"Duration: {(srt.NewEnd - srt.NewStart).ToString(@"hh\:mm\:ss\.fff")}";
 
                     SetTtsButtonState(MediaButtonState.Idle);
                 }
@@ -807,5 +822,18 @@ namespace SoundToText
             }
         }
 
+        private void btnPrevTitle_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t.IsRunning) return;
+            if (lstResult.SelectedIndex > 0)
+                lstResult.SelectedIndex--;
+        }
+
+        private void btnNextTitle_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t.IsRunning) return;
+            if (lstResult.SelectedIndex < lstResult.Items.Count - 1)
+                lstResult.SelectedIndex++;
+        }
     }
 }
