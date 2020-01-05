@@ -23,6 +23,14 @@ using System.Text.RegularExpressions;
 
 namespace SoundToText
 {
+    public class AudioSlice
+    {
+        public bool IsActive { get; set; } = false;
+        public TimeSpan Start { get; set; } = default(TimeSpan);
+        public TimeSpan End { get; set; } = default(TimeSpan);
+        public byte[] Audio { get; set; } = null;
+    }
+
     public class SpeechRecognizer
     {
         #region Recognizer Internal Variable
@@ -56,6 +64,12 @@ namespace SoundToText
         private string URL_AzureSpeechResponse = "https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1";
         private string Token_AzureSpeech = string.Empty;
         private DateTime Token_AzureSpeech_Lifetime = DateTime.Now;
+        #endregion
+
+        #region Private vars
+        private int _ReRecognize = -1;
+
+        private CountdownEvent taskCount = new CountdownEvent(1);
         #endregion
 
         #region Properties
@@ -160,10 +174,14 @@ namespace SoundToText
         public bool GoogleEnabled { get; set; } = false;
         #endregion
 
-        #region Private vars
-        private int _ReRecognize = -1;
+        #region Common Helper Routines
+        private void Log(string text)
+        {
+#if DEBUG
+            Console.WriteLine(text);
+#endif
+        }
 
-        private CountdownEvent taskCount = new CountdownEvent(1);
         private async void CheckCompleted(bool autoRelease = true)
         {
             if (autoRelease)
@@ -269,7 +287,7 @@ namespace SoundToText
             {
                 if (IsPausing)
                 {
-                    lastAudioPos = GetTime(_recognizerStream.Position);
+                    lastAudioPos = GetTime(_recognizerStream.Position, defaultWaveFmt);
                 }
                 else
                 {
@@ -649,7 +667,7 @@ namespace SoundToText
         }
         #endregion
 
-        #region Recognizer Helper routines
+        #region Audio Converting Helper Routines
         private async Task<byte[]> GetBytes(RecognizedAudio audio)
         {
             byte[] result = null;
@@ -748,21 +766,33 @@ namespace SoundToText
             return (result);
         }
 
-        private async Task<WaveStream> GetWaveStream(byte[] audio, WaveFormat fmt)
+        private async Task<WaveStream> GetWaveStreamFromPcmBytes(byte[] audio, WaveFormat fmt)
         {
             WaveStream result = null;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                await ms.WriteAsync(audio, 0, audio.Length);
-                ms.Seek(0, SeekOrigin.Begin);
-                using (WaveFileReader reader = new WaveFileReader(ms))
-                {
-                    result = new WaveFormatConversionStream(defaultWaveFmt, reader);
-                    result.CurrentTime = TimeSpan.FromSeconds(0);
-                    result.Seek(0, SeekOrigin.Begin);
-                    //await result.FlushAsync();
-                }
-            }
+
+            MemoryStream mso = new MemoryStream();
+            WaveFileWriter writer = new WaveFileWriter(mso, fmt);
+            await writer.WriteAsync(audio, 0, audio.Length);
+            await writer.FlushAsync();
+            mso.Seek(0, SeekOrigin.Begin);
+            WaveFileReader reader = new WaveFileReader(mso);
+            result = new WaveFormatConversionStream(fmt, reader);
+            result.CurrentTime = TimeSpan.FromSeconds(0);
+            result.Seek(0, SeekOrigin.Begin);
+            await result.FlushAsync();
+
+            return (result);
+        }
+
+        private async Task<WaveStream> GetWaveStream(MemoryStream audio, WaveFormat fmt)
+        {
+            WaveStream result = null;
+            var pos = audio.Position;
+            var bytes = new byte[audio.Length];
+            await audio.ReadAsync(bytes, 0, bytes.Length);
+            await audio.FlushAsync();
+            result = await GetWaveStreamFromPcmBytes(bytes, fmt);
+            audio.Seek(pos, SeekOrigin.Begin);
             return (result);
         }
 
@@ -781,41 +811,20 @@ namespace SoundToText
             catch (Exception) { }
             return (result);
         }
+        #endregion
 
-        private TimeSpan GetTime(long pos)
+        #region Audio Time Index Helper Routines
+        private TimeSpan GetTime(long pos, WaveFormat fmt)
         {
             TimeSpan result = TimeSpan.FromSeconds(0);
 
             if(_recognizerStream is MemoryStream && _recognizerStream.Length > 0)
             {
-                var sBytes = defaultWaveFmt.SampleRate * defaultWaveFmt.BitsPerSample / 8;
+                var sBytes = fmt.SampleRate * fmt.BitsPerSample * fmt.Channels / 8;
                 result = TimeSpan.FromSeconds((double)pos / (double)sBytes);
             }
 
             return (result);
-        }
-
-        private async void UpdateTitleInfo(SRT title, RecognitionResult result)
-        {
-            if (title is SRT)
-            {
-                title.Start = lastAudioPos + result.Audio.AudioPosition;
-                title.End = title.Start + result.Audio.Duration;
-                title.Text = result.Text.Trim();
-                title.SetAltText(result.Alternates);
-                title.Audio = await GetBytes(result.Audio);
-                title.NewStart = title.Start;
-                title.NewEnd = title.End;
-
-                AudioPos = title.End;
-            }
-        }
-
-        private void Log(string text)
-        {
-#if DEBUG
-            Console.WriteLine(text);
-#endif
         }
 
         private int IndexOf(TimeSpan start, TimeSpan end, bool fuzzy = false)
@@ -841,6 +850,24 @@ namespace SoundToText
             return (result);
         }
 
+        private async void UpdateTitleInfo(SRT title, RecognitionResult result)
+        {
+            if (title is SRT)
+            {
+                title.Start = lastAudioPos + result.Audio.AudioPosition;
+                title.End = title.Start + result.Audio.Duration;
+                title.Text = result.Text.Trim();
+                title.SetAltText(result.Alternates);
+                title.Audio = await GetBytes(result.Audio);
+                title.NewStart = title.Start;
+                title.NewEnd = title.End;
+
+                AudioPos = title.End;
+            }
+        }
+        #endregion
+
+        #region SubTitles I/O Helper Routines
         public string ToSRT()
         {
             return (Text);
@@ -892,7 +919,34 @@ namespace SoundToText
             return (sb.ToString());
         }
 
-        public void LoadSRT(string file)
+        private SRT MakeSRT(AudioSlice slice, int idx = 0)
+        {
+            var title = new SRT()
+            {
+                Index = idx,
+                Language = culture.IetfLanguageTag,
+                Audio = null,
+                Start = slice.Start,
+                End = slice.End,
+                NewAudio = null,
+                NewStart = slice.Start,
+                NewEnd = slice.End
+            };
+            return (title);
+        }
+
+        public void LoadSlice(IEnumerable<AudioSlice> slices, bool active = true)
+        {
+            var selected = slices.Where(o => o.IsActive == active);
+            srt.Clear();
+            foreach(var s in selected)
+            {
+                srt.Add(MakeSRT(s, srt.Count));
+            }
+
+        }
+
+        public async void LoadSRT(string file)
         {
             if (File.Exists(file))
             {
@@ -947,12 +1001,13 @@ namespace SoundToText
                             }
                         }
                         catch (Exception) { }
+                        if (srt.Count < 100) await Task.Delay(1);
                     }
                 }
             }
         }
 
-        public void LoadCSV(string file)
+        public async void LoadCSV(string file)
         {
             if (File.Exists(file))
             {
@@ -983,12 +1038,14 @@ namespace SoundToText
                             }
                         }
                         catch (Exception) { }
-                        //await Task.Delay(1);
+                        if(srt.Count<100) await Task.Delay(1);
                     }
                 }
             }
         }
+        #endregion
 
+        #region Audio Processing Helper Routines
         private async Task<SpeechAudioFormatInfo> LoadAudio(string audiofile)
         {
             SpeechAudioFormatInfo audioInfo = null;
@@ -1054,6 +1111,119 @@ namespace SoundToText
             }
         }
 
+        private static bool IsSilence(float amplitude, sbyte threshold)
+        {
+            double dB = 20 * Math.Log10(Math.Abs(amplitude));
+            return dB < threshold;
+        }
+
+        private static bool IsSilence(byte[] amplitude, sbyte threshold, WaveFormat fmt)
+        {
+            double amp = 0;
+            var step = fmt.BitsPerSample / 8;
+            for (var i = 0; i < amplitude.Length; i += step)
+            {
+                double a = BitConverter.ToInt16(amplitude, i) / 32768.0;
+                amp += Math.Abs(a);
+            }
+            amp = amp * step / amplitude.Length;
+            if (amp == 0) amp = 0.000001;
+            double dB = 20 * Math.Log10(Math.Abs(amp));
+            return dB < threshold;
+        }
+
+        private static bool IsSilence(byte[] amplitude, int index, int count, int step, sbyte threshold)
+        {
+            double amp = 0;
+            for (var i = index; i < index + count; i += step)
+            {
+                double a = BitConverter.ToInt16(amplitude, i) / 32768.0;
+                amp += Math.Abs(a);
+            }
+            amp = amp * step / amplitude.Length;
+            if (amp == 0) amp = 0.000001;
+            double dB = 20 * Math.Log10(Math.Abs(amp));
+            return dB < threshold;
+        }
+
+        public async Task<List<AudioSlice>> SliceAudio(sbyte Threshold = -40, double activeDuration = 0.7500, double silenceDuration = 0.7500, bool? active = null)
+        {
+            List<AudioSlice> result = new List<AudioSlice>();
+            try
+            {
+                await new Action(async () =>
+                {
+                    IsRunning = true;
+                    IsPausing = false;
+                    taskCount.AddCount();
+
+                    if (active != null) srt.Clear();
+                    var wave = _recognizerStream.ToArray();
+                    var TotalTime = GetTime(wave.Length - 1, defaultWaveFmt);
+                    AudioLength = TotalTime;
+                    activeDuration = Math.Round(activeDuration, 3);
+                    TimeSpan activeDurationTime = TimeSpan.FromSeconds(activeDuration);
+                    TimeSpan silenceDurationTime = TimeSpan.FromSeconds(silenceDuration);
+                    bool silence = false;
+                    int sample = defaultWaveFmt.SampleRate * defaultWaveFmt.BitsPerSample * defaultWaveFmt.Channels / 8 / 10;
+                    int step = defaultWaveFmt.BitsPerSample / 8;
+                    AudioSlice slice = new AudioSlice();
+                    for (var i = 0; i < wave.Length; i += sample)
+                    {
+                        var CurrentTime = GetTime(i, defaultWaveFmt);
+                        var count = i + sample > wave.Length ? wave.Length - i : sample;
+                        //var iss = IsSilence(wave, i, count, step, Threshold);
+                        byte[] samples = new byte[sample];
+                        Array.Copy(wave, i, samples, 0, count);
+                        var iss = IsSilence(samples, Threshold, defaultWaveFmt); 
+                        //var iss = IsSilence(wave.Skip(i).Take(sample).ToArray(), Threshold, defaultWaveFmt);
+                        if (result.Count == 0) silence = !iss;
+                        if (silence != iss && (slice.End - slice.Start >= (silence ? silenceDurationTime : activeDurationTime)))
+                        {
+                            slice.IsActive = !silence;
+                            result.Add(slice);
+                            if (active != null && active.Value == slice.IsActive)
+                                srt.Add(MakeSRT(slice, srt.Count));
+                            AudioPos = slice.Start;
+                            ProgressHost.Report(Progress);
+                            Log($"Processing : {slice.Start.ToString(@"hh\:mm\:ss\.fff")} - {slice.End.ToString(@"hh\:mm\:ss\.fff")}");
+                            await Task.Delay(1);
+
+                            slice = new AudioSlice()
+                            {
+                                Start = CurrentTime,
+                                End = CurrentTime
+                            };
+                            silence = iss;
+                        }
+                        slice.End = CurrentTime;
+                        //Log($"Processing : {slice.Start.ToString(@"hh\:mm\:ss\.fff")} - {slice.End.ToString(@"hh\:mm\:ss\.fff")}");
+                    }
+
+                    if (slice is AudioSlice)
+                    {
+                        slice.End = GetTime(wave.Length - 1, defaultWaveFmt);
+                        result.Add(slice);
+                        if (active != null && active.Value == slice.IsActive)
+                            srt.Add(MakeSRT(slice, srt.Count));
+                        AudioPos = TotalTime;
+                        ProgressHost.Report(Progress);
+                        Log($"Processing : {slice.Start.ToString(@"hh\:mm\:ss\.fff")} - {slice.End.ToString(@"hh\:mm\:ss\.fff")}");
+                        await Task.Delay(1);
+                    }
+                    CheckCompleted(true);
+                }).InvokeAsync();
+            }
+#if DEBUG
+            catch (Exception ex) { Log(ex.Message); }
+#else
+            catch (Exception) { }
+#endif
+            return (result);
+        }
+#endregion
+
+#region Recognizer Helper routines
         private async void Recognizer(string audiofile, bool restart = false)
         {
             _ReRecognize = -1;
@@ -1112,7 +1282,8 @@ namespace SoundToText
                         {
                             taskCount.AddCount();
                             _ReRecognize = title.Index;
-                            var bytes = await GetPcmBytes(title.Audio, defaultWaveFmt);
+                            var audio = title.Audio == null ? await GetAudio(_recognizerStream, title.NewStart, title.NewEnd) : title.Audio;
+                            var bytes = await GetPcmBytes(audio, defaultWaveFmt);
                             var pcm = await GetStream(bytes);
                             if (pcm is Stream && pcm.Length > 0)
                             {
@@ -1143,9 +1314,9 @@ namespace SoundToText
             }
             CheckCompleted(false);
         }
-        #endregion
+#endregion
 
-        #region Recognizer Control routines
+#region Recognizer Control routines
         public bool IsRunning { get; private set; } = false;
         public void Start(string audiofile = default(string))
         {
@@ -1205,13 +1376,13 @@ namespace SoundToText
             {
                 IsRunning = false;
                 IsPausing = false;
-                //_recognizer.RecognizeAsyncCancel();
                 _recognizer.RecognizeAsyncStop();
             }
+            CheckCompleted(false);
         }
-        #endregion
+#endregion
 
-        #region SpeechRecognizer routines
+#region SpeechRecognizer routines
         public SpeechRecognizer(CultureInfo culture = default(CultureInfo))
         {
             try
@@ -1220,7 +1391,7 @@ namespace SoundToText
 
                 taskCount.Reset(1);
 
-                #region Microsoft SAPI Recognition
+#region Microsoft SAPI Recognition
                 foreach (var ri in InstalledRecognizers)
                 {
                     var r = new SpeechRecognitionEngine(ri.Culture);
@@ -1261,9 +1432,9 @@ namespace SoundToText
                 _defaultRecognizer.AudioStateChanged += Recognizer_AudioStateChanged;
 
                 _recognizer = _defaultRecognizer;
-                #endregion
+#endregion
 
-                #region iFlyTek Speech Recognition
+#region iFlyTek Speech Recognition
                 APPID_iFlySpeech = File.Exists(APPID_iFlySpeech_File) ? File.ReadAllText(APPID_iFlySpeech_File).Trim() : string.Empty;
                 if (!string.IsNullOrEmpty(APPID_iFlySpeech))
                 {
@@ -1300,9 +1471,9 @@ namespace SoundToText
                         };
                     }
                 }
-                #endregion
+#endregion
 
-                #region Azure Cognitive Service
+#region Azure Cognitive Service
                 APIKEY_AzureSpeech = File.Exists(APIKEY_AzureSpeech_File) ? File.ReadAllText(APIKEY_AzureSpeech_File).Trim() : string.Empty;
                 if (!string.IsNullOrEmpty(APIKEY_AzureSpeech))
                 {
@@ -1332,11 +1503,11 @@ namespace SoundToText
                         URL_AzureTranslate = string.Join("", kv.Skip(1));
                     }
                 }
-                #endregion
+#endregion
 
-                #region Google Speech Recognize
+#region Google Speech Recognize
                 APIKEY_GoogleSpeech = File.Exists(APIKEY_GoogleSpeech_File) ? File.ReadAllText(APIKEY_GoogleSpeech_File).Trim() : string.Empty;
-                #endregion
+#endregion
             }
             catch (Exception)
             {
@@ -1349,7 +1520,7 @@ namespace SoundToText
         {
             if (_recognizer is SpeechRecognitionEngine) _recognizer.Dispose();
         }
-        #endregion
+#endregion
     }
 
     public class AzureSpeechRecognizResult

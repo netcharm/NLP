@@ -39,7 +39,11 @@
             </Border>
         </ControlTemplate>
     </Window.Resources>
-    
+
+    <!--<Window.InputBindings>
+        <KeyBinding Command="" Key ="P" Modifiers="Ctrl"></KeyBinding>
+    </Window.InputBindings>-->
+
     <Grid Background="{DynamicResource WindowBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -66,19 +70,17 @@
                 <Button 
                     x:Name="btnOpen" x:Uid="Open" 
                     Content="&#xE197;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
-                    MinWidth="48" MinHeight="48" Margin="0,4,4,4"
+                    MinWidth="48" MinHeight="48" Margin="0,4,4,4"                    
                     Click="btnOpen_Click" />
                 <Button 
                     x:Name="btnSave" x:Uid="Save" 
                     Content="&#xE105;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
-                    MinWidth="48" MinHeight="48" Margin="4"
+                    MinWidth="48" MinHeight="48" Margin="4" 
                     Click="btnSave_Click"/>
                 <ComboBox x:Name="cbLanguage" x:Uid="Language" 
                           HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
-                          Margin="4" Width="124" SelectionChanged="cbLanguage_SelectionChanged"
-                          />
-                <Button 
-                    x:Name="btnOption" x:Uid="Option" 
+                          Margin="4" Width="124" SelectionChanged="cbLanguage_SelectionChanged" />
+                <Button x:Name="btnOption" x:Uid="Option" 
                     HorizontalAlignment="Right"
                     Content="&#xE115;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4,4,0,4"
@@ -86,7 +88,7 @@
                     <Button.ContextMenu>
                         <ContextMenu FontFamily="Segoe UI, 微软雅黑" FontSize="16">
                             <MenuItem x:Name="miOptEngineSAPI" x:Uid="OptEngineSAPI" Header="Microsoft SAPI"
-                                      Click="miOptEngine_Click"/>
+                                      Click="miOptEngine_Click" />
                             <Separator/>
                             <MenuItem x:Name="miOptEngineiFlySDK" x:Uid="OptEngineiFlySDK" Header="iFlyTek IAT (SDK)"
                                       Click="miOptEngine_Click"/>
@@ -100,6 +102,23 @@
                     </Button.ContextMenu>
                 </Button>
             </StackPanel>
+            <!-- Progress Panel -->
+            <ProgressBar Grid.Column="1" x:Name="progressBar" x:Uid="Progress" 
+                         HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                         MinHeight="32" Margin="4"/>
+            <TextBlock Grid.Column="1" x:Name="progressInfo" x:Uid="ProgressInfo" 
+                       TextAlignment="Center"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" 
+                       FontSize="16" FontFamily="Iosevka, Monaco, Inconsolata, Consolas, Segoe UI">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush x:Name="progressInfoLinear" StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" Offset="0"></GradientStop>
+                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" Offset="0" x:Name="progressInfoLeft"></GradientStop>
+                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" Offset="0" x:Name="progressInfoRight"></GradientStop>
+                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" Offset="1"></GradientStop>
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
             <!-- Media Control Panel -->
             <StackPanel Grid.Column="2" x:Name="MediaPanel" 
                     HorizontalAlignment="Right" VerticalAlignment="Center" 
@@ -146,6 +165,11 @@
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" 
                       Margin="4" />
                 <Button 
+                    x:Name="btnSlice" x:Uid="Slicer" 
+                    Content="&#xE8C6;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
+                    MinWidth="48" MinHeight="48" Margin="4"
+                    Click="btnSlice_Click"/>
+                <Button 
                     x:Name="btnConvertPlay" x:Uid="Convert" ToolTip="Recognizing"
                     Content="&#xE134;" FontFamily="Segoe MDL2 Assets, Segoe UI" FontSize="24" 
                     MinWidth="48" MinHeight="48" Margin="4"
@@ -183,23 +207,6 @@
                     MinWidth="48" MinHeight="48" Margin="4"
                     Click="btnConvertStop_Click"/>
             </StackPanel>
-            <!-- Progress Panel -->
-            <ProgressBar Grid.Column="1" x:Name="progressBar" x:Uid="Progress" 
-                         HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                         MinHeight="32" Margin="4"/>
-            <TextBlock Grid.Column="1" x:Name="progressInfo" x:Uid="ProgressInfo" 
-                       TextAlignment="Center"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" 
-                       FontSize="16" FontFamily="Iosevka, Monaco, Inconsolata, Consolas, Segoe UI">
-                <TextBlock.Foreground>
-                    <LinearGradientBrush x:Name="progressInfoLinear" StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" Offset="0"></GradientStop>
-                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" Offset="0" x:Name="progressInfoLeft"></GradientStop>
-                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" Offset="0" x:Name="progressInfoRight"></GradientStop>
-                        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" Offset="1"></GradientStop>
-                    </LinearGradientBrush>
-                </TextBlock.Foreground>
-            </TextBlock>
         </Grid>
         
         <!-- Subtitle Result List -->
@@ -227,8 +234,12 @@
             </ListBox.ItemTemplate>
             <ListBox.ContextMenu>
                 <ContextMenu FontFamily="Segoe UI, 微软雅黑" FontSize="16">
-                    <MenuItem x:Name="miRecognizing" x:Uid="Recognizing" Header="Recognizing via third party service" Click="btnConvertPlay_Click"/>
-                    <MenuItem x:Name="miTranslating" x:Uid="Translating" Header="Translating via third party service" Click="btnConvertPlay_Click"/>
+                    <MenuItem x:Name="miRecognizing" x:Uid="Recognizing" Header="Recognizing via third party service" 
+                              InputGestureText="Ctrl+R"
+                              Click="btnConvertPlay_Click"/>
+                    <MenuItem x:Name="miTranslating" x:Uid="Translating" Header="Translating via third party service" 
+                              InputGestureText="Ctrl+T"
+                              Click="btnConvertPlay_Click"/>
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>

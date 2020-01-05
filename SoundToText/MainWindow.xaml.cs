@@ -71,6 +71,7 @@ namespace SoundToText
                         btnOpen.IsEnabled = true;
                         break;
                 }
+                btnSlice.IsEnabled = btnConvertPlay.IsEnabled;
                 if (state == MediaButtonState.Invalid)
                 {
                     MediaPanel.IsEnabled = false;
@@ -156,14 +157,15 @@ namespace SoundToText
                 {
                     if (s2t.IsRunning) return;
 
+                    SetMediaButtonState(MediaButtonState.Running);
                     s2t.AudioFile = file;
-                    SetMediaButtonState(MediaButtonState.Idle);
                     NAudioEngine.Instance.OpenFile(file);
                     s2t.Result.Clear();
                     lblTitle.Text = string.Empty;
                     edTitle.Text = string.Empty;
                     edStartTime.Value = TimeSpan.FromSeconds(0);
                     edEndTime.Value = TimeSpan.FromSeconds(0);
+                    SetMediaButtonState(MediaButtonState.Idle);
                 }
             }
         }
@@ -360,26 +362,36 @@ namespace SoundToText
                         else
                             File.WriteAllText(lastSaveFile, s2t.ToSRT(), Encoding.UTF8);
                     }
+                    e.Handled = true;
                 }
-                else if(e.Key == Key.O)
+                else if (e.Key == Key.O)
                 {
                     btnOpen_Click(btnOpen, e);
+                    e.Handled = true;
                 }
                 else if(e.Key == Key.Enter)
                 {
                     btnCommit_Click(btnCommit, e);
+                    e.Handled = true;
                 }
                 else if(e.Key == Key.R)
                 {
                     btnConvertPlay_Click(miRecognizing, e);
+                    e.Handled = true;
                 }
                 else if (e.Key == Key.T)
                 {
                     btnConvertPlay_Click(miTranslating, e);
+                    e.Handled = true;
                 }
                 else if (e.Key == Key.P)
                 {
                     btnTtsPlay_Click(btnTtsPlay, e);
+                    e.Handled = true;
+                }
+                else if(e.Key == Key.Divide)
+                {
+                    btnSlice_Click(btnSlice, e);
                 }
             }
         }
@@ -539,10 +551,16 @@ namespace SoundToText
                     }
                     else if (exts_srt.Contains(ext))
                     {
-                        if (ext.Equals(".csv"))
-                            s2t.LoadCSV(fn);
-                        else if (ext.Equals(".srt"))
-                            s2t.LoadSRT(fn);
+                        var ret = MessageBoxResult.Yes;
+                        if(s2t.Result.Count>0)
+                            ret = MessageBox.Show("Will lost current subtitles, continue?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
+                        if (ret == MessageBoxResult.Yes)
+                        {
+                            if (ext.Equals(".csv"))
+                                s2t.LoadCSV(fn);
+                            else if (ext.Equals(".srt"))
+                                s2t.LoadSRT(fn);
+                        }                        
                     }
                 }
             }
@@ -572,6 +590,14 @@ namespace SoundToText
                     lastSaveFile = fn;
                 }
             }
+        }
+
+        private async void btnSlice_Click(object sender, RoutedEventArgs e)
+        {
+            if (s2t.IsRunning) return;
+            SetMediaButtonState(MediaButtonState.Running);
+            var results = await s2t.SliceAudio(-50, 2, 0.5, true);
+            //s2t.LoadSlice(results, true);
         }
 
         private void btnConvertPlay_Click(object sender, RoutedEventArgs e)
