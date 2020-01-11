@@ -205,6 +205,7 @@ namespace SubTitles
             if (!string.IsNullOrEmpty(LastFilename))
                 dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
             dlgSave.DefaultExt = ".ass";
+            dlgSave.FileName = Path.GetFileNameWithoutExtension(LastFilename);
             dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
             dlgSave.FilterIndex = 0;
             if (dlgSave.ShowDialog() == true)
@@ -214,6 +215,7 @@ namespace SubTitles
                 else if (dlgSave.FilterIndex == 4)
                     flags = flags | ASS.SaveFlags.VTT;
                 ass.Save(dlgSave.FileName, flags);
+                LastFilename = dlgSave.FileName;
             }
         }
 
