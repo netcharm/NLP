@@ -299,7 +299,7 @@ namespace SubTitles
             OpenFileDialog dlgOpen = new OpenFileDialog();
             dlgOpen.DefaultExt = ".ass";
             //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
-            dlgOpen.Filter = "All Supported File|*.ass;*.ssa;*.srt|ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt";
+            dlgOpen.Filter = "All Supported File|*.ass;*.ssa;*.srt;*.vtt|ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|VTT Fils|*.vtt";
             dlgOpen.FilterIndex = 0;
             if (dlgOpen.ShowDialog() == true)
             {

@@ -665,7 +665,7 @@ namespace SubTitles
                 var ext = Path.GetExtension(ass).ToLower();
                 var fn = Path.GetFileNameWithoutExtension(ass);
                 var lines = File.ReadAllLines(ass);
-                if (ext.Equals(".srt"))
+                if (ext.Equals(".srt") || ext.Equals(".vtt"))
                 {
                     await LoadFromSrt(lines, fn);
                 }
