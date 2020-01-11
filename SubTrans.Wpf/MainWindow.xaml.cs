@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
@@ -151,6 +152,7 @@ namespace SubTitles
                 col.Header = "ID";
                 col.DisplayMemberBinding = new Binding(col.Header.ToString());
                 col.CellTemplate = GetCellTemplate(col.Header.ToString());
+                col.Width = 48;
                 gv.Columns.Add(col);
 
                 foreach (string header in headers)
@@ -174,12 +176,20 @@ namespace SubTitles
 
         private async void LoadSubTitle(string subtitle)
         {
-            await ass.Load(subtitle);
-            InitListView(lvItems, ass.EventFields);
-            LastFilename = subtitle;
-            for (int i = 0; i < ass.Events.Count; i++)
+            try
             {
-                events.Add(ass.Events[i]);
+                LoadProgress.IsIndeterminate = true;
+                await ass.Load(subtitle);
+                InitListView(lvItems, ass.EventFields);
+                LastFilename = subtitle;
+                for (int i = 0; i < ass.Events.Count; i++)
+                {
+                    events.Add(ass.Events[i]);
+                }
+            }
+            finally
+            {
+                LoadProgress.IsIndeterminate = false;
             }
         }
 
@@ -307,7 +317,8 @@ namespace SubTitles
                 {
                     var idx = lvItems.Items.IndexOf(lvItems.SelectedItems[i]);
                     var evt = ass.Events[idx];
-                    sb.AppendLine(evt.Text);
+                    var t = Regex.Replace(evt.Text, @"\\[n|N]", " $0 ", RegexOptions.IgnoreCase);
+                    sb.AppendLine(t);
                 }
                 var text = sb.ToString();
                 Clipboard.SetDataObject(text);
