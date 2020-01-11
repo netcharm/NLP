@@ -251,7 +251,7 @@ namespace SoundToText
 #endif
                 var index = IndexOf(e.Result.Audio.AudioPosition, e.Result.Audio.AudioPosition + e.Result.Audio.Duration);
                 SRT title = index == -1 ? srt.Last() : srt[index];
-                if(!string.IsNullOrEmpty(e.Result.Text))
+                if (!string.IsNullOrEmpty(e.Result.Text))
                     UpdateTitleInfo(title, e.Result);
                 ThirdPartyRecognizer(title);
             }
@@ -308,7 +308,7 @@ namespace SoundToText
         #endregion
 
         #region Third Party Recognizer
-        private void ThirdPartyRecognizer(SRT title, bool force=false)
+        private void ThirdPartyRecognizer(SRT title, bool force = false)
         {
             if (iFlyEnabledSDK && iflysr is iFly.SpeechRecognizer)
             {
@@ -394,7 +394,7 @@ namespace SoundToText
                     }
                 }
                 CheckCompleted(true);
-            //});
+                //});
             }).InvokeAsync();
         }
 
@@ -425,7 +425,7 @@ namespace SoundToText
                             {
                                 var t = await iflyIAT.Recognizer(BA_AudioFile);
                                 //await iflyIAT.Disconnect();
-                                if(!string.IsNullOrEmpty(t.Trim()))
+                                if (!string.IsNullOrEmpty(t.Trim()))
                                     title.Text = t.Trim();
                                 //await iflyIAT.Connect();
                                 //title.Text = await iflyIAT.Recognizer(BA_AudioFile);
@@ -538,7 +538,8 @@ namespace SoundToText
         {
             string result = "";
 
-            if (string.IsNullOrEmpty(APIKEY_AzureTranslate) || langSrc.Equals(langDst) || string.IsNullOrEmpty(text)) {
+            if (string.IsNullOrEmpty(APIKEY_AzureTranslate) || langSrc.Equals(langDst) || string.IsNullOrEmpty(text))
+            {
                 //if (_ReRecognize >= 0 && IsCompleted is Action)
                 //{
                 //    IsRunning = false;
@@ -818,7 +819,7 @@ namespace SoundToText
         {
             TimeSpan result = TimeSpan.FromSeconds(0);
 
-            if(_recognizerStream is MemoryStream && _recognizerStream.Length > 0)
+            if (_recognizerStream is MemoryStream && _recognizerStream.Length > 0)
             {
                 var sBytes = fmt.SampleRate * fmt.BitsPerSample * fmt.Channels / 8;
                 result = TimeSpan.FromSeconds((double)pos / (double)sBytes);
@@ -892,7 +893,8 @@ namespace SoundToText
 
             foreach (var t in srt)
             {
-                sb.AppendLine($"Dialogue: 0,{t.NewStart.ToString(@"hh\:mm\:ss\.ff")},{t.NewEnd.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{t.MultiLingoText}");
+                var text = t.MultiLingoText.Replace("\r\n", "\\N").Replace("\n\r", "\\N").Replace("\r", "\\N").Replace("\n", "\\N");
+                sb.AppendLine($"Dialogue: 0,{t.NewStart.ToString(@"hh\:mm\:ss\.ff")},{t.NewEnd.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{text}");
             }
 
             return (sb.ToString());
@@ -939,7 +941,7 @@ namespace SoundToText
         {
             var selected = slices.Where(o => o.IsActive == active);
             srt.Clear();
-            foreach(var s in selected)
+            foreach (var s in selected)
             {
                 srt.Add(MakeSRT(s, srt.Count));
             }
@@ -995,7 +997,7 @@ namespace SoundToText
                                 start = default(TimeSpan);
                                 end = default(TimeSpan);
                             }
-                            else if(index > 0)
+                            else if (index >= 0)
                             {
                                 text += $"\r\n{contents[i].Trim()}";
                             }
@@ -1038,7 +1040,7 @@ namespace SoundToText
                             }
                         }
                         catch (Exception) { }
-                        if(srt.Count<100) await Task.Delay(1);
+                        if (srt.Count < 100) await Task.Delay(1);
                     }
                 }
             }
@@ -1175,7 +1177,7 @@ namespace SoundToText
                         //var iss = IsSilence(wave, i, count, step, Threshold);
                         byte[] samples = new byte[sample];
                         Array.Copy(wave, i, samples, 0, count);
-                        var iss = IsSilence(samples, Threshold, defaultWaveFmt); 
+                        var iss = IsSilence(samples, Threshold, defaultWaveFmt);
                         //var iss = IsSilence(wave.Skip(i).Take(sample).ToArray(), Threshold, defaultWaveFmt);
                         if (result.Count == 0) silence = !iss;
                         if (silence != iss && (slice.End - slice.Start >= (silence ? silenceDurationTime : activeDurationTime)))
@@ -1221,9 +1223,9 @@ namespace SoundToText
 #endif
             return (result);
         }
-#endregion
+        #endregion
 
-#region Recognizer Helper routines
+        #region Recognizer Helper routines
         private async void Recognizer(string audiofile, bool restart = false)
         {
             _ReRecognize = -1;
@@ -1298,13 +1300,13 @@ namespace SoundToText
                 }
             }
         }
-        
+
         public void Translate(SRT title, string langDst = "zh-CN")
         {
             _ReRecognize = title.Index;
             ThirdPartyTranslate(title, langDst);
         }
-        
+
         public void Translate(IEnumerable<SRT> titles, string langDst = "zh-CN")
         {
             _ReRecognize = -1;
@@ -1314,9 +1316,9 @@ namespace SoundToText
             }
             CheckCompleted(false);
         }
-#endregion
+        #endregion
 
-#region Recognizer Control routines
+        #region Recognizer Control routines
         public bool IsRunning { get; private set; } = false;
         public void Start(string audiofile = default(string))
         {
@@ -1380,9 +1382,9 @@ namespace SoundToText
             }
             CheckCompleted(false);
         }
-#endregion
+        #endregion
 
-#region SpeechRecognizer routines
+        #region SpeechRecognizer routines
         public SpeechRecognizer(CultureInfo culture = default(CultureInfo))
         {
             try
@@ -1391,7 +1393,7 @@ namespace SoundToText
 
                 taskCount.Reset(1);
 
-#region Microsoft SAPI Recognition
+                #region Microsoft SAPI Recognition
                 foreach (var ri in InstalledRecognizers)
                 {
                     var r = new SpeechRecognitionEngine(ri.Culture);
@@ -1432,9 +1434,9 @@ namespace SoundToText
                 _defaultRecognizer.AudioStateChanged += Recognizer_AudioStateChanged;
 
                 _recognizer = _defaultRecognizer;
-#endregion
+                #endregion
 
-#region iFlyTek Speech Recognition
+                #region iFlyTek Speech Recognition
                 APPID_iFlySpeech = File.Exists(APPID_iFlySpeech_File) ? File.ReadAllText(APPID_iFlySpeech_File).Trim() : string.Empty;
                 if (!string.IsNullOrEmpty(APPID_iFlySpeech))
                 {
@@ -1461,7 +1463,7 @@ namespace SoundToText
                         APIKEY_iFlySpeech = kv[0].Trim();
                         APISecret_iFlySpeech = kv[1].Trim();
                     }
-                    if(!string.IsNullOrEmpty(APPID_iFlySpeech) && !string.IsNullOrEmpty(APIKEY_iFlySpeech) && !string.IsNullOrEmpty(APISecret_iFlySpeech))
+                    if (!string.IsNullOrEmpty(APPID_iFlySpeech) && !string.IsNullOrEmpty(APIKEY_iFlySpeech) && !string.IsNullOrEmpty(APISecret_iFlySpeech))
                     {
                         iflyIAT = new iFly.iFlySpeechOnline()
                         {
@@ -1471,9 +1473,9 @@ namespace SoundToText
                         };
                     }
                 }
-#endregion
+                #endregion
 
-#region Azure Cognitive Service
+                #region Azure Cognitive Service
                 APIKEY_AzureSpeech = File.Exists(APIKEY_AzureSpeech_File) ? File.ReadAllText(APIKEY_AzureSpeech_File).Trim() : string.Empty;
                 if (!string.IsNullOrEmpty(APIKEY_AzureSpeech))
                 {
@@ -1503,11 +1505,11 @@ namespace SoundToText
                         URL_AzureTranslate = string.Join("", kv.Skip(1));
                     }
                 }
-#endregion
+                #endregion
 
-#region Google Speech Recognize
+                #region Google Speech Recognize
                 APIKEY_GoogleSpeech = File.Exists(APIKEY_GoogleSpeech_File) ? File.ReadAllText(APIKEY_GoogleSpeech_File).Trim() : string.Empty;
-#endregion
+                #endregion
             }
             catch (Exception)
             {
@@ -1520,7 +1522,7 @@ namespace SoundToText
         {
             if (_recognizer is SpeechRecognitionEngine) _recognizer.Dispose();
         }
-#endregion
+        #endregion
     }
 
     public class AzureSpeechRecognizResult
