@@ -11,21 +11,6 @@ using System.Threading.Tasks;
 
 namespace SubTitles
 {
-    public static class DefaultAssStyle
-    {
-        public static string ENG_Default { get; } = "Style: Default,Tahoma,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string ENG_Note { get; } = "Style: Note,Times New Roman,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string ENG_Title { get; } = "Style: Title,Arial,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-
-        public static string CHS_Default { get; } = "Style: Default,更纱黑体 SC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHS_Note { get; } = "Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHS_Title { get; } = "Style: Title,更纱黑体 SC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-
-        public static string CHT_Default { get; } = "Style: Default,Sarasa Gothic TC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Note { get; } = "Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Title { get; } = "Style: Title,Sarasa Gothic TC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-    }
-
     public static class DefaultVttHeader
     {
         public static string Style { get; } = @"video::cue {
@@ -226,9 +211,9 @@ namespace SubTitles
             sb.AppendLine($"[V4+ Styles]");
             sb.AppendLine($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
             //sb.AppendLine($"Style: Default,Tahoma,24,&H00FFFFFF,&HF0000000,&H00000000,&HF0000000,1,0,0,0,100,100,0,0.00,1,1,0,2,30,30,10,1");
-            sb.AppendLine($"{DefaultAssStyle.CHS_Default}");
-            sb.AppendLine($"{DefaultAssStyle.CHS_Note}");
-            sb.AppendLine($"{DefaultAssStyle.CHS_Title}");
+            sb.AppendLine($"{AssStyle.CHS_Default}");
+            sb.AppendLine($"{AssStyle.CHS_Note}");
+            sb.AppendLine($"{AssStyle.CHS_Title}");
             sb.AppendLine();
             sb.AppendLine($"[Events]");
             sb.AppendLine($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
@@ -251,9 +236,9 @@ namespace SubTitles
             sb.Add($"[V4+ Styles]");
             sb.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
             //sb.AppendLine($"Style: Default,Tahoma,24,&H00FFFFFF,&HF0000000,&H00000000,&HF0000000,1,0,0,0,100,100,0,0.00,1,1,0,2,30,30,10,1");
-            sb.Add($"{DefaultAssStyle.CHS_Default}");
-            sb.Add($"{DefaultAssStyle.CHS_Note}");
-            sb.Add($"{DefaultAssStyle.CHS_Title}");
+            sb.Add($"{AssStyle.CHS_Default}");
+            sb.Add($"{AssStyle.CHS_Note}");
+            sb.Add($"{AssStyle.CHS_Title}");
             sb.Add("");
             sb.Add($"[Events]");
             sb.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");

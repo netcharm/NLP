@@ -18,16 +18,26 @@ namespace SubTitles
         public string curr_text;
     }
 
+    public static class AssStyle
+    {
+        public static string ENG_Default { get; } = @"Style: Default,Tahoma,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_Note { get; } = @"Style: Note,Times New Roman,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_Title { get; } = @"Style: Title,Arial,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&HF3DC95&}";
+
+        public static string CHS_Default { get; } = @"Style: Default,更纱黑体 SC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_Title { get; } = @"Style: Title,更纱黑体 SC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
+
+        public static string CHT_Default { get; } = @"Style: Default,Sarasa Gothic TC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Title { get; } = @"Style: Title,Sarasa Gothic TC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
+    }
+
     public class ASS
     {
-        public static string Style_Default_ENG = @"Style: Default,Tahoma,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string Style_Note_ENG = @"Style: Note,Times New Roman,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string Style_Title_ENG = @"Style: Title,Arial,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-
-        public static string Style_Default_CHS = @"Style: Default,微软雅黑,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string Style_Note_CHS = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string Style_Title_CHS = @"Style: Title,全真細隸書,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-
         private enum Sections { ScriptInfo = 0, Styles = 1, Events = 2, Fonts = 3, Graphics = 4, Unknown = -1 };
 
         [Flags]
@@ -780,9 +790,9 @@ namespace SubTitles
                 lines.Add($"\n");
                 lines.Add($"[V4+ Styles]\n");
                 lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n");
-                lines.Add($"{Style_Default_CHS}\n");
-                lines.Add($"{Style_Note_CHS}\n");
-                lines.Add($"{Style_Title_CHS}\n");
+                lines.Add($"{AssStyle.CHS_Default}\n");
+                lines.Add($"{AssStyle.CHS_Note}\n");
+                lines.Add($"{AssStyle.CHS_Title}\n");
                 lines.Add($"\n");
                 lines.Add($"[Events]\n");
                 lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text\n");
@@ -874,7 +884,8 @@ namespace SubTitles
             sb.AppendLine(EventsRaw[1]);
             for (int i = 2; i < events.Count+2; i++)
             {
-                var evt = events[i - 2];
+                var current = i-2;
+                var evt = events[current];
                 var evo = new List<string>();
                 foreach (var k in event_fields)
                 {
@@ -886,19 +897,19 @@ namespace SubTitles
                 switch (flags)
                 {
                     case SaveFlags.None:
-                        line = $"{string.Join(",", evo)},{events[i - 2].Text}";
+                        line = $"{string.Join(",", evo)},{events[current].Text}";
                         break;
                     case SaveFlags.Merge:
-                        if (string.IsNullOrEmpty(events[i - 2].Translated))
-                            line = $"{string.Join(",", evo)},{events[i - 2].Text}";
+                        if (string.IsNullOrEmpty(events[current].Translated))
+                            line = $"{string.Join(",", evo)},{AssStyle.ENG_Color}{events[current].Text}";
                         else
-                            line = $"{string.Join(",", evo)},{events[i - 2].Text}\\N{events[i-2].Translated}";
+                            line = $"{string.Join(",", evo)},{AssStyle.ENG_Color}{events[current].Text}\\N{AssStyle.CHS_Color}{events[current].Translated}";
                         break;
                     case SaveFlags.Replace:
-                        if (string.IsNullOrEmpty(events[i - 2].Translated))
-                            line = $"{string.Join(",", evo)},{events[i - 2].Text}";
+                        if (string.IsNullOrEmpty(events[current].Translated))
+                            line = $"{string.Join(",", evo)},{events[current].Text}";
                         else
-                            line = $"{string.Join(",", evo)},{events[i - 2].Translated}";
+                            line = $"{string.Join(",", evo)},{events[current].Translated}";
                         break;
                     default:
                         break;

@@ -18,4 +18,11 @@
 2. Speak subtitle via system SAPI
 3. Speech recognizing to text via SAPI/iFlytek SDK/Azure cognitive Service
 
+## SubTrans.Wpf
+1. Load ASS/SSA/SRT/VTT
+2. Selected some lines you want to translating
+3. Copy to Clipboard
+4. Translated the Clipboard and copy translated result to Clipboard
+5. Paste result from Clipboard
+
 
