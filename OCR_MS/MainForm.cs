@@ -475,7 +475,7 @@ namespace OCR_MS
                     {
                         var s = Convert.ToString(editor);
                         var cvt = new FontConverter();
-                        edResult.Font = cvt.ConvertFromString(s) as Font;
+                        edResult.Font = cvt.ConvertFromInvariantString(s) as Font;
                     }
                     catch (Exception) { }
                 }
@@ -531,7 +531,7 @@ namespace OCR_MS
                 },
                 {"result", new Dictionary<string, string>()
                     {
-                        {"font", (new FontConverter()).ConvertToString(edResult.Font)}
+                        {"font", (new FontConverter()).ConvertToInvariantString(edResult.Font)}
                     }
                 },
                 { "api", ApiKey.Select( o => new Dictionary<string, string>() { { "name", o.Key }, { "key", o.Value } } ).ToList() }
