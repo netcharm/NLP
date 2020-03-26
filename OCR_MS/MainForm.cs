@@ -467,6 +467,19 @@ namespace OCR_MS
                 }
                 #endregion
 
+                #region Result Editor Option
+                JToken editor = token.SelectToken("$..result.font", false);
+                if (editor != null)
+                {
+                    try
+                    {
+                        var s = Convert.ToString(editor);
+                        var cvt = new FontConverter();
+                        edResult.Font = cvt.ConvertFromString(s) as Font;
+                    }
+                    catch (Exception) { }
+                }
+                #endregion
             }
             CFGLOADED = true;
         }
@@ -514,6 +527,11 @@ namespace OCR_MS
                 {"speech",  new Dictionary<string, object>()
                     {
                         {"auto_speech", tsmiTextAutoSpeech.Checked }
+                    }
+                },
+                {"result", new Dictionary<string, string>()
+                    {
+                        {"font", (new FontConverter()).ConvertToString(edResult.Font)}
                     }
                 },
                 { "api", ApiKey.Select( o => new Dictionary<string, string>() { { "name", o.Key }, { "key", o.Value } } ).ToList() }
