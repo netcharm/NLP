@@ -976,7 +976,8 @@ namespace OCR_MS
         {
             List<string> lang_cn = new List<string>() { "zh-hans", "zh-cn", "zh" };
             List<string> lang_tw = new List<string>() { "zh-hant", "zh-tw" };
-            List<string> lang_jp = new List<string>() { "ja-jp", "ja", "jp" };
+            List<string> lang_ja = new List<string>() { "ja-jp", "ja", "jp" };
+            List<string> lang_ko = new List<string>() { "ko-kr", "ko", "korea" };
             List<string> lang_en = new List<string>() { "en-us", "us", "en" };
 
             try
@@ -1000,6 +1001,10 @@ namespace OCR_MS
                     {
                         lang = "ja";
                     }
+                    else if (Regex.Matches(text, @"[\uac00-\ud7ff]", RegexOptions.Multiline).Count > 0)
+                    {
+                        lang = "ko";
+                    }
                     else if (Regex.Matches(text, @"[\u4e00-\u9fbb]", RegexOptions.Multiline).Count > 0)
                     {
                         lang = "zh";
@@ -1019,9 +1024,16 @@ namespace OCR_MS
                         synth.SelectVoice(voice.VoiceInfo.Name);
                         break;
                     }
-                    else if (lang_jp.Contains(vl.ToLower()) &&
+                    else if (lang_ja.Contains(vl.ToLower()) &&
                         lang.StartsWith("ja", StringComparison.CurrentCultureIgnoreCase) &&
                         voice.VoiceInfo.Name.ToLower().Contains("haruka"))
+                    {
+                        synth.SelectVoice(voice.VoiceInfo.Name);
+                        break;
+                    }
+                    else if (lang_ko.Contains(vl.ToLower()) &&
+                        lang.StartsWith("ko", StringComparison.CurrentCultureIgnoreCase) &&
+                        voice.VoiceInfo.Name.ToLower().Contains("heami"))
                     {
                         synth.SelectVoice(voice.VoiceInfo.Name);
                         break;
