@@ -141,23 +141,32 @@ namespace OCR_MS
                             {
                                 List<string> ocr_word = new List<string>();
                                 IEnumerable<JToken> texts = word.SelectTokens( "$..text", false );
+                                var boxes = word.SelectTokens("$..boundingBox", false ).ToList();
+
+                                var boxIndex = 0;
+                                var lastBoundingBoxRight = -1;
                                 foreach (var text in texts)
                                 {
                                     var t = text.ToString();
-                                    var c = t.Last();
-                                    var prefix = string.Empty;
-                                    var suffix = string.Empty;
+                                    if (t.Length <= 0) continue;
 
-                                    if (char.IsPunctuation(c) || char.IsSymbol(c) || char.IsWhiteSpace(c)) suffix = string.Empty;
-                                    else if (string.IsNullOrEmpty(W_SEP) && char.IsLetterOrDigit(c) && Convert.ToInt32(c) < 0x200)
+                                    // Calc space for insert whitespace to text header
+                                    var prefix = string.Empty;
+                                    if (string.IsNullOrEmpty(W_SEP))
                                     {
-                                        suffix = " ";
-                                        var lc = ocr_word.Count>0 ? ocr_word.Last().Last() : 'a';
-                                        if (char.IsLetterOrDigit(lc) || !char.IsWhiteSpace(lc)) prefix = " ";
+                                        var boxValue = boxes[boxIndex].ToString().Split(',').Select(x => int.Parse(x)).ToArray();
+                                        var boxLeft = boxValue[0];
+                                        var boxWidth = boxValue[2];
+                                        var spaceWidth = boxWidth / t.Length * 0.3;
+                                        if (boxIndex == 0)
+                                            lastBoundingBoxRight = boxLeft + boxWidth;
+                                        else
+                                            if (boxLeft - lastBoundingBoxRight > spaceWidth) prefix = " ";
+                                        lastBoundingBoxRight = boxLeft + boxWidth;
+                                        boxIndex++;
                                     }
-                                    
-                                    ocr_word.Add($"{prefix}{t}{suffix}");
-                                    //sb.Append( W_SEP + text.ToString() );
+
+                                    ocr_word.Add($"{prefix}{t}");
                                 }
                                 sb.AppendLine(string.Join(W_SEP, ocr_word));
                             }
