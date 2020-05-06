@@ -143,7 +143,20 @@ namespace OCR_MS
                                 IEnumerable<JToken> texts = word.SelectTokens( "$..text", false );
                                 foreach (var text in texts)
                                 {
-                                    ocr_word.Add(text.ToString());
+                                    var t = text.ToString();
+                                    var c = t.Last();
+                                    var prefix = string.Empty;
+                                    var suffix = string.Empty;
+
+                                    if (char.IsPunctuation(c) || char.IsSymbol(c) || char.IsWhiteSpace(c)) suffix = string.Empty;
+                                    else if (string.IsNullOrEmpty(W_SEP) && char.IsLetterOrDigit(c) && Convert.ToInt32(c) < 0x200)
+                                    {
+                                        suffix = " ";
+                                        var lc = ocr_word.Count>0 ? ocr_word.Last().Last() : 'a';
+                                        if (char.IsLetterOrDigit(lc) || !char.IsWhiteSpace(lc)) prefix = " ";
+                                    }
+                                    
+                                    ocr_word.Add($"{prefix}{t}{suffix}");
                                     //sb.Append( W_SEP + text.ToString() );
                                 }
                                 sb.AppendLine(string.Join(W_SEP, ocr_word));
@@ -1018,8 +1031,15 @@ namespace OCR_MS
                     var vl = info.Culture.IetfLanguageTag;
 
                     if (lang_cn.Contains(vl.ToLower()) &&
-                        lang.StartsWith("zh", StringComparison.CurrentCultureIgnoreCase) &&
+                        lang.StartsWith("zh-hans", StringComparison.CurrentCultureIgnoreCase) &&
                         voice.VoiceInfo.Name.ToLower().Contains("huihui"))
+                    {
+                        synth.SelectVoice(voice.VoiceInfo.Name);
+                        break;
+                    }
+                    else if (lang_tw.Contains(vl.ToLower()) &&
+                        lang.StartsWith("zh-hant", StringComparison.CurrentCultureIgnoreCase) &&
+                        voice.VoiceInfo.Name.ToLower().Contains("hanhan"))
                     {
                         synth.SelectVoice(voice.VoiceInfo.Name);
                         break;
