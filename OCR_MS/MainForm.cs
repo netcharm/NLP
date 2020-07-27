@@ -143,8 +143,10 @@ namespace OCR_MS
                                 IEnumerable<JToken> texts = word.SelectTokens( "$..text", false );
                                 var boxes = word.SelectTokens("$..boundingBox", false ).ToList();
 
-                                var boxIndex = 0;
-                                var lastBoundingBoxRight = -1;
+                                int boxIndex = 0;
+                                int lastBoundingBoxRight = -1;
+                                char lastTail = ' ';
+                                double lastSpaceWidth = .0F;
                                 foreach (var text in texts)
                                 {
                                     var t = text.ToString();
@@ -157,12 +159,22 @@ namespace OCR_MS
                                         var boxValue = boxes[boxIndex].ToString().Split(',').Select(x => int.Parse(x)).ToArray();
                                         var boxLeft = boxValue[0];
                                         var boxWidth = boxValue[2];
-                                        var spaceWidth = boxWidth / t.Length * 0.3;
+                                        var spaceWidth = boxWidth / t.Length * 0.33;
                                         if (boxIndex == 0)
                                             lastBoundingBoxRight = boxLeft + boxWidth;
                                         else
-                                            if (boxLeft - lastBoundingBoxRight > spaceWidth) prefix = " ";
+                                        {
+                                            var c = t.First();
+                                            if (char.IsPunctuation(c)) prefix = string.Empty;
+                                            else if (char.IsSymbol(c)) prefix = string.Empty;
+                                            else if (char.IsPunctuation(lastTail)) prefix = string.Empty;
+                                            else if (char.IsSymbol(lastTail)) prefix = string.Empty;
+                                            else if (char.IsWhiteSpace(lastTail)) prefix = string.Empty;
+                                            else if (boxLeft - lastBoundingBoxRight > Math.Max(lastSpaceWidth, spaceWidth)) prefix = " ";
+                                        }
                                         lastBoundingBoxRight = boxLeft + boxWidth;
+                                        lastTail = t.Last();
+                                        lastSpaceWidth = spaceWidth;
                                         boxIndex++;
                                     }
 
@@ -565,18 +577,22 @@ namespace OCR_MS
         #region OCR
         private async Task<string> Run_OCR(Bitmap src, string lang = "unk")
         {
-            edResult.Text = await MakeRequest_OCR(src, lang);
-            if (tsmiTextAutoSpeech.Checked) btnSpeech.PerformClick();
-            if (tsmiTranslateAuto.Checked) btnTranslate.PerformClick();
-            if (!string.IsNullOrEmpty(edResult.Text))
+            try
             {
-                tsmiShowWindow.PerformClick();
-                if (OCR_HISTORY)
+                edResult.Text = await MakeRequest_OCR(src, lang);
+                if (tsmiTextAutoSpeech.Checked) btnSpeech.PerformClick();
+                if (tsmiTranslateAuto.Checked) btnTranslate.PerformClick();
+                if (!string.IsNullOrEmpty(edResult.Text))
                 {
-                    if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
-                    ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
+                    tsmiShowWindow.PerformClick();
+                    if (OCR_HISTORY)
+                    {
+                        if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
+                        ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
+                    }
                 }
             }
+            catch { }
             return (edResult.Text);
         }
         #endregion
