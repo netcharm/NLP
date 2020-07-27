@@ -125,6 +125,23 @@ namespace SubTitles
 
         #endregion
 
+        private string GetValidFileName(string name)
+        {
+            string result = string.Empty;
+
+            List<char> cl = new List<char>();
+            var ci = Path.GetInvalidFileNameChars();
+            foreach (char c in name)
+            {
+                if (ci.Contains(c))
+                    cl.Add('_');
+                else
+                    cl.Add(c);
+            }
+
+            return (string.Join("", cl));
+        }
+
         private DataTemplate GetCellTemplate(string colname)
         {
             string xaml = @"<DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"" 
@@ -197,7 +214,7 @@ namespace SubTitles
         {
             if (ass == null) return;
             else if (string.IsNullOrEmpty(LastFilename) && !string.IsNullOrEmpty(ass.ScriptInfo.Title))
-                LastFilename = ass.ScriptInfo.Title;
+                LastFilename = GetValidFileName(ass.ScriptInfo.Title);
             else if (!string.IsNullOrEmpty(LastFilename) && string.IsNullOrEmpty(ass.ScriptInfo.Title))
                 ass.ScriptInfo.Title = LastFilename;
 
@@ -206,7 +223,7 @@ namespace SubTitles
                 dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
             dlgSave.DefaultExt = ".ass";
             dlgSave.FileName = Path.GetFileNameWithoutExtension(LastFilename);
-            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
+            dlgSave.Filter = "SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt|ASS File|*.ass";
             dlgSave.FilterIndex = 0;
             if (dlgSave.ShowDialog() == true)
             {
@@ -409,6 +426,7 @@ namespace SubTitles
                 cmiLangEng.IsChecked = false;
                 cmiLangChs.IsChecked = true;
             }
+            ass.ChangeStyle();
         }
     }
 }

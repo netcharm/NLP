@@ -774,7 +774,7 @@ namespace SubTitles
         {
             var srt = new SrtCollection();
             await srt.Load(contents);
-            var lines = srt.ToAss(title);
+            var lines = srt.ToAss(title, YoutubeLanguage);
             Load(lines.ToArray());
         }
 
@@ -790,32 +790,32 @@ namespace SubTitles
             if (contents is string[])
             {
                 List<string> lines = new List<string>();
-                lines.Add($"[Script Info]\n");
-                lines.Add($"Title: {title}\n");
-                lines.Add($"\n");
-                lines.Add($"[V4+ Styles]\n");
-                lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n");
+                lines.Add($"[Script Info]");
+                lines.Add($"Title: {title}");
+                lines.Add($"");
+                lines.Add($"[V4+ Styles]");
+                lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
                 if (YoutubeLanguage.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    lines.Add($"{AssStyle.CHS_Default}\n");
-                    lines.Add($"{AssStyle.CHS_Note}\n");
-                    lines.Add($"{AssStyle.CHS_Title}\n");
+                    lines.Add($"{AssStyle.CHS_Default}");
+                    lines.Add($"{AssStyle.CHS_Note}");
+                    lines.Add($"{AssStyle.CHS_Title}");
                 }
                 else if (YoutubeLanguage.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    lines.Add($"{AssStyle.CHS_Default}\n");
-                    lines.Add($"{AssStyle.CHS_Note}\n");
-                    lines.Add($"{AssStyle.CHS_Title}\n");
+                    lines.Add($"{AssStyle.CHT_Default}");
+                    lines.Add($"{AssStyle.CHT_Note}");
+                    lines.Add($"{AssStyle.CHT_Title}");
                 }
                 else
                 {
-                    lines.Add($"{AssStyle.ENG_Default}\n");
-                    lines.Add($"{AssStyle.ENG_Note}\n");
-                    lines.Add($"{AssStyle.ENG_Title}\n");
+                    lines.Add($"{AssStyle.ENG_Default}");
+                    lines.Add($"{AssStyle.ENG_Note}");
+                    lines.Add($"{AssStyle.ENG_Title}");
                 }
-                lines.Add($"\n");
-                lines.Add($"[Events]\n");
-                lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text\n");
+                lines.Add($"");
+                lines.Add($"[Events]");
+                lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
 
                 var c = contents.Length;
                 int th = 0, tm = 0, ts = 0;
@@ -845,7 +845,7 @@ namespace SubTitles
 
                         curr_time = new DateTime(1, 1, 1, th, tm, ts);
                         curr_text = contents[i + 1].Replace("\n", "");
-
+                        
                         lines.Add($"Dialogue: 0,{last_time.ToString("HH:mm:ss.ff")},{curr_time.ToString("HH:mm:ss.ff")},Default,NTP,0000,0000,0000,,{last_text}");
                         //lines.Add(new YouTubeSubtitleItem() { last_time = last_time, curr_time = curr_time, last_text = last_text });
                     }
@@ -1008,6 +1008,39 @@ namespace SubTitles
             File.WriteAllText(Path.ChangeExtension(ass_file, ext), sb.ToString(), new UTF8Encoding(true));
         }
 
+        public void ChangeStyle()
+        {
+            if (StylesRaw.Count <= 2) return;
+            try
+            {
+                for (int i = StylesRaw.Count - 1; i > 1; i--)
+                {
+                    StylesRaw.RemoveAt(i);
+                }
+
+                if (YoutubeLanguage.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StylesRaw.Add($"{AssStyle.CHS_Default}");
+                    StylesRaw.Add($"{AssStyle.CHS_Note}");
+                    StylesRaw.Add($"{AssStyle.CHS_Title}");
+                }
+                else if (YoutubeLanguage.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StylesRaw.Add($"{AssStyle.CHT_Default}");
+                    StylesRaw.Add($"{AssStyle.CHT_Note}");
+                    StylesRaw.Add($"{AssStyle.CHT_Title}");
+                }
+                else
+                {
+                    StylesRaw.Add($"{AssStyle.ENG_Default}");
+                    StylesRaw.Add($"{AssStyle.ENG_Note}");
+                    StylesRaw.Add($"{AssStyle.ENG_Title}");
+                }
+
+                StylesRaw.Add("");
+            }
+            catch (Exception) { }
+        }
     }
 }
 
