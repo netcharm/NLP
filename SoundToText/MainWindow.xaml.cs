@@ -268,7 +268,7 @@ namespace SoundToText
             t2s = new SpeechTTS()
             {
                 AutoChangeSpeechSpeed = false,
-                IsSpeakCompleted = new Action(() => {
+                SpeakCompleted = new Action<System.Speech.Synthesis.SpeakCompletedEventArgs>((evt) => {
                     if (Application.Current.Dispatcher.CheckAccess())
                     {
                         SetTtsButtonState(MediaButtonState.Completed);

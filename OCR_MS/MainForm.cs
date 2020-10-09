@@ -490,8 +490,16 @@ namespace OCR_MS
                 {
                     try
                     {
-                        Speech.AutoChangeSpeechSpeed = Convert.ToBoolean(autospeech);
-                        tsmiTextAutoSpeech.Checked = Speech.AutoChangeSpeechSpeed;
+                        tsmiTextAutoSpeech.Checked = autospeech.Value<bool>();
+                    }
+                    catch (Exception) { }
+                }
+                JToken altmixedculture = token.SelectToken("$..speech.alt_play_mixed_culture", false);
+                if (altmixedculture != null)
+                {
+                    try
+                    {
+                        Speech.AltPlayMixedCulture = altmixedculture.Value<bool>();
                     }
                     catch (Exception) { }
                 }
@@ -556,7 +564,8 @@ namespace OCR_MS
                 },
                 {"speech",  new Dictionary<string, object>()
                     {
-                        {"auto_speech", tsmiTextAutoSpeech.Checked }
+                        {"auto_speech", tsmiTextAutoSpeech.Checked },
+                        {"alt_play_mixed_culture", Speech.AltPlayMixedCulture },
                     }
                 },
                 {"result", new Dictionary<string, string>()
@@ -629,16 +638,16 @@ namespace OCR_MS
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
             #region Speech Synthesis Events Action
-            Speech.IsSpeakStarted = new Action(() => {
+            Speech.SpeakStarted = new Action<SpeakStartedEventArgs>((evt) => {
                 tsmiTextPlay.Checked = true;
                 tsmiTextPause.Checked = false;
                 tsmiTextStop.Checked = false;
             });
 
-            Speech.IsSpeakProgress = new Action(() => {
+            Speech.SpeakProgress = new Action<SpeakProgressEventArgs>((evt) => {
             });
 
-            Speech.IsStateChanged = new Action(() => {
+            Speech.StateChanged = new Action<StateChangedEventArgs>((evt) => {
                 if (Speech.State == SynthesizerState.Paused)
                 {
                     tsmiTextPlay.Checked = true;
@@ -659,7 +668,7 @@ namespace OCR_MS
                 }
             });
 
-            Speech.IsSpeakCompleted = new Action(() => {
+            Speech.SpeakCompleted = new Action<SpeakCompletedEventArgs>((evt) => {
                 tsmiTextPlay.Checked = false;
                 tsmiTextPause.Checked = false;
                 tsmiTextStop.Checked = true;

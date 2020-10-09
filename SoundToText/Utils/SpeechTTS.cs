@@ -13,85 +13,7 @@ namespace SoundToText
 {
     public class SpeechTTS
     {
-        #region Speech Synthesis routines
-        public static List<InstalledVoice> InstalledVoices { get; private set; } = null;
-
-        public bool AutoChangeSpeechSpeed { get; set; } = true;
-
-        public SynthesizerState State { get { return (synth is SpeechSynthesizer ? synth.State : SynthesizerState.Ready); } }
-
-        public Action IsStateChanged { get; set; } = null;
-        public Action IsSpeakStarted { get; set; } = null;
-        public Action IsSpeakProgress { get; set; } = null;
-        public Action IsSpeakCompleted { get; set; } = null;
-
-        private static Dictionary<CultureInfo, List<string>> nametable = new Dictionary<CultureInfo, List<string>>() {
-            { CultureInfo.GetCultureInfo("zh-CN"), new List<string>() { "huihui", "yaoyao", "lili", "kangkang" } },
-            { CultureInfo.GetCultureInfo("zh-TW"), new List<string>() { "hanhan", "yating", "zhiwei" } },
-            { CultureInfo.GetCultureInfo("ja-JP"), new List<string>() { "haruka", "ayumi", "sayaka", "ichiro" } },
-            { CultureInfo.GetCultureInfo("ko-KR"), new List<string>() { "heami" } },
-            { CultureInfo.GetCultureInfo("en-US"), new List<string>() { "david", "zira", "mark", "eva" } }
-        };
-
-        private SpeechSynthesizer synth = null;
-        private string voice_default = string.Empty;
-        //private bool SPEECH_AUTO = false;
-        private bool SPEECH_SLOW = false;
-        private string SPEECH_TEXT = string.Empty;
-        private CultureInfo SPEECH_CULTURE = null;
-
-        public static Dictionary<string, string> GetNames()
-        {
-            var result = nametable.Select(n => new KeyValuePair<string, string>(n.Key.IetfLanguageTag, string.Join(", ", n.Value)));
-            return (result.ToDictionary(kv => kv.Key, kv => kv.Value));
-        }
-
-        public static Dictionary<CultureInfo, List<string>> SetNames(Dictionary<string, string> names)
-        {
-            var result = names.Select(n => new KeyValuePair<CultureInfo, List<string>>(CultureInfo.GetCultureInfo(n.Key.Trim()), n.Value.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToList()));
-            return (result.ToDictionary(kv => kv.Key, kv => kv.Value));
-        }
-
-        public static void SetCustomNames(Dictionary<string, string> names)
-        {
-            nametable = SetNames(names);
-        }
-
-        private async void Synth_StateChanged(object sender, StateChangedEventArgs e)
-        {
-            if (synth == null) return;
-
-            if (synth.State == SynthesizerState.Paused)
-            {
-
-            }
-            else if (synth.State == SynthesizerState.Speaking)
-            {
-
-            }
-            else if (synth.State == SynthesizerState.Ready)
-            {
-
-            }
-            if (IsStateChanged is Action) await Dispatcher.CurrentDispatcher.InvokeAsync(IsStateChanged, DispatcherPriority.Background);
-        }
-
-        private async void Synth_SpeakStarted(object sender, SpeakStartedEventArgs e)
-        {
-            if (IsSpeakStarted is Action) await Dispatcher.CurrentDispatcher.InvokeAsync(IsSpeakStarted, DispatcherPriority.Background);
-        }
-
-        private async void Synth_SpeakProgress(object sender, SpeakProgressEventArgs e)
-        {
-            if (IsSpeakProgress is Action) await Dispatcher.CurrentDispatcher.InvokeAsync(IsSpeakProgress, DispatcherPriority.Background);
-        }
-
-        private async void Synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
-        {
-            if (IsSpeakCompleted is Action) await Dispatcher.CurrentDispatcher.InvokeAsync(IsSpeakCompleted, DispatcherPriority.Background);
-        }
-        #endregion
-
+        #region Culture routines
         public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
 
         public bool ChineseSimplifiedPrefer { get; set; } = true;
@@ -315,7 +237,9 @@ namespace SoundToText
             else if (result.Count == 0) result.Add(new KeyValuePair<string, CultureInfo>(text, lastCulture));
             return (result);
         }
+        #endregion
 
+        #region Voice routines
         private InstalledVoice GetVoice(CultureInfo culture)
         {
             InstalledVoice result = null;
@@ -400,7 +324,118 @@ namespace SoundToText
             }
             return (result);
         }
+        #endregion
 
+        #region Speech Synthesis routines
+        public static List<InstalledVoice> InstalledVoices { get; private set; } = null;
+        private Queue<KeyValuePair<string, CultureInfo>> PlayQueue = new Queue<KeyValuePair<string, CultureInfo>>();
+
+        public bool AutoChangeSpeechSpeed { get; set; } = true;
+        public bool AltPlayMixedCulture { get; set; } = false;
+
+        public SynthesizerState State { get { return (synth is SpeechSynthesizer ? synth.State : SynthesizerState.Ready); } }
+
+        public Action<StateChangedEventArgs> StateChanged { get; set; } = null;
+        public Action<SpeakStartedEventArgs> SpeakStarted { get; set; } = null;
+        public Action<SpeakProgressEventArgs> SpeakProgress { get; set; } = null;
+        public Action<SpeakCompletedEventArgs> SpeakCompleted { get; set; } = null;
+
+        private static Dictionary<CultureInfo, List<string>> nametable = new Dictionary<CultureInfo, List<string>>() {
+            { CultureInfo.GetCultureInfo("zh-CN"), new List<string>() { "huihui", "yaoyao", "lili", "kangkang" } },
+            { CultureInfo.GetCultureInfo("zh-TW"), new List<string>() { "hanhan", "yating", "zhiwei" } },
+            { CultureInfo.GetCultureInfo("ja-JP"), new List<string>() { "haruka", "ayumi", "sayaka", "ichiro" } },
+            { CultureInfo.GetCultureInfo("ko-KR"), new List<string>() { "heami" } },
+            { CultureInfo.GetCultureInfo("en-US"), new List<string>() { "david", "zira", "mark", "eva" } }
+        };
+
+        private SpeechSynthesizer synth = null;
+        private string voice_default = string.Empty;
+        //private bool SPEECH_AUTO = false;
+        private bool SPEECH_SLOW = false;
+        private string SPEECH_TEXT = string.Empty;
+        private CultureInfo SPEECH_CULTURE = null;
+
+        public static Dictionary<string, string> GetNames()
+        {
+            var result = nametable.Select(n => new KeyValuePair<string, string>(n.Key.IetfLanguageTag, string.Join(", ", n.Value)));
+            return (result.ToDictionary(kv => kv.Key, kv => kv.Value));
+        }
+
+        public static Dictionary<CultureInfo, List<string>> SetNames(Dictionary<string, string> names)
+        {
+            var result = names.Select(n => new KeyValuePair<CultureInfo, List<string>>(CultureInfo.GetCultureInfo(n.Key.Trim()), n.Value.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToList()));
+            return (result.ToDictionary(kv => kv.Key, kv => kv.Value));
+        }
+
+        public static void SetCustomNames(Dictionary<string, string> names)
+        {
+            nametable = SetNames(names);
+        }
+
+        private async void Synth_StateChanged(object sender, StateChangedEventArgs e)
+        {
+            if (synth == null) return;
+
+            if (synth.State == SynthesizerState.Paused)
+            {
+
+            }
+            else if (synth.State == SynthesizerState.Speaking)
+            {
+
+            }
+            else if (synth.State == SynthesizerState.Ready)
+            {
+
+            }
+            if (StateChanged is Action<StateChangedEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
+            {
+                StateChanged(e);
+            }, DispatcherPriority.Background);
+        }
+
+        private async void Synth_SpeakStarted(object sender, SpeakStartedEventArgs e)
+        {
+            if (synth == null) return;
+
+            if (SpeakStarted is Action<SpeakStartedEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
+            {
+                SpeakStarted(e);
+            }, DispatcherPriority.Background);
+        }
+
+        private async void Synth_SpeakProgress(object sender, SpeakProgressEventArgs e)
+        {
+            if (synth == null) return;
+
+            if (e.Cancelled) PlayQueue.Clear();
+            if (SpeakProgress is Action<SpeakProgressEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
+            {
+                SpeakProgress(e);
+            }, DispatcherPriority.Background);
+        }
+
+        private async void Synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
+        {
+            if (synth == null) return;
+
+            if (e.Cancelled) PlayQueue.Clear();
+            if (PlayQueue.Count > 0)
+            {
+                var first = PlayQueue.Dequeue();
+                Play(first.Key, first.Value);
+            }
+            else
+            {
+                if (SpeakCompleted is Action<SpeakCompletedEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
+                {
+                    SpeakCompleted(e);
+                }, DispatcherPriority.Background);
+            }
+        }
+        #endregion
+
+        #region Play contents routines
         public void Play(string text, CultureInfo locale = null, bool async = true)
         {
             if (!(synth is SpeechSynthesizer)) return;
@@ -416,19 +451,19 @@ namespace SoundToText
 
             try
             {
+                //Stop();
                 synth.SpeakAsyncCancelAll();
-                synth.Resume();
-
-                synth.SelectVoice(voice_default);
+                //synth.Resume();
 
                 if (!(locale is CultureInfo)) locale = DetectCulture(text);
 
                 var voice = GetCustomVoiceName(locale);
-                if (!string.IsNullOrEmpty(voice)) synth.SelectVoice(voice);
+                if (string.IsNullOrEmpty(voice)) synth.SelectVoice(voice_default);
+                else synth.SelectVoice(voice);
 
                 //synth.Volume = 100;  // 0...100
                 //synth.Rate = 0;     // -10...10
-                if (AutoChangeSpeechSpeed)
+                if (AutoChangeSpeechSpeed && !AltPlayMixedCulture)
                 {
                     if (text.Equals(SPEECH_TEXT, StringComparison.CurrentCultureIgnoreCase) &&
                         SPEECH_CULTURE.IetfLanguageTag.Equals(locale.IetfLanguageTag, StringComparison.CurrentCultureIgnoreCase))
@@ -440,16 +475,16 @@ namespace SoundToText
                     else synth.Rate = 0;
                 }
 
-                synth.SpeakAsyncCancelAll();
-                synth.Resume();
-
                 if (async)
-                    synth.SpeakAsync(text);  // Asynchronous
+                    lastPrompt = synth.SpeakAsync(text);  // Asynchronous
                 else
                     synth.Speak(text);       // Synchronous
 
-                SPEECH_TEXT = text;
-                SPEECH_CULTURE = locale;
+                if (!AltPlayMixedCulture)
+                {
+                    SPEECH_TEXT = text;
+                    SPEECH_CULTURE = locale;
+                }
             }
 #if DEBUG
             catch (Exception ex)
@@ -466,6 +501,7 @@ namespace SoundToText
             Play(text, FindCultureByName(locale), async);
         }
 
+        private Prompt lastPrompt = null;
         public void Play(PromptBuilder prompt, CultureInfo locale = null, bool async = true)
         {
             if (!(synth is SpeechSynthesizer)) return;
@@ -483,15 +519,13 @@ namespace SoundToText
 
             try
             {
-                synth.SpeakAsyncCancelAll();
-                synth.Resume();
-
-                synth.SelectVoice(voice_default);
+                Stop();
 
                 if (!(locale is CultureInfo)) locale = prompt.Culture;
 
                 var voice = GetCustomVoiceName(locale);
-                if (!string.IsNullOrEmpty(voice)) synth.SelectVoice(voice);
+                if (string.IsNullOrEmpty(voice)) synth.SelectVoice(voice_default);
+                else synth.SelectVoice(voice);
 
                 //synth.Volume = 100;  // 0...100
                 //synth.Rate = 0;     // -10...10
@@ -508,11 +542,8 @@ namespace SoundToText
                     else synth.Rate = 0;
                 }
 
-                synth.SpeakAsyncCancelAll();
-                synth.Resume();
-
                 if (async)
-                    synth.SpeakAsync(prompt);  // Asynchronous
+                    lastPrompt = synth.SpeakAsync(prompt);  // Asynchronous
                 else
                     synth.Speak(prompt);       // Synchronous
 
@@ -536,26 +567,63 @@ namespace SoundToText
 
         public void Play(IEnumerable<string> contents, CultureInfo locale = null)
         {
-            var prompt = new PromptBuilder();
-            prompt.ClearContent();
-            foreach (var text in contents)
+            if (AltPlayMixedCulture)
             {
-                var sentences = SliceByCulture(text, locale);
-                var culture = locale == null ? sentences.FirstOrDefault().Value : locale;
-                prompt.StartParagraph(culture);
-                foreach (var kv in sentences)
+                if (contents is IEnumerable<string>)
                 {
-                    var new_text = kv.Key;
-                    var new_culture = kv.Value;
-                    prompt.StartSentence(new_culture);
-                    prompt.StartVoice(GetCustomVoiceName(new_culture));
-                    prompt.AppendText(new_text);
-                    prompt.EndVoice();
-                    prompt.EndSentence();
+                    PlayQueue.Clear();
+                    if (AutoChangeSpeechSpeed)
+                    {
+                        var speech_text = string.Join(Environment.NewLine, contents);
+                        if (SPEECH_TEXT.Equals(speech_text))
+                            SPEECH_SLOW = !SPEECH_SLOW;
+                        else
+                            SPEECH_SLOW = false;
+
+                        if (SPEECH_SLOW) synth.Rate = -5;
+                        else synth.Rate = 0;
+
+                        SPEECH_TEXT = speech_text;
+                    }
+                    foreach (var text in contents)
+                    {
+                        var sentences = SliceByCulture(text, locale);
+                        foreach (var s in sentences)
+                            PlayQueue.Enqueue(s);
+                    }
+                    if (PlayQueue.Count > 0)
+                    {
+                        Stop();
+                        var first = PlayQueue.Dequeue();
+                        Play(first.Key, first.Value);
+                    }
                 }
-                prompt.EndParagraph();
             }
-            Play(prompt, locale);
+            else
+            {
+                PlayQueue.Clear();
+                var prompt = new PromptBuilder();
+                prompt.ClearContent();
+                foreach (var text in contents)
+                {
+                    var sentences = SliceByCulture(text, locale);
+                    var culture = locale == null ? sentences.FirstOrDefault().Value : locale;
+                    prompt.StartParagraph(culture);
+                    foreach (var kv in sentences)
+                    {
+                        var new_text = kv.Key;
+                        var new_culture = kv.Value;
+                        //prompt.StartSentence(new_culture);
+                        prompt.StartVoice(GetCustomVoiceName(new_culture));
+                        prompt.AppendText(new_text);
+                        prompt.EndVoice();
+                        //prompt.EndSentence();
+                        //prompt.AppendBreak();
+                    }
+                    prompt.EndParagraph();
+                }
+                Play(prompt, locale);
+            }
         }
 
         public void Play(IEnumerable<string> contents, string locale)
@@ -587,19 +655,30 @@ namespace SoundToText
             catch (Exception) { }
         }
 
-        public void Stop()
+        public async void Stop()
         {
             try
             {
                 if (synth is SpeechSynthesizer)
                 {
-                    synth.SpeakAsyncCancelAll();
-                    synth.Resume();
+                    if (synth.State != SynthesizerState.Ready)
+                    {
+                        if (lastPrompt is Prompt)
+                        {
+                            synth.SpeakAsyncCancel(lastPrompt);
+                            await Task.Delay(10);
+                        }
+                        synth.SpeakAsyncCancelAll();
+                        await Task.Delay(10);
+                        synth.Resume();
+                    }
                 }
             }
             catch (Exception) { }
         }
+        #endregion
 
+        #region Constructor & Finalizers/Destructors
         public SpeechTTS()
         {
             try
@@ -630,39 +709,49 @@ namespace SoundToText
             }
             catch (Exception) { }
         }
+        #endregion
     }
 
     public static class Speech
     {
-        public static Action IsStateChanged
+        #region Speech Synthesizer events actions
+        public static Action<StateChangedEventArgs> StateChanged
         {
-            get { return (t2s is SpeechTTS ? t2s.IsStateChanged : null); }
-            set { if (t2s is SpeechTTS) t2s.IsStateChanged = value; }
+            get { return (t2s is SpeechTTS ? t2s.StateChanged : null); }
+            set { if (t2s is SpeechTTS) t2s.StateChanged = value; }
         }
-        public static Action IsSpeakStarted
+        public static Action<SpeakStartedEventArgs> SpeakStarted
         {
-            get { return (t2s is SpeechTTS ? t2s.IsSpeakStarted : null); }
-            set { if (t2s is SpeechTTS) t2s.IsSpeakStarted = value; }
+            get { return (t2s is SpeechTTS ? t2s.SpeakStarted : null); }
+            set { if (t2s is SpeechTTS) t2s.SpeakStarted = value; }
         }
-        public static Action IsSpeakProgress
+        public static Action<SpeakProgressEventArgs> SpeakProgress
         {
-            get { return (t2s is SpeechTTS ? t2s.IsSpeakProgress : null); }
-            set { if (t2s is SpeechTTS) t2s.IsSpeakProgress = value; }
+            get { return (t2s is SpeechTTS ? t2s.SpeakProgress : null); }
+            set { if (t2s is SpeechTTS) t2s.SpeakProgress = value; }
         }
-        public static Action IsSpeakCompleted
+        public static Action<SpeakCompletedEventArgs> SpeakCompleted
         {
-            get { return (t2s is SpeechTTS ? t2s.IsSpeakCompleted : null); }
-            set { if (t2s is SpeechTTS) t2s.IsSpeakCompleted = value; }
+            get { return (t2s is SpeechTTS ? t2s.SpeakCompleted : null); }
+            set { if (t2s is SpeechTTS) t2s.SpeakCompleted = value; }
         }
+        #endregion
 
+        #region Speech Synthesizer properties
         public static bool AutoChangeSpeechSpeed
         {
             get { return (t2s is SpeechTTS ? t2s.AutoChangeSpeechSpeed : true); }
             set { if (t2s is SpeechTTS) t2s.AutoChangeSpeechSpeed = value; }
         }
-
+        public static bool AltPlayMixedCulture
+        {
+            get { return (t2s is SpeechTTS ? t2s.AltPlayMixedCulture : true); }
+            set { if (t2s is SpeechTTS) t2s.AltPlayMixedCulture = value; }
+        }
         public static SynthesizerState State { get { return (t2s is SpeechTTS ? t2s.State : SynthesizerState.Ready); } }
+        #endregion
 
+        #region Init speech synthesizer instance
         private static SpeechTTS t2s = Init();
 
         private static SpeechTTS Init()
@@ -670,14 +759,16 @@ namespace SoundToText
             var tts = new SpeechTTS()
             {
                 AutoChangeSpeechSpeed = AutoChangeSpeechSpeed,
-                IsStateChanged = IsStateChanged,
-                IsSpeakStarted = IsSpeakStarted,
-                IsSpeakProgress = IsSpeakProgress,
-                IsSpeakCompleted = IsSpeakCompleted
+                StateChanged = StateChanged,
+                SpeakStarted = SpeakStarted,
+                SpeakProgress = SpeakProgress,
+                SpeakCompleted = SpeakCompleted
             };
             return (tts);
         }
+        #endregion
 
+        #region Synthesizer helper routines
         public static CultureInfo FindCultureByName(this string lang)
         {
             CultureInfo culture = null;
@@ -739,7 +830,7 @@ namespace SoundToText
                         culture = CultureInfo.GetCultureInfo("en-US");
                 }
 
-                if (culture.EnglishName.StartsWith("unk", StringComparison.CurrentCultureIgnoreCase))
+                if (culture is CultureInfo && culture.EnglishName.StartsWith("unk", StringComparison.CurrentCultureIgnoreCase))
                     culture = null;
             }
             catch (Exception) { culture = null; }
@@ -756,10 +847,10 @@ namespace SoundToText
             }
             if (t2s is SpeechTTS)
             {
-                if (t2s.IsStateChanged == null && IsStateChanged is Action) t2s.IsStateChanged = IsStateChanged;
-                if (t2s.IsSpeakStarted == null && IsSpeakStarted is Action) t2s.IsSpeakStarted = IsSpeakStarted;
-                if (t2s.IsSpeakProgress == null && IsSpeakProgress is Action) t2s.IsSpeakProgress = IsSpeakProgress;
-                if (t2s.IsSpeakCompleted == null && IsSpeakCompleted is Action) t2s.IsSpeakCompleted = IsSpeakCompleted;
+                if (t2s.StateChanged == null && StateChanged is Action<StateChangedEventArgs>) t2s.StateChanged = StateChanged;
+                if (t2s.SpeakStarted == null && SpeakStarted is Action<SpeakStartedEventArgs>) t2s.SpeakStarted = SpeakStarted;
+                if (t2s.SpeakProgress == null && SpeakProgress is Action<SpeakProgressEventArgs>) t2s.SpeakProgress = SpeakProgress;
+                if (t2s.SpeakCompleted == null && SpeakCompleted is Action<SpeakCompletedEventArgs>) t2s.SpeakCompleted = SpeakCompleted;
                 t2s.AutoChangeSpeechSpeed = AutoChangeSpeechSpeed;
 
                 if (culture == null)
@@ -794,21 +885,15 @@ namespace SoundToText
             }
             if (t2s is SpeechTTS)
             {
-                if (t2s.IsStateChanged == null && IsStateChanged is Action) t2s.IsStateChanged = IsStateChanged;
-                if (t2s.IsSpeakStarted == null && IsSpeakStarted is Action) t2s.IsSpeakStarted = IsSpeakStarted;
-                if (t2s.IsSpeakProgress == null && IsSpeakProgress is Action) t2s.IsSpeakProgress = IsSpeakProgress;
-                if (t2s.IsSpeakCompleted == null && IsSpeakCompleted is Action) t2s.IsSpeakCompleted = IsSpeakCompleted;
+                if (t2s.StateChanged == null && StateChanged is Action<StateChangedEventArgs>) t2s.StateChanged = StateChanged;
+                if (t2s.SpeakStarted == null && SpeakStarted is Action<SpeakStartedEventArgs>) t2s.SpeakStarted = SpeakStarted;
+                if (t2s.SpeakProgress == null && SpeakProgress is Action<SpeakProgressEventArgs>) t2s.SpeakProgress = SpeakProgress;
+                if (t2s.SpeakCompleted == null && SpeakCompleted is Action<SpeakCompletedEventArgs>) t2s.SpeakCompleted = SpeakCompleted;
                 t2s.AutoChangeSpeechSpeed = AutoChangeSpeechSpeed;
 
+                t2s.AltPlayMixedCulture = true;
                 if (culture == null)
-                {
-                    var tlist = texts.ToList();
-                    //if (tlist.Count() == 1)
-                    //    t2s.Play(tlist.FirstOrDefault(), culture, async);
-                    //else if (tlist.Count() > 1)
-                    //    t2s.Play(tlist, culture);
-                    t2s.Play(tlist, culture);
-                }
+                    t2s.Play(texts.ToList(), culture);
                 else
                     t2s.Play(string.Join(Environment.NewLine, texts), culture, async);
             }
@@ -839,5 +924,6 @@ namespace SoundToText
         {
             if (t2s is SpeechTTS) t2s.Stop();
         }
+        #endregion
     }
 }
