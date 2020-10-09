@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace SoundToText
+namespace OCR_MS
 {
     public class SpeechTTS
     {

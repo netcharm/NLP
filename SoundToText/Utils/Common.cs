@@ -67,9 +67,7 @@ namespace SoundToText
 #endif
         }
 
-        public static async 
-        Task
-InvokeAsync(this Action action)
+        public static async Task InvokeAsync(this Action action)
         {
             await Application.Current.Dispatcher.BeginInvoke(action);
         }

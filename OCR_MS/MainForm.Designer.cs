@@ -101,7 +101,6 @@
             this.cbLanguage.FormattingEnabled = true;
             this.cbLanguage.Name = "cbLanguage";
             this.hint.SetToolTip(this.cbLanguage, resources.GetString("cbLanguage.ToolTip"));
-            this.cbLanguage.SelectedIndexChanged += new System.EventHandler(this.cbLanguage_SelectedIndexChanged);
             // 
             // lblLanguage
             // 

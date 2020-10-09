@@ -267,7 +267,8 @@ namespace SoundToText
 
             t2s = new SpeechTTS()
             {
-                IsCompleted = new Action(() => {
+                AutoChangeSpeechSpeed = false,
+                IsSpeakCompleted = new Action(() => {
                     if (Application.Current.Dispatcher.CheckAccess())
                     {
                         SetTtsButtonState(MediaButtonState.Completed);
@@ -788,7 +789,8 @@ namespace SoundToText
             if(t2s is SpeechTTS)
             {
                 SetTtsButtonState(MediaButtonState.Running);
-                t2s.Play(edTitle.Text);
+                var text = edTitle.SelectedText.Length>0 ? edTitle.SelectedText : edTitle.Text;
+                t2s.Play(text.Split());
             }
         }
 

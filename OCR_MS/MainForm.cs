@@ -38,10 +38,6 @@ namespace OCR_MS
 
         private bool OCR_HISTORY = false;
 
-        private bool SPEECH_AUTO = false;
-        private bool SPEECH_SLOW = false;
-        private string SPEECH_TEXT = string.Empty;
-
         #region OCR with microsoft cognitive api
         private string APIKEYTITLE_CV = "Computer Vision API";
         internal Dictionary<string, string> ocr_languages = new Dictionary<string, string>() {
@@ -494,8 +490,8 @@ namespace OCR_MS
                 {
                     try
                     {
-                        SPEECH_AUTO = Convert.ToBoolean(autospeech);
-                        tsmiTextAutoSpeech.Checked = SPEECH_AUTO;
+                        Speech.AutoChangeSpeechSpeed = Convert.ToBoolean(autospeech);
+                        tsmiTextAutoSpeech.Checked = Speech.AutoChangeSpeechSpeed;
                     }
                     catch (Exception) { }
                 }
@@ -597,54 +593,6 @@ namespace OCR_MS
         }
         #endregion
 
-        #region Speech Synthesis routines
-        private SpeechSynthesizer synth = null;
-        private string voice_default = string.Empty;
-
-        private void Synth_StateChanged(object sender, System.Speech.Synthesis.StateChangedEventArgs e)
-        {
-            if (synth == null) return;
-
-            if (synth.State == SynthesizerState.Paused)
-            {
-                tsmiTextPlay.Checked = true;
-                tsmiTextPause.Checked = true;
-                tsmiTextStop.Checked = false;
-            }
-            else if (synth.State == SynthesizerState.Speaking)
-            {
-                tsmiTextPlay.Checked = true;
-                tsmiTextPause.Checked = false;
-                tsmiTextStop.Checked = false;
-            }
-            else if (synth.State == SynthesizerState.Ready)
-            {
-                tsmiTextPlay.Checked = false;
-                tsmiTextPause.Checked = false;
-                tsmiTextStop.Checked = true;
-            }
-        }
-
-        private void Synth_SpeakStarted(object sender, SpeakStartedEventArgs e)
-        {
-            tsmiTextPlay.Checked = true;
-            tsmiTextPause.Checked = false;
-            tsmiTextStop.Checked = false;
-        }
-
-        private void Synth_SpeakProgress(object sender, SpeakProgressEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
-
-        private void Synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
-        {
-            tsmiTextPlay.Checked = false;
-            tsmiTextPause.Checked = false;
-            tsmiTextStop.Checked = true;
-        }
-        #endregion
-
         private double font_size_default = 9;
         private void FontSizeChange(int action, int max = 48, int min = 9)
         {
@@ -680,13 +628,42 @@ namespace OCR_MS
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
-            #region Synthesis
-            synth = new SpeechSynthesizer();
-            voice_default = synth.Voice.Name;
-            synth.SpeakStarted += Synth_SpeakStarted;
-            synth.SpeakProgress += Synth_SpeakProgress;
-            synth.StateChanged += Synth_StateChanged;
-            synth.SpeakCompleted += Synth_SpeakCompleted;
+            #region Speech Synthesis Events Action
+            Speech.IsSpeakStarted = new Action(() => {
+                tsmiTextPlay.Checked = true;
+                tsmiTextPause.Checked = false;
+                tsmiTextStop.Checked = false;
+            });
+
+            Speech.IsSpeakProgress = new Action(() => {
+            });
+
+            Speech.IsStateChanged = new Action(() => {
+                if (Speech.State == SynthesizerState.Paused)
+                {
+                    tsmiTextPlay.Checked = true;
+                    tsmiTextPause.Checked = true;
+                    tsmiTextStop.Checked = false;
+                }
+                else if (Speech.State == SynthesizerState.Speaking)
+                {
+                    tsmiTextPlay.Checked = true;
+                    tsmiTextPause.Checked = false;
+                    tsmiTextStop.Checked = false;
+                }
+                else if (Speech.State == SynthesizerState.Ready)
+                {
+                    tsmiTextPlay.Checked = false;
+                    tsmiTextPause.Checked = false;
+                    tsmiTextStop.Checked = true;
+                }
+            });
+
+            Speech.IsSpeakCompleted = new Action(() => {
+                tsmiTextPlay.Checked = false;
+                tsmiTextPause.Checked = false;
+                tsmiTextStop.Checked = true;
+            });
             #endregion
 
             notify.Icon = Icon;
@@ -910,11 +887,6 @@ namespace OCR_MS
             }
         }
 
-        private void cbLanguage_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SPEECH_SLOW = true;
-        }
-
         private void edResult_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.OemMinus)
@@ -1020,96 +992,13 @@ namespace OCR_MS
 
             try
             {
-                string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
-
-                synth.SelectVoice(voice_default);
                 string lang = cbLanguage.SelectedValue.ToString();
-                if (lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    lang = Result_Lang;
-                    //
-                    // 中文：[\u4e00-\u9fcc, \u3400-\u4db5, \u20000-\u2a6d6, \u2a700-\u2b734, \u2b740-\u2b81d, \uf900-\ufad9, \u2f800-\u2fa1d]
-                    // 日文：[\u0800-\u4e00] [\u3041-\u31ff]
-                    // 韩文：[\uac00-\ud7ff]
-                    //
-                    //var m_jp = Regex.Matches(text, @"([\u0800-\u4e00])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-                    //var m_zh = Regex.Matches(text, @"([\u4e00-\u9fbb])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+                string culture = string.IsNullOrEmpty(lang) ? "unk" : lang;
 
-                    if (Regex.Matches(text, @"[\u3041-\u31ff]", RegexOptions.Multiline).Count > 0)
-                    {
-                        lang = "ja";
-                    }
-                    else if (Regex.Matches(text, @"[\uac00-\ud7ff]", RegexOptions.Multiline).Count > 0)
-                    {
-                        lang = "ko";
-                    }
-                    else if (Regex.Matches(text, @"[\u4e00-\u9fbb]", RegexOptions.Multiline).Count > 0)
-                    {
-                        lang = "zh";
-                    }
-                }
-
-                // Initialize a new instance of the SpeechSynthesizer.
-                foreach (InstalledVoice voice in synth.GetInstalledVoices())
-                {
-                    VoiceInfo info = voice.VoiceInfo;
-                    var vl = info.Culture.IetfLanguageTag;
-
-                    if (lang_cn.Contains(vl.ToLower()) &&
-                        lang.StartsWith("zh-hans", StringComparison.CurrentCultureIgnoreCase) &&
-                        voice.VoiceInfo.Name.ToLower().Contains("huihui"))
-                    {
-                        synth.SelectVoice(voice.VoiceInfo.Name);
-                        break;
-                    }
-                    else if (lang_tw.Contains(vl.ToLower()) &&
-                        lang.StartsWith("zh-hant", StringComparison.CurrentCultureIgnoreCase) &&
-                        voice.VoiceInfo.Name.ToLower().Contains("hanhan"))
-                    {
-                        synth.SelectVoice(voice.VoiceInfo.Name);
-                        break;
-                    }
-                    else if (lang_ja.Contains(vl.ToLower()) &&
-                        lang.StartsWith("ja", StringComparison.CurrentCultureIgnoreCase) &&
-                        voice.VoiceInfo.Name.ToLower().Contains("haruka"))
-                    {
-                        synth.SelectVoice(voice.VoiceInfo.Name);
-                        break;
-                    }
-                    else if (lang_ko.Contains(vl.ToLower()) &&
-                        lang.StartsWith("ko", StringComparison.CurrentCultureIgnoreCase) &&
-                        voice.VoiceInfo.Name.ToLower().Contains("heami"))
-                    {
-                        synth.SelectVoice(voice.VoiceInfo.Name);
-                        break;
-                    }
-                    else if (lang_en.Contains(vl.ToLower()) &&
-                        lang.StartsWith("en", StringComparison.CurrentCultureIgnoreCase) &&
-                        voice.VoiceInfo.Name.ToLower().Contains("zira"))
-                    {
-                        synth.SelectVoice(voice.VoiceInfo.Name);
-                        break;
-                    }
-                }
-
-                //synth.Volume = 100;  // 0...100
-                //synth.Rate = 0;     // -10...10
-                if (text.Equals(SPEECH_TEXT, StringComparison.CurrentCultureIgnoreCase))
-                    SPEECH_SLOW = !SPEECH_SLOW;
+                if (edResult.SelectionLength > 0)
+                    Speech.Play(new List<string>() { edResult.SelectedText }, culture);
                 else
-                    SPEECH_SLOW = false;
-
-                if (SPEECH_SLOW) synth.Rate = -5;
-                else synth.Rate = 0;
-
-
-                // Synchronous
-                //synth.Speak( text );
-                // Asynchronous
-                synth.SpeakAsyncCancelAll();
-                synth.Resume();
-                synth.SpeakAsync(text);
-                SPEECH_TEXT = text;
+                    Speech.Play(edResult.Lines, culture);
             }
             catch (Exception ex)
             {
@@ -1193,12 +1082,6 @@ namespace OCR_MS
 
         private void tsmiExit_Click(object sender, EventArgs e)
         {
-            if (synth != null)
-            {
-                synth.Resume();
-                synth.SpeakAsyncCancelAll();
-            }
-
             Application.Exit();
         }
 
@@ -1316,23 +1199,20 @@ namespace OCR_MS
 
         private void tsmiTextSpeech_Click(object sender, EventArgs e)
         {
-            if (synth == null) return;
-
             if (sender == tsmiTextPlay)
             {
                 btnSpeech.PerformClick();
             }
             else if (sender == tsmiTextPause)
             {
-                if (synth.State == SynthesizerState.Paused)
-                    synth.Resume();
-                else if (synth.State == SynthesizerState.Speaking)
-                    synth.Pause();
+                if (Speech.State == SynthesizerState.Paused)
+                    Speech.Resume();
+                else if (Speech.State == SynthesizerState.Speaking)
+                    Speech.Pause();
             }
             else if (sender == tsmiTextStop)
             {
-                synth.SpeakAsyncCancelAll();
-                synth.Resume();
+                Speech.Stop();
             }
         }
 
@@ -1410,7 +1290,7 @@ namespace OCR_MS
 
         private void tsmiTextAutoSpeech_CheckedChanged(object sender, EventArgs e)
         {
-            SPEECH_AUTO = tsmiTextAutoSpeech.Checked;
+            Speech.AutoChangeSpeechSpeed = tsmiTextAutoSpeech.Checked;
         }
 
     }
