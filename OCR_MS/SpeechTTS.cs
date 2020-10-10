@@ -333,6 +333,7 @@ namespace OCR_MS
 
         public bool AutoChangeSpeechSpeed { get; set; } = true;
         public bool AltPlayMixedCulture { get; set; } = false;
+        public bool SimpleCultureDetect { get; set; } = true;
 
         public SynthesizerState State { get { return (synth is SpeechSynthesizer ? synth.State : SynthesizerState.Ready); } }
 
@@ -409,7 +410,6 @@ namespace OCR_MS
         {
             if (synth == null) return;
 
-            if (e.Cancelled) PlayQueue.Clear();
             if (SpeakProgress is Action<SpeakProgressEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
             {
                 SpeakProgress(e);
@@ -420,8 +420,7 @@ namespace OCR_MS
         {
             if (synth == null) return;
 
-            if (e.Cancelled) PlayQueue.Clear();
-            if (PlayQueue.Count > 0)
+            if (!e.Cancelled && PlayQueue.Count > 0)
             {
                 var first = PlayQueue.Dequeue();
                 Play(first.Key, first.Value);
@@ -441,8 +440,7 @@ namespace OCR_MS
         {
             if (!(synth is SpeechSynthesizer)) return;
 
-            var voices = synth.GetInstalledVoices();
-            if (voices.Count <= 0) return;
+            if (synth.GetInstalledVoices().Count <= 0) return;
 
             if (synth.State == SynthesizerState.Paused)
             {
@@ -452,9 +450,7 @@ namespace OCR_MS
 
             try
             {
-                //Stop();
-                synth.SpeakAsyncCancelAll();
-                //synth.Resume();
+                Stop();
 
                 if (!(locale is CultureInfo)) locale = DetectCulture(text);
 
@@ -464,7 +460,7 @@ namespace OCR_MS
 
                 //synth.Volume = 100;  // 0...100
                 //synth.Rate = 0;     // -10...10
-                if (AutoChangeSpeechSpeed && !AltPlayMixedCulture)
+                if (AutoChangeSpeechSpeed && (SimpleCultureDetect || !AltPlayMixedCulture))
                 {
                     if (text.Equals(SPEECH_TEXT, StringComparison.CurrentCultureIgnoreCase) &&
                         SPEECH_CULTURE.IetfLanguageTag.Equals(locale.IetfLanguageTag, StringComparison.CurrentCultureIgnoreCase))
@@ -481,7 +477,7 @@ namespace OCR_MS
                 else
                     synth.Speak(text);       // Synchronous
 
-                if (!AltPlayMixedCulture)
+                if (AutoChangeSpeechSpeed && (SimpleCultureDetect || !AltPlayMixedCulture))
                 {
                     SPEECH_TEXT = text;
                     SPEECH_CULTURE = locale;
@@ -656,7 +652,7 @@ namespace OCR_MS
             catch (Exception) { }
         }
 
-        public async void Stop()
+        public void Stop()
         {
             try
             {
@@ -667,10 +663,10 @@ namespace OCR_MS
                         if (lastPrompt is Prompt)
                         {
                             synth.SpeakAsyncCancel(lastPrompt);
-                            await Task.Delay(10);
+                            Thread.Sleep(100);
                         }
                         synth.SpeakAsyncCancelAll();
-                        await Task.Delay(10);
+                        Thread.Sleep(100);
                         synth.Resume();
                     }
                 }
@@ -748,6 +744,11 @@ namespace OCR_MS
         {
             get { return (t2s is SpeechTTS ? t2s.AltPlayMixedCulture : true); }
             set { if (t2s is SpeechTTS) t2s.AltPlayMixedCulture = value; }
+        }
+        public static bool SimpleCultureDetect
+        {
+            get { return (t2s is SpeechTTS ? t2s.SimpleCultureDetect : true); }
+            set { if (t2s is SpeechTTS) t2s.SimpleCultureDetect = value; }
         }
         public static SynthesizerState State { get { return (t2s is SpeechTTS ? t2s.State : SynthesizerState.Ready); } }
         #endregion
@@ -856,11 +857,16 @@ namespace OCR_MS
 
                 if (culture == null)
                 {
-                    var tlist = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                    if (tlist.Count() == 1)
-                        t2s.Play(text, culture, async);
-                    else if (tlist.Count() > 1)
-                        t2s.Play(tlist, culture);
+                    if (SimpleCultureDetect)
+                        t2s.Play(text, "unk", async);
+                    else
+                    {
+                        var tlist = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                        if (tlist.Count() == 1)
+                            t2s.Play(text, culture, async);
+                        else if (tlist.Count() > 1)
+                            t2s.Play(tlist, culture);
+                    }
                 }
                 else
                     t2s.Play(text, culture, async);
@@ -894,7 +900,12 @@ namespace OCR_MS
 
                 t2s.AltPlayMixedCulture = true;
                 if (culture == null)
-                    t2s.Play(texts.ToList(), culture);
+                {
+                    if (SimpleCultureDetect)
+                        t2s.Play(string.Join(Environment.NewLine, texts), "unk", async);
+                    else
+                        t2s.Play(texts.ToList(), culture);
+                }
                 else
                     t2s.Play(string.Join(Environment.NewLine, texts), culture, async);
             }

@@ -503,6 +503,15 @@ namespace OCR_MS
                     }
                     catch (Exception) { }
                 }
+                JToken simpledetectculture = token.SelectToken("$..speech.simple_detect_culture", false);
+                if (simpledetectculture != null)
+                {
+                    try
+                    {
+                        Speech.AltPlayMixedCulture = simpledetectculture.Value<bool>();
+                    }
+                    catch (Exception) { }
+                }
                 #endregion
 
                 #region Result Editor Option
@@ -566,6 +575,7 @@ namespace OCR_MS
                     {
                         {"auto_speech", tsmiTextAutoSpeech.Checked },
                         {"alt_play_mixed_culture", Speech.AltPlayMixedCulture },
+                        {"simple_detect_culture", Speech.SimpleCultureDetect }
                     }
                 },
                 {"result", new Dictionary<string, string>()
@@ -993,14 +1003,11 @@ namespace OCR_MS
 
         private void btnSpeech_Click(object sender, EventArgs e)
         {
-            List<string> lang_cn = new List<string>() { "zh-hans", "zh-cn", "zh" };
-            List<string> lang_tw = new List<string>() { "zh-hant", "zh-tw" };
-            List<string> lang_ja = new List<string>() { "ja-jp", "ja", "jp" };
-            List<string> lang_ko = new List<string>() { "ko-kr", "ko", "korea" };
-            List<string> lang_en = new List<string>() { "en-us", "us", "en" };
-
             try
             {
+                if (ModifierKeys == Keys.Alt) Speech.SimpleCultureDetect = false;
+                else Speech.SimpleCultureDetect = true;
+
                 string lang = cbLanguage.SelectedValue.ToString();
                 string culture = string.IsNullOrEmpty(lang) ? "unk" : lang;
 
