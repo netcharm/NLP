@@ -756,14 +756,7 @@ namespace SoundToText
 
         private static SpeechTTS Init()
         {
-            var tts = new SpeechTTS()
-            {
-                AutoChangeSpeechSpeed = AutoChangeSpeechSpeed,
-                StateChanged = StateChanged,
-                SpeakStarted = SpeakStarted,
-                SpeakProgress = SpeakProgress,
-                SpeakCompleted = SpeakCompleted
-            };
+            var tts = new SpeechTTS();
             return (tts);
         }
         #endregion
