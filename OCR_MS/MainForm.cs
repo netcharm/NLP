@@ -643,6 +643,7 @@ namespace OCR_MS
             InitializeComponent();
         }
 
+        private int cursor_offset = -1;
         private void MainForm_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
@@ -652,9 +653,13 @@ namespace OCR_MS
                 tsmiTextPlay.Checked = true;
                 tsmiTextPause.Checked = false;
                 tsmiTextStop.Checked = false;
+                if (cursor_offset == -1) cursor_offset = edResult.SelectionLength > 0 ? edResult.SelectionStart : 0;
             });
 
             Speech.SpeakProgress = new Action<SpeakProgressEventArgs>((evt) => {
+                var ei = evt as SpeakProgressEventArgs;
+                edResult.SelectionStart = cursor_offset >= 0 ? ei.CharacterPosition + cursor_offset : ei.CharacterPosition;
+                edResult.SelectionLength = ei.CharacterCount;
             });
 
             Speech.StateChanged = new Action<StateChangedEventArgs>((evt) => {
@@ -682,6 +687,7 @@ namespace OCR_MS
                 tsmiTextPlay.Checked = false;
                 tsmiTextPause.Checked = false;
                 tsmiTextStop.Checked = true;
+                cursor_offset = -1;
             });
             #endregion
 
@@ -1005,8 +1011,14 @@ namespace OCR_MS
         {
             try
             {
-                if (ModifierKeys == Keys.Alt) Speech.SimpleCultureDetect = false;
-                else Speech.SimpleCultureDetect = true;
+                if (ModifierKeys.HasFlag(Keys.Control))
+                    Speech.SimpleCultureDetect = false;
+                else
+                    Speech.SimpleCultureDetect = true;
+                if (ModifierKeys.HasFlag(Keys.Alt))
+                    Speech.AltPlayMixedCulture = true;
+                else
+                    Speech.AltPlayMixedCulture = false;
 
                 string lang = cbLanguage.SelectedValue.ToString();
                 string culture = string.IsNullOrEmpty(lang) ? "unk" : lang;

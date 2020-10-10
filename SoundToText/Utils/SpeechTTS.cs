@@ -503,10 +503,8 @@ namespace SoundToText
         {
             if (!(synth is SpeechSynthesizer)) return;
 
+            if (synth.GetInstalledVoices().Count <= 0) return;
             if (!(prompt is PromptBuilder) || prompt.IsEmpty) return;
-
-            var voices = synth.GetInstalledVoices();
-            if (voices.Count <= 0) return;
 
             if (synth.State == SynthesizerState.Paused)
             {
@@ -849,12 +847,6 @@ namespace SoundToText
             }
             if (t2s is SpeechTTS)
             {
-                if (t2s.StateChanged == null && StateChanged is Action<StateChangedEventArgs>) t2s.StateChanged = StateChanged;
-                if (t2s.SpeakStarted == null && SpeakStarted is Action<SpeakStartedEventArgs>) t2s.SpeakStarted = SpeakStarted;
-                if (t2s.SpeakProgress == null && SpeakProgress is Action<SpeakProgressEventArgs>) t2s.SpeakProgress = SpeakProgress;
-                if (t2s.SpeakCompleted == null && SpeakCompleted is Action<SpeakCompletedEventArgs>) t2s.SpeakCompleted = SpeakCompleted;
-                t2s.AutoChangeSpeechSpeed = AutoChangeSpeechSpeed;
-
                 if (culture == null)
                 {
                     if (SimpleCultureDetect)
@@ -892,13 +884,6 @@ namespace SoundToText
             }
             if (t2s is SpeechTTS)
             {
-                if (t2s.StateChanged == null && StateChanged is Action<StateChangedEventArgs>) t2s.StateChanged = StateChanged;
-                if (t2s.SpeakStarted == null && SpeakStarted is Action<SpeakStartedEventArgs>) t2s.SpeakStarted = SpeakStarted;
-                if (t2s.SpeakProgress == null && SpeakProgress is Action<SpeakProgressEventArgs>) t2s.SpeakProgress = SpeakProgress;
-                if (t2s.SpeakCompleted == null && SpeakCompleted is Action<SpeakCompletedEventArgs>) t2s.SpeakCompleted = SpeakCompleted;
-                t2s.AutoChangeSpeechSpeed = AutoChangeSpeechSpeed;
-
-                t2s.AltPlayMixedCulture = true;
                 if (culture == null)
                 {
                     if (SimpleCultureDetect)
