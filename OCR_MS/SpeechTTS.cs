@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Speech.Synthesis;
@@ -167,12 +168,12 @@ namespace OCR_MS
                 //Console.WriteLine("Mainland-tw");
                 result = ChineseSimplifiedPrefer ? CultureInfo.GetCultureInfoByIetfLanguageTag("zh-TW") : CultureInfo.GetCultureInfoByIetfLanguageTag("zh-CN");
             }
-            else if (Regex.IsMatch(text, $@"^{pattern_emoji}?$", regex_opt))
+            else if (Regex.IsMatch(text, $@"^{pattern_emoji}$", regex_opt))
             {
                 //Console.WriteLine("Emoji");
                 result = CultureInfo.CurrentCulture;
             }
-            else if (Regex.IsMatch(text, $@"^{pattern_symbol}?$", regex_opt))
+            else if (Regex.IsMatch(text, $@"^{pattern_symbol}$", regex_opt))
             {
                 //Console.WriteLine("Symbol");
                 result = CultureInfo.CurrentCulture;
@@ -333,6 +334,7 @@ namespace OCR_MS
 
         public bool AutoChangeSpeechSpeed { get; set; } = true;
         public bool AltPlayMixedCulture { get; set; } = false;
+        public bool PlayMixedCultureInline { get; set; } = false;
         public bool SimpleCultureDetect { get; set; } = true;
 
         public SynthesizerState State { get { return (synth is SpeechSynthesizer ? synth.State : SynthesizerState.Ready); } }
@@ -438,6 +440,8 @@ namespace OCR_MS
         #region Play contents routines
         public void Play(string text, CultureInfo locale = null, bool async = true)
         {
+            if (string.IsNullOrEmpty(text.Trim())) return;
+
             if (!(synth is SpeechSynthesizer)) return;
 
             if (synth.GetInstalledVoices().Count <= 0) return;
@@ -486,7 +490,7 @@ namespace OCR_MS
 #if DEBUG
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
 #else
             catch (Exception) { }
@@ -548,7 +552,7 @@ namespace OCR_MS
 #if DEBUG
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
 #else
             catch (Exception) { }
@@ -582,15 +586,29 @@ namespace OCR_MS
                     }
                     foreach (var text in contents)
                     {
-                        var sentences = SliceByCulture(text, locale);
-                        foreach (var s in sentences)
-                            PlayQueue.Enqueue(s);
+                        if (string.IsNullOrEmpty(text)) continue;
+                        if (PlayMixedCultureInline)
+                        {
+                            var sentences = SliceByCulture(text, locale);
+                            foreach (var s in sentences)
+                                PlayQueue.Enqueue(s);
+                        }
+                        else
+                        {
+                            PlayQueue.Enqueue(new KeyValuePair<string, CultureInfo>(text, DetectCulture(text)));
+                        }
                     }
                     if (PlayQueue.Count > 0)
                     {
                         Stop();
                         var first = PlayQueue.Dequeue();
                         Play(first.Key, first.Value);
+                    }
+                    else
+                    {
+                        SPEECH_TEXT = string.Empty;
+                        SPEECH_SLOW = false;
+                        synth.Rate = 0;
                     }
                 }
             }
@@ -601,21 +619,32 @@ namespace OCR_MS
                 prompt.ClearContent();
                 foreach (var text in contents)
                 {
-                    var sentences = SliceByCulture(text, locale);
-                    var culture = locale == null ? sentences.FirstOrDefault().Value : locale;
-                    prompt.StartParagraph(culture);
-                    foreach (var kv in sentences)
+                    if (string.IsNullOrEmpty(text)) continue;
+                    if (PlayMixedCultureInline)
                     {
-                        var new_text = kv.Key;
-                        var new_culture = kv.Value;
-                        //prompt.StartSentence(new_culture);
-                        prompt.StartVoice(GetCustomVoiceName(new_culture));
-                        prompt.AppendText(new_text);
-                        prompt.EndVoice();
-                        //prompt.EndSentence();
-                        //prompt.AppendBreak();
+                        var sentences = SliceByCulture(text, locale);
+                        var culture = locale == null ? sentences.FirstOrDefault().Value : locale;
+                        prompt.StartParagraph(culture);
+                        foreach (var kv in sentences)
+                        {
+                            var new_text = kv.Key;
+                            var new_culture = kv.Value;
+                            if (string.IsNullOrEmpty(new_text)) continue;
+                            prompt.StartVoice(GetCustomVoiceName(new_culture));
+                            prompt.AppendText(new_text);
+                            prompt.EndVoice();
+                        }
+                        prompt.EndParagraph();
                     }
-                    prompt.EndParagraph();
+                    else
+                    {
+                        var culture = locale == null ? DetectCulture(text) : locale;
+                        prompt.StartParagraph(culture);
+                        prompt.StartVoice(GetCustomVoiceName(culture));
+                        prompt.AppendText(text);
+                        prompt.EndVoice();
+                        prompt.EndParagraph();
+                    }
                 }
                 Play(prompt, locale);
             }
@@ -747,6 +776,11 @@ namespace OCR_MS
         {
             get { return (t2s is SpeechTTS ? t2s.SimpleCultureDetect : true); }
             set { if (t2s is SpeechTTS) t2s.SimpleCultureDetect = value; }
+        }
+        public static bool PlayMixedCultureInline
+        {
+            get { return (t2s is SpeechTTS ? t2s.PlayMixedCultureInline : true); }
+            set { if (t2s is SpeechTTS) t2s.PlayMixedCultureInline = value; }
         }
         public static SynthesizerState State { get { return (t2s is SpeechTTS ? t2s.State : SynthesizerState.Ready); } }
 

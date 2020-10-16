@@ -272,6 +272,9 @@ namespace OCR_MS
         private int lastClipboardSN = 0;
         #endregion
 
+        private int lastSelectionStart = 0;
+        private int lastSelectionLength  = 0;
+
         protected override void WndProc(ref Message m)
         {
             if (m.Msg == WM_CHANGECBCHAIN)
@@ -649,20 +652,26 @@ namespace OCR_MS
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
             #region Speech Synthesis Events Action
-            Speech.SpeakStarted = new Action<SpeakStartedEventArgs>((evt) => {
+            Speech.SpeakStarted = new Action<SpeakStartedEventArgs>((evt) =>
+            {
+                edResult.ReadOnly = true;
+                lastSelectionStart = edResult.SelectionStart;
+                lastSelectionLength = edResult.SelectionLength;
                 tsmiTextPlay.Checked = true;
                 tsmiTextPause.Checked = false;
                 tsmiTextStop.Checked = false;
                 if (cursor_offset == -1) cursor_offset = edResult.SelectionLength > 0 ? edResult.SelectionStart : 0;
             });
 
-            Speech.SpeakProgress = new Action<SpeakProgressEventArgs>((evt) => {
+            Speech.SpeakProgress = new Action<SpeakProgressEventArgs>((evt) =>
+            {
                 var ei = evt as SpeakProgressEventArgs;
                 edResult.SelectionStart = cursor_offset >= 0 ? ei.CharacterPosition + cursor_offset : ei.CharacterPosition;
                 edResult.SelectionLength = ei.CharacterCount;
             });
 
-            Speech.StateChanged = new Action<StateChangedEventArgs>((evt) => {
+            Speech.StateChanged = new Action<StateChangedEventArgs>((evt) =>
+            {
                 if (Speech.State == SynthesizerState.Paused)
                 {
                     tsmiTextPlay.Checked = true;
@@ -683,11 +692,15 @@ namespace OCR_MS
                 }
             });
 
-            Speech.SpeakCompleted = new Action<SpeakCompletedEventArgs>((evt) => {
+            Speech.SpeakCompleted = new Action<SpeakCompletedEventArgs>((evt) =>
+            {
                 tsmiTextPlay.Checked = false;
                 tsmiTextPause.Checked = false;
                 tsmiTextStop.Checked = true;
                 cursor_offset = -1;
+                edResult.SelectionStart = lastSelectionStart;
+                edResult.SelectionLength = lastSelectionLength;
+                edResult.ReadOnly = false;
             });
             #endregion
 
@@ -1024,7 +1037,7 @@ namespace OCR_MS
                 string culture = string.IsNullOrEmpty(lang) ? "unk" : lang;
 
                 if (edResult.SelectionLength > 0)
-                    Speech.Play(new List<string>() { edResult.SelectedText }, culture);
+                    Speech.Play(edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" }, StringSplitOptions.RemoveEmptyEntries), culture);
                 else
                     Speech.Play(edResult.Lines, culture);
             }
