@@ -27,11 +27,13 @@ namespace OCR_MS
         private string AppName = Path.GetFileNameWithoutExtension(Application.ExecutablePath);
 
         private static Dictionary<string, string> ApiKey = new Dictionary<string, string>();
+        private static Dictionary<string, string> ApiEndpoint = new Dictionary<string, string>();
 
         private static string[] exts_img = new string[] { ".bmp", ".jpg", ".png", ".jpeg", ".tif", ".tiff", ".gif" };
         private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
 
         private bool CFGLOADED = false;
+        private bool ALWAYS_ON_TOP = false;
         private bool CLOSE_TO_TRAY = false;
         private bool CLIPBOARD_CLEAR = false;
         private bool CLIPBOARD_WATCH = true;
@@ -80,36 +82,46 @@ namespace OCR_MS
         {
             string result = "";
             string ApiKey_CV = ApiKey.ContainsKey( APIKEYTITLE_CV ) ? ApiKey[APIKEYTITLE_CV] : string.Empty;
+            string ApiEndpoint_CV = ApiEndpoint.ContainsKey( APIKEYTITLE_CV ) ? ApiEndpoint[APIKEYTITLE_CV] : string.Empty;
 
             if (string.IsNullOrEmpty(ApiKey_CV)) return (result);
 
-            var client = new HttpClient();
             var queryString = HttpUtility.ParseQueryString( string.Empty );
-
-            // Request headers
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiKey_CV);
-
             // Request parameters
             queryString["language"] = lang;
-            queryString["detectOrientation "] = "true";
-            var uri = "https://westus.api.cognitive.microsoft.com/vision/v1.0/ocr?" + queryString;
+            queryString["detectOrientation"] = "true";
+            var uri = $"{ApiEndpoint_CV}/vision/v3.1/ocr?" + queryString;
+            uri = uri.Replace("//vision", "/vision");
 
-            HttpResponseMessage response;
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             using (Stream png = new MemoryStream())
             {
                 src.Save(png, ImageFormat.Png);
                 byte[] buffer = ( (MemoryStream) png ).ToArray();
-                string buf = "data:image/png;base64," + Convert.ToBase64String( buffer );
+                //string buf = "data:image/png;base64," + Convert.ToBase64String( buffer );
 
                 string W_SEP = "";
 
                 // Request body
+                HttpClient client = new HttpClient();
+                // Request headers
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiKey_CV);
+                //client.DefaultRequestHeaders.Add("Accept", "*/*");
+                //client.DefaultRequestHeaders.Add("User-Agent", "curl/7.55.1");
+
                 using (var content = new ByteArrayContent(buffer))
                 {
+                    string ocr_result = string.Empty;
                     content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                    response = await client.PostAsync(uri, content);
-                    string ocr_result = await response.Content.ReadAsStringAsync();
+
+                    try
+                    {
+                        HttpResponseMessage response = await client.PostAsync(uri, content);
+                        ocr_result = await response.Content.ReadAsStringAsync();
+                    }
+                    catch (Exception ex) { result = ex.Message; Console.WriteLine(ex.Message + Environment.NewLine + ex.StackTrace); }
+                    if (string.IsNullOrEmpty(ocr_result)) return ($"ERROR:{result}");
 
                     JToken token = JToken.Parse( ocr_result );
                     Result_JSON = JsonConvert.SerializeObject(token, Formatting.Indented);
@@ -173,7 +185,6 @@ namespace OCR_MS
                                         lastSpaceWidth = spaceWidth;
                                         boxIndex++;
                                     }
-
                                     ocr_word.Add($"{prefix}{t}");
                                 }
                                 sb.AppendLine(string.Join(W_SEP, ocr_word));
@@ -330,9 +341,16 @@ namespace OCR_MS
                     {
                         var apikey = kv.SelectTokens("$..key", false).First().ToString();
                         var apiname = kv.SelectTokens("$..name", false).First().ToString();
+                        var tk_apiendpoint = kv.SelectTokens("$..endpoint", false).FirstOrDefault();
+                        var apiendpoint = tk_apiendpoint != null ? tk_apiendpoint.ToString() : "https://westus.api.cognitive.microsoft.com/";
+                        
                         if (apikey != null && apiname != null)
                         {
                             ApiKey[apiname] = apikey;
+                        }
+                        if (apiendpoint != null && apiname != null)
+                        {
+                            ApiEndpoint[apiname] = apiendpoint;
                         }
                     }
                 }
@@ -356,6 +374,13 @@ namespace OCR_MS
                             //throw;
                         }
                     }
+                }
+                JToken ontop = token.SelectToken("$..topmost", false);
+                if (ontop != null)
+                {
+                    bool.TryParse(ontop.ToString(), out ALWAYS_ON_TOP);
+                    tsmiTopMost.Checked = ALWAYS_ON_TOP;
+                    this.TopMost = ALWAYS_ON_TOP;
                 }
                 #endregion
 
@@ -549,6 +574,7 @@ namespace OCR_MS
                         { "watch", CLIPBOARD_WATCH }
                     }
                 },
+                { "topmost", ALWAYS_ON_TOP },
                 { "close_to_tray", CLOSE_TO_TRAY },
                 { "opacity", this.Opacity },
                 { "pos", new Dictionary<string, int>()
@@ -610,7 +636,7 @@ namespace OCR_MS
                     }
                 }
             }
-            catch { }
+            catch(Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
             return (edResult.Text);
         }
         #endregion
@@ -1141,6 +1167,7 @@ namespace OCR_MS
         private void tsmiTopMost_Click(object sender, EventArgs e)
         {
             this.TopMost = tsmiTopMost.Checked;
+            ALWAYS_ON_TOP = tsmiTopMost.Checked;
         }
 
         private void tsmiShowLastOCRResultJSON_Click(object sender, EventArgs e)
