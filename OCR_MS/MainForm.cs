@@ -82,7 +82,8 @@ namespace OCR_MS
         {
             string result = "";
             string ApiKey_CV = ApiKey.ContainsKey( APIKEYTITLE_CV ) ? ApiKey[APIKEYTITLE_CV] : string.Empty;
-            string ApiEndpoint_CV = ApiEndpoint.ContainsKey( APIKEYTITLE_CV ) ? ApiEndpoint[APIKEYTITLE_CV] : string.Empty;
+            string ApiEndpoint_CV = ApiEndpoint.ContainsKey(APIKEYTITLE_CV) ? ApiEndpoint[APIKEYTITLE_CV] : "https://westus.api.cognitive.microsoft.com/";
+            if (!ApiEndpoint.ContainsKey(APIKEYTITLE_CV)) ApiEndpoint[APIKEYTITLE_CV] = ApiEndpoint_CV;
 
             if (string.IsNullOrEmpty(ApiKey_CV)) return (result);
 
@@ -207,6 +208,8 @@ namespace OCR_MS
             string result = "";
             string ApiKey_TT = ApiKey.ContainsKey( APIKEYTITLE_TT ) ? ApiKey[APIKEYTITLE_TT] : string.Empty;
             if (string.IsNullOrEmpty(ApiKey_TT)) return (result);
+            var ApiEndpoint_TT = ApiEndpoint.ContainsKey(APIKEYTITLE_TT) ? ApiEndpoint[ApiKey_TT] : "https://api.cognitive.microsofttranslator.com/";
+            if (!ApiEndpoint.ContainsKey(APIKEYTITLE_TT)) ApiEndpoint[APIKEYTITLE_TT] = ApiEndpoint_TT;
 
             var queryString = HttpUtility.ParseQueryString( string.Empty );
             // Request parameters
@@ -221,7 +224,9 @@ namespace OCR_MS
             // North       : America: api-nam.cognitive.microsofttranslator.com
             // Europe      : api-eur.cognitive.microsofttranslator.com
             // Asia Pacific: api-apc.cognitive.microsofttranslator.com
-            var uri = $"https://api.cognitive.microsofttranslator.com/translate?" + queryString;
+            //var uri = $"https://api.cognitive.microsofttranslator.com/translate?" + queryString;
+            var uri = $"{ApiEndpoint_TT}/translate?" + queryString;
+            uri = uri.Replace("//translate", "/translate");
 
             //var lines = src.Split(new string[] { "\n\r", "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries );
             //var srclines = lines.Select(l => $"{{'Text':'{l.Replace("'", "\\'").Replace("\"", "\\\"")}'}}");            
@@ -342,13 +347,13 @@ namespace OCR_MS
                         var apikey = kv.SelectTokens("$..key", false).First().ToString();
                         var apiname = kv.SelectTokens("$..name", false).First().ToString();
                         var tk_apiendpoint = kv.SelectTokens("$..endpoint", false).FirstOrDefault();
-                        var apiendpoint = tk_apiendpoint != null ? tk_apiendpoint.ToString() : "https://westus.api.cognitive.microsoft.com/";
+                        var apiendpoint = tk_apiendpoint != null ? tk_apiendpoint.ToString() : string.Empty;
                         
-                        if (apikey != null && apiname != null)
+                        if (!string.IsNullOrEmpty(apikey) && !string.IsNullOrEmpty(apiname))
                         {
                             ApiKey[apiname] = apikey;
                         }
-                        if (apiendpoint != null && apiname != null)
+                        if (!string.IsNullOrEmpty(apiendpoint) && !string.IsNullOrEmpty(apiname))
                         {
                             ApiEndpoint[apiname] = apiendpoint;
                         }
@@ -612,7 +617,7 @@ namespace OCR_MS
                         {"font", (new FontConverter()).ConvertToInvariantString(edResult.Font)}
                     }
                 },
-                { "api", ApiKey.Select( o => new Dictionary<string, string>() { { "name", o.Key }, { "key", o.Value } } ).ToList() }
+                { "api", ApiKey.Select( o => new Dictionary<string, string>() { { "name", o.Key }, { "key", o.Value }, { "endpoint", ApiEndpoint.ContainsKey(o.Key) ? ApiEndpoint[o.Key] : string.Empty } } ).ToList() }
             };
 
             File.WriteAllText(cfg, JsonConvert.SerializeObject(json, Formatting.Indented));
