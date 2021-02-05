@@ -208,7 +208,7 @@ namespace OCR_MS
             string result = "";
             string ApiKey_TT = ApiKey.ContainsKey( APIKEYTITLE_TT ) ? ApiKey[APIKEYTITLE_TT] : string.Empty;
             if (string.IsNullOrEmpty(ApiKey_TT)) return (result);
-            var ApiEndpoint_TT = ApiEndpoint.ContainsKey(APIKEYTITLE_TT) ? ApiEndpoint[ApiKey_TT] : "https://api.cognitive.microsofttranslator.com/";
+            var ApiEndpoint_TT = ApiEndpoint.ContainsKey(APIKEYTITLE_TT) ? ApiEndpoint[APIKEYTITLE_TT] : "https://api.cognitive.microsofttranslator.com/";
             if (!ApiEndpoint.ContainsKey(APIKEYTITLE_TT)) ApiEndpoint[APIKEYTITLE_TT] = ApiEndpoint_TT;
 
             var queryString = HttpUtility.ParseQueryString( string.Empty );
