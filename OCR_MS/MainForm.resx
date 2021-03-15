@@ -304,7 +304,7 @@
     <value>7</value>
   </data>
   <data name="btnTranslate.ToolTip" xml:space="preserve">
-    <value>OCR Result To Speech.</value>
+    <value>Translating Result</value>
   </data>
   <data name="&gt;&gt;btnTranslate.Name" xml:space="preserve">
     <value>btnTranslate</value>
