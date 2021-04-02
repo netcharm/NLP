@@ -69,10 +69,16 @@
             this.tsmiTextStop = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTranslateAuto = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTranslateEngine = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTranslateEngineAzure = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTranslateEngineBaidu = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslate = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateSrc = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateDst = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiOcrEngine = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOcrEngineAzure = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiOcrEngineBaidu = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiClearClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep4 = new System.Windows.Forms.ToolStripSeparator();
@@ -200,10 +206,12 @@
             this.tsmiTextStop,
             this.tsmiSep2,
             this.tsmiTranslateAuto,
+            this.tsmiTranslateEngine,
             this.tsmiTranslate,
             this.tsmiTranslateSrc,
             this.tsmiTranslateDst,
             this.tsmiSep3,
+            this.tsmiOcrEngine,
             this.tsmiWatchClipboard,
             this.tsmiClearClipboard,
             this.tsmiSep4,
@@ -388,6 +396,28 @@
             resources.ApplyResources(this.tsmiTranslateAuto, "tsmiTranslateAuto");
             this.tsmiTranslateAuto.CheckedChanged += new System.EventHandler(this.tsmiTranslateAuto_CheckedChanged);
             // 
+            // tsmiTranslateEngine
+            // 
+            this.tsmiTranslateEngine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiTranslateEngineAzure,
+            this.tsmiTranslateEngineBaidu});
+            this.tsmiTranslateEngine.Name = "tsmiTranslateEngine";
+            resources.ApplyResources(this.tsmiTranslateEngine, "tsmiTranslateEngine");
+            // 
+            // tsmiTranslateAzure
+            // 
+            this.tsmiTranslateEngineAzure.Checked = true;
+            this.tsmiTranslateEngineAzure.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiTranslateEngineAzure.Name = "tsmiTranslateAzure";
+            resources.ApplyResources(this.tsmiTranslateEngineAzure, "tsmiTranslateAzure");
+            this.tsmiTranslateEngineAzure.Click += new System.EventHandler(this.tsmiTranslateEngine_Click);
+            // 
+            // tsmiTranslateBaidu
+            // 
+            this.tsmiTranslateEngineBaidu.Name = "tsmiTranslateBaidu";
+            resources.ApplyResources(this.tsmiTranslateEngineBaidu, "tsmiTranslateBaidu");
+            this.tsmiTranslateEngineBaidu.Click += new System.EventHandler(this.tsmiTranslateEngine_Click);
+            // 
             // tsmiTranslate
             // 
             this.tsmiTranslate.Name = "tsmiTranslate";
@@ -408,6 +438,28 @@
             // 
             this.tsmiSep3.Name = "tsmiSep3";
             resources.ApplyResources(this.tsmiSep3, "tsmiSep3");
+            // 
+            // tsmiOcrEngine
+            // 
+            this.tsmiOcrEngine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiOcrEngineAzure,
+            this.tsmiOcrEngineBaidu});
+            this.tsmiOcrEngine.Name = "tsmiOcrEngine";
+            resources.ApplyResources(this.tsmiOcrEngine, "tsmiOcrEngine");
+            // 
+            // tsmiOcrEngineAzure
+            // 
+            this.tsmiOcrEngineAzure.Checked = true;
+            this.tsmiOcrEngineAzure.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsmiOcrEngineAzure.Name = "tsmiOcrEngineAzure";
+            resources.ApplyResources(this.tsmiOcrEngineAzure, "tsmiOcrEngineAzure");
+            this.tsmiOcrEngineAzure.Click += new System.EventHandler(this.tsmiOcrEngine_Click);
+            // 
+            // tsmiOcrEngineBaidu
+            // 
+            this.tsmiOcrEngineBaidu.Name = "tsmiOcrEngineBaidu";
+            resources.ApplyResources(this.tsmiOcrEngineBaidu, "tsmiOcrEngineBaidu");
+            this.tsmiOcrEngineBaidu.Click += new System.EventHandler(this.tsmiOcrEngine_Click);
             // 
             // tsmiWatchClipboard
             // 
@@ -535,6 +587,12 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiTranslateDst;
         private System.Windows.Forms.ToolStripMenuItem tsmiOptions;
         private System.Windows.Forms.ToolStripMenuItem tsmiLogOCRHistory;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTranslateEngine;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTranslateEngineAzure;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTranslateEngineBaidu;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOcrEngine;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOcrEngineAzure;
+        private System.Windows.Forms.ToolStripMenuItem tsmiOcrEngineBaidu;
     }
 }
 

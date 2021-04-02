@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Speech.Synthesis;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -26,9 +27,6 @@ namespace OCR_MS
         private string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
         private string AppName = Path.GetFileNameWithoutExtension(Application.ExecutablePath);
 
-        private static Dictionary<string, string> ApiKey = new Dictionary<string, string>();
-        private static Dictionary<string, string> ApiEndpoint = new Dictionary<string, string>();
-
         private static string[] exts_img = new string[] { ".bmp", ".jpg", ".png", ".jpeg", ".tif", ".tiff", ".gif" };
         private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
 
@@ -40,50 +38,64 @@ namespace OCR_MS
 
         private bool OCR_HISTORY = false;
 
+        private const string API_TITLE_CV = "Computer Vision API";
+        private const string API_TITLE_TT = "Translator Text API";
+
+        private string GetLangiageFrom(string lang = "")
+        {
+            string lang_src = string.IsNullOrEmpty(lang) ? "unk" : lang;
+            lang_src = Result_Lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ? string.Empty : Result_Lang;
+            if (string.IsNullOrEmpty(lang_src)) lang_src = (string)tsmiTranslateSrc.Tag;
+            if (string.IsNullOrEmpty(lang_src) || lang_src.Equals("unk", StringComparison.CurrentCultureIgnoreCase)) lang_src = cbLanguage.SelectedValue.ToString();
+            return (lang_src.ToLower());
+        }
+
+        private string GetLangiageTo()
+        {
+            string lang_dst = "zh-hans";
+
+            var ld = (string)tsmiTranslateDst.Tag;
+            if (!ld.Equals("unk", StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(ld))
+                lang_dst = ld;
+            else
+            {
+                var cl = CultureInfo.CurrentCulture;
+                lang_dst = cl.Parent.IetfLanguageTag;
+            }
+
+            return (lang_dst.ToLower());
+        }
+
         #region OCR with microsoft cognitive api
-        private string APIKEYTITLE_CV = "Computer Vision API";
-        internal Dictionary<string, string> ocr_languages = new Dictionary<string, string>() {
+        private static Dictionary<string, AzureAPI> AzureApi = new Dictionary<string, AzureAPI>();
+
+        internal Dictionary<string, string> azure_languages = new Dictionary<string, string>() {
             {"unk","AutoDetect"},
-            {"zh-Hans","ChineseSimplified"},
-            {"zh-Hant","ChineseTraditional"},
-            {"cs","Czech"},
-            {"da","Danish"},
-            {"nl","Dutch"},
-            {"en","English"},
-            {"fi","Finnish"},
-            {"fr","French"},
-            {"de","German"},
-            {"el","Greek"},
-            {"hu","Hungarian"},
-            {"it","Italian"},
-            {"ja","Japanese"},
-            {"ko","Korean"},
-            {"nb","Norwegian"},
-            {"pl","Polish"},
-            {"pt","Portuguese"},
-            {"ru","Russian"},
-            {"es","Spanish"},
-            {"sv","Swedish"},
-            {"tr","Turkish"},
-            {"ar","Arabic"},
-            {"ro","Romanian"},
-            {"sr-Cyrl","SerbianCyrillic"},
-            {"sr-Latn","SerbianLatin"},
-            {"sk","Slovak"}
+            {"zh-Hans","ChineseSimplified"}, {"zh-Hant","ChineseTraditional"},
+            {"cs","Czech"}, {"da","Danish"}, {"nl","Dutch"}, {"en","English"}, {"fi","Finnish"}, {"fr","French"}, {"de","German"},
+            {"el","Greek"}, {"hu","Hungarian"}, {"it","Italian"}, {"ja","Japanese"}, {"ko","Korean"}, {"nb","Norwegian"}, {"pl","Polish"},
+            {"pt","Portuguese"}, {"ru","Russian"}, {"es","Spanish"}, {"sv","Swedish"}, {"tr","Turkish"}, {"ar","Arabic"}, {"ro","Romanian"},
+            {"sr-Cyrl","SerbianCyrillic"}, {"sr-Latn","SerbianLatin"}, {"sk","Slovak"},
+            {"th", "Tailand" }, {"yue", "粤语" }, {"wyw", "文言文" },
         };
-        internal Dictionary<string, string> ocr_lang = new Dictionary<string, string>();
+        internal Dictionary<string, string> azure_lang = new Dictionary<string, string>();
 
         internal string Result_JSON = string.Empty;
         internal string Result_Lang = string.Empty;
         internal static int ResultHistoryLimit = 100;
         internal List<KeyValuePair<string, string>> ResultHistory = new List<KeyValuePair<string, string>>(ResultHistoryLimit);
 
-        internal async Task<string> MakeRequest_OCR(Bitmap src, string lang = "unk")
+        internal async Task<string> MakeRequest_Azure_OCR(Image src, string lang = "unk")
         {
             string result = "";
-            string ApiKey_CV = ApiKey.ContainsKey( APIKEYTITLE_CV ) ? ApiKey[APIKEYTITLE_CV] : string.Empty;
-            string ApiEndpoint_CV = ApiEndpoint.ContainsKey(APIKEYTITLE_CV) ? ApiEndpoint[APIKEYTITLE_CV] : "https://westus.api.cognitive.microsoft.com/";
-            if (!ApiEndpoint.ContainsKey(APIKEYTITLE_CV)) ApiEndpoint[APIKEYTITLE_CV] = ApiEndpoint_CV;
+            string ApiKey_CV = AzureApi.ContainsKey(API_TITLE_CV) ? AzureApi[API_TITLE_CV].ApiKey : string.Empty;
+            if (string.IsNullOrEmpty(ApiKey_CV)) return (result);
+            string ApiEndpoint_CV = AzureApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(AzureApi[API_TITLE_CV].EndPoint) ? AzureApi[API_TITLE_CV].EndPoint : "https://westus.api.cognitive.microsoft.com/";
+
+            if (!AzureApi.ContainsKey(API_TITLE_CV))
+                AzureApi.Add(API_TITLE_CV, new AzureAPI() { ApiKey = ApiKey_CV, EndPoint = ApiEndpoint_CV });
+            else if(string.IsNullOrEmpty(AzureApi[API_TITLE_CV].EndPoint))
+                AzureApi[API_TITLE_CV].EndPoint = ApiEndpoint_CV;
 
             if (string.IsNullOrEmpty(ApiKey_CV)) return (result);
 
@@ -199,17 +211,49 @@ namespace OCR_MS
             }
             return (result);
         }
+
+        internal async Task<string> Run_Azure_OCR(Image src, string lang = "unk")
+        {
+            var result = string.Empty;
+            if (AzureApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(AzureApi[API_TITLE_CV].ApiKey))
+            {
+                try
+                {
+                    result = await MakeRequest_Azure_OCR(src, lang);
+                    if (tsmiTextAutoSpeech.Checked) btnSpeech.PerformClick();
+                    if (tsmiTranslateAuto.Checked) btnTranslate.PerformClick();
+                    if (!string.IsNullOrEmpty(edResult.Text))
+                    {
+                        tsmiShowWindow.PerformClick();
+                        if (OCR_HISTORY)
+                        {
+                            if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
+                            ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
+                        }
+                    }
+                }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
+            }
+            if (CFGLOADED && (!AzureApi.ContainsKey(API_TITLE_TT) || string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey)))
+            {
+                MessageBox.Show($"Microsoft Azure Cognitive Servise {API_TITLE_TT} key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return (result);
+        }
         #endregion
 
         #region Translate with microsoft cognitive api
-        private const string APIKEYTITLE_TT = "Translator Text API";
-        internal async Task<string> MakeRequest_Translate(string src, string langDst = "zh-Hans", string langSrc = "")
+        internal async Task<string> MakeRequest_Azure_Translate(string src, string langDst = "zh-Hans", string langSrc = "")
         {
             string result = "";
-            string ApiKey_TT = ApiKey.ContainsKey( APIKEYTITLE_TT ) ? ApiKey[APIKEYTITLE_TT] : string.Empty;
+            string ApiKey_TT = AzureApi.ContainsKey(API_TITLE_TT) ? AzureApi[API_TITLE_TT].ApiKey : string.Empty;
             if (string.IsNullOrEmpty(ApiKey_TT)) return (result);
-            var ApiEndpoint_TT = ApiEndpoint.ContainsKey(APIKEYTITLE_TT) ? ApiEndpoint[APIKEYTITLE_TT] : "https://api.cognitive.microsofttranslator.com/";
-            if (!ApiEndpoint.ContainsKey(APIKEYTITLE_TT)) ApiEndpoint[APIKEYTITLE_TT] = ApiEndpoint_TT;
+            string ApiEndpoint_TT = AzureApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(AzureApi[API_TITLE_TT].EndPoint) ? AzureApi[API_TITLE_TT].EndPoint : "https://api.cognitive.microsofttranslator.com/";
+
+            if (!AzureApi.ContainsKey(API_TITLE_TT))
+                AzureApi.Add(API_TITLE_TT, new AzureAPI() { ApiKey = ApiKey_TT, EndPoint = ApiEndpoint_TT });
+            else if (string.IsNullOrEmpty(AzureApi[API_TITLE_CV].EndPoint))
+                AzureApi[API_TITLE_TT].EndPoint = ApiEndpoint_TT;
 
             var queryString = HttpUtility.ParseQueryString( string.Empty );
             // Request parameters
@@ -243,7 +287,7 @@ namespace OCR_MS
             {
                 string translate_result = await response.Content.ReadAsStringAsync();
 
-                JToken token = JToken.Parse( translate_result);
+                JToken token = JToken.Parse(translate_result);
                 Result_JSON = JsonConvert.SerializeObject(token, Formatting.Indented);
                 Result_JSON = Result_JSON.Replace("\\\"", "\"");
 
@@ -263,6 +307,226 @@ namespace OCR_MS
             return (result);
         }
         private bool TRANSLATING_AUTO = false;
+
+        internal async Task<string> Run_Azure_Translate(string src)
+        {
+            string result = string.Empty;
+            if (AzureApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey) && !string.IsNullOrEmpty(edResult.Text))
+            {
+                try
+                {
+                    pbar.Style = ProgressBarStyle.Marquee;
+
+                    var langSrc = GetLangiageFrom();                   
+                    var langDst = GetLangiageTo();
+                    
+                    result = await MakeRequest_Azure_Translate(src, langDst, langSrc);
+                }
+                catch (Exception) { }
+                finally
+                {
+                    pbar.Style = ProgressBarStyle.Blocks;
+                }
+            }
+            return (result.Trim());
+        }
+        #endregion
+
+        #region Baidu OCR/Translating
+        private static Dictionary<string, BaiduAPI> BaiduApi = new Dictionary<string, BaiduAPI>();
+        internal Dictionary<string, string> baidu_languages = new Dictionary<string, string>() {
+            { "unk", "auto" },
+            { "zh-hans", "zh" }, { "zh-hant", "zh" }, {"yue", "yue" }, {"wyw", "wyw" },            
+            { "en", "en" }, { "ja", "jp" }, { "ko", "kor" }, { "fr", "fra" }, { "es", "spa" }, { "th", "th" },
+            { "ar", "ara" }, { "ru", "ru" }, { "pt", "pt" }, { "de", "de" }, { "it", "it" }, { "el", "el" }, { "nl", "nl" }, { "pl", "pl" }
+        };
+
+        internal Dictionary<string, string> baidu_languages_tt = new Dictionary<string, string>() {
+            //{ "unk", "auto_detect" }, { "auto", "auto_detect" }, 
+            { "unk", "CHN_ENG" }, { "auto", "CHN_ENG" }, { "auto_detect", "CHN_ENG" },
+            { "zh", "CHN_ENG" }, { "zh-hans", "CHN_ENG" }, { "zh-hant", "CHN_ENG" },
+            { "en", "ENG" }, { "ja", "JAP" }, { "jp", "JAP" }, { "ko", "KOR" }, { "kor", "KOR" },
+            { "fr", "FRE" }, { "fra", "FRE" }, { "es", "SPA" }, { "spa", "SPA" }, { "po", "POR" }, { "por", "POR" },
+            { "it", "ITA" }, { "ita", "ITA" }, { "ru", "RUS" }, { "rus", "RUS" }, { "da", "DAN" }, { "dan", "DAN" },
+            { "nl", "DUT" }, { "dut", "DUT" }, { "sv", "SWE" }, { "swe", "SWE" }, { "pl", "POL" }, { "pol", "POL"},
+            { "ar", "ara" }, { "pt", "pt" }, { "de", "de" }, { "el", "el" }, 
+        };
+
+        internal async Task<string> Run_Baidu_OCR(Image src, string lang = "unk")
+        {
+            string result = string.Empty;
+
+            var ran = new Random(65536);
+            var salt = ran.Next(32768, 65536);
+            var tokenURL = BaiduApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(BaiduApi[API_TITLE_CV].TokenURL) ? BaiduApi[API_TITLE_CV].TokenURL : "https://aip.baidubce.com/oauth/2.0/token";
+            var apiURL = BaiduApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(BaiduApi[API_TITLE_CV].EndPoint) ? BaiduApi[API_TITLE_CV].EndPoint : "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic";
+            var appID = BaiduApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(BaiduApi[API_TITLE_CV].AppId) ? BaiduApi[API_TITLE_CV].AppId : string.Empty;
+            var apiKEY = BaiduApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(BaiduApi[API_TITLE_CV].AppKey) ? BaiduApi[API_TITLE_CV].AppKey : string.Empty;
+            var appKEY = BaiduApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(BaiduApi[API_TITLE_CV].SecretKey) ? BaiduApi[API_TITLE_CV].SecretKey : string.Empty;
+            if (string.IsNullOrEmpty(appID) || string.IsNullOrEmpty(apiKEY) || string.IsNullOrEmpty(appKEY)) return (result);
+
+            var md5hash = MD5.Create();
+            var signs = md5hash.ComputeHash(Encoding.UTF8.GetBytes($"{appID}{src}{salt}{appKEY}"));
+            var sign = string.Join("", signs.Select(v => v.ToString("x2")));
+
+            var lang_src = GetLangiageFrom(lang);
+            lang_src = baidu_languages_tt.ContainsKey(lang_src) ? baidu_languages_tt[lang_src] : "CHN_ENG";
+
+            var param_token = new Dictionary<string, string>()
+            {
+                { "grant_type", "client_credentials" },
+                { "client_id", apiKEY },
+                { "client_secret", appKEY }
+            };
+
+            using (var client = new HttpClient())
+            {
+                var access_token = string.Empty;
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, tokenURL))
+                {
+                    request.Content = new FormUrlEncodedContent(param_token);
+                    using (HttpResponseMessage response = await client.SendAsync(request, HttpCompletionOption.ResponseContentRead))
+                    {
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            var token_result = await response.Content.ReadAsStringAsync();
+                            JToken token = JToken.Parse(token_result);
+                            Result_JSON = JsonConvert.SerializeObject(token, Formatting.Indented);
+                            Result_JSON = Result_JSON.Replace("\\\"", "\"");
+
+                            JToken oauths = token.SelectToken("$", false);
+                            var o_access_token = oauths.SelectToken("$.access_token");
+                            var o_scope = oauths.SelectToken("$.scope");
+                            var o_expires_in = oauths.SelectToken("$.expires_in");
+                            var o_refresh_token = oauths.SelectToken("$.refresh_token");
+                            var o_session_key = oauths.SelectToken("$.session_key");
+                            var o_session_secret = oauths.SelectToken("$.session_secret");
+
+                            var scopes = o_scope.Value<string>().Split().ToList();
+                            if (scopes.IndexOf("brain_all_scope") >= 0 || scopes.IndexOf("brain_ocr_scope") >= 0)
+                            {
+                                access_token = o_access_token.Value<string>();
+                            }
+
+                        }
+                    }
+                }
+                if (string.IsNullOrEmpty(access_token)) return (result);
+
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, $"{apiURL}?access_token={access_token}"))
+                {
+                    using (MemoryStream png = new MemoryStream())
+                    {
+                        src.Save(png, ImageFormat.Png);
+
+                        byte[] buffer_png = png.ToArray();
+                        char[] buffer_b64 = new char[buffer_png.Length*2];
+                        int ret = Convert.ToBase64CharArray(buffer_png, 0, buffer_png.Length, buffer_b64, 0, Base64FormattingOptions.None);
+                        byte[] content_b64 = buffer_b64.Take(ret).Select(c => Convert.ToByte(c)).ToArray();
+
+                        var param = new Dictionary<string, string>()
+                        {
+                            { "image", Encoding.Default.GetString(content_b64) },
+                            { "detect_direction", "true" },
+                            { "probability", "true" },
+                            { "paragraph", "true" },
+                            { "language_type", lang_src },
+                        };
+                        request.Content = new FormUrlEncodedContent(param);
+                        using (HttpResponseMessage response = await client.SendAsync(request, HttpCompletionOption.ResponseContentRead))
+                        {
+                            if (response.StatusCode == HttpStatusCode.OK)
+                            {
+                                var ocr_result = await response.Content.ReadAsStringAsync();
+
+                                JToken token = JToken.Parse(ocr_result);
+                                Result_JSON = JsonConvert.SerializeObject(token, Formatting.Indented);
+                                Result_JSON = Result_JSON.Replace("\\\"", "\"");
+
+                                JToken words_list = token.SelectToken("$.words_result", false);
+                                if (words_list != null)
+                                {
+                                    StringBuilder sb = new StringBuilder();
+                                    foreach (var words_item in words_list.Children())
+                                    {
+                                        JToken words = words_item.SelectToken("$.words", false);
+                                        JToken words_probability = words_item.SelectToken("$.probability", false);
+                                        JToken words_location = words_item.SelectToken("$.location", false);
+                                        sb.AppendLine(words.Value<string>().Trim());
+                                    }
+                                    result = sb.ToString().Trim();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return (result);
+        }
+
+        internal async Task<string> Run_Baidu_Translate(string src)
+        {
+            string result = string.Empty;
+
+            var ran = new Random(65536);
+            var salt = ran.Next(32768, 65536);
+            var apiURL = BaiduApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(BaiduApi[API_TITLE_TT].EndPoint) ? BaiduApi[API_TITLE_TT].EndPoint : "https://api.fanyi.baidu.com/api/trans/vip/translate";
+            var appID = BaiduApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(BaiduApi[API_TITLE_TT].AppId) ? BaiduApi[API_TITLE_TT].AppId : string.Empty;
+            var appKEY = BaiduApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(BaiduApi[API_TITLE_TT].SecretKey) ? BaiduApi[API_TITLE_TT].SecretKey : string.Empty;
+            if (string.IsNullOrEmpty(appID) || string.IsNullOrEmpty(appKEY)) return (result);
+
+            var md5hash = MD5.Create();
+            var signs = md5hash.ComputeHash(Encoding.UTF8.GetBytes($"{appID}{src}{salt}{appKEY}"));
+            var sign = string.Join("", signs.Select(v => v.ToString("x2")));
+
+            var lang_src = GetLangiageFrom();
+            lang_src = baidu_languages.ContainsKey(lang_src) ? baidu_languages[lang_src] : "auto";
+
+            var lang_dst = GetLangiageTo();
+            lang_dst = baidu_languages.ContainsKey(lang_dst) ? lang_dst = baidu_languages[lang_dst] : "auto";
+
+            var param = new Dictionary<string, string>()
+            {
+                { "q", src },
+                { "from", lang_src },
+                { "to", lang_dst },
+                { "appid", appID },
+                { "salt", $"{salt}" },
+                { "sign", sign },
+            };
+
+            using (var client = new HttpClient())
+            {
+                using (HttpResponseMessage response = await client.PostAsync(apiURL, new FormUrlEncodedContent(param)))
+                {
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var translate_result = await response.Content.ReadAsStringAsync();
+
+                        JToken token = JToken.Parse(translate_result);
+                        Result_JSON = JsonConvert.SerializeObject(token, Formatting.Indented);
+                        Result_JSON = Result_JSON.Replace("\\\"", "\"");
+
+                        JToken translations = token.SelectToken("$", false);
+                        JToken t_from = translations.SelectToken("$.from", false);
+                        JToken t_to = translations.SelectToken("$.to", false);
+                        JToken t_results = translations.SelectToken("$.trans_result", false);
+                        if (t_results != null)
+                        {
+                            StringBuilder sb = new StringBuilder();
+                            foreach (var t_result in t_results.Children())
+                            {
+                                JToken t_result_src = t_result.SelectToken("$..src", false);
+                                JToken t_result_dst = t_result.SelectToken("$..dst", false);
+                                sb.AppendLine(t_result_dst.Value<string>().Trim());
+                            }
+                            result = sb.ToString().Trim();
+                        }
+                    }
+                }
+            }
+            return (result.Trim());
+        }
         #endregion
 
         #region Monitor Clipboard
@@ -293,38 +557,46 @@ namespace OCR_MS
 
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == WM_CHANGECBCHAIN)
+            try
             {
-                // If the next window is closing, repair the chain. 
-                if (m.WParam == _clipboardViewerNext)
-                    _clipboardViewerNext = m.LParam;
-                // Otherwise, pass the message to the next link. 
-                else if (_clipboardViewerNext != IntPtr.Zero)
-                    SendMessage(_clipboardViewerNext, m.Msg, m.WParam, m.LParam);
-            }
-
-            base.WndProc(ref m);    // Process the message 
-
-            if (!CLIPBOARD_WATCH) return;
-
-            //if ( m.Msg == WM_CLIPBOARDUPDATE )
-            if (m.Msg == WM_DRAWCLIPBOARD)
-            {
-                ClipboardChanged = false;
-                var cbsn = GetClipboardSequenceNumber();
-                if (lastClipboardSN != cbsn)
+                if (m.Msg == WM_CHANGECBCHAIN)
                 {
-                    lastClipboardSN = cbsn;
-                    // Clipboard's data
-                    IDataObject iData = Clipboard.GetDataObject();
-                    if (iData.GetDataPresent(DataFormats.Bitmap))
+                    // If the next window is closing, repair the chain. 
+                    if (m.WParam == _clipboardViewerNext)
+                        _clipboardViewerNext = m.LParam;
+                    // Otherwise, pass the message to the next link. 
+                    else if (_clipboardViewerNext != IntPtr.Zero)
+                        SendMessage(_clipboardViewerNext, m.Msg, m.WParam, m.LParam);
+                }
+
+                base.WndProc(ref m);    // Process the message 
+
+                if (!CLIPBOARD_WATCH) return;
+
+                //if ( m.Msg == WM_CLIPBOARDUPDATE )
+                if (m.Msg == WM_DRAWCLIPBOARD)
+                {
+                    ClipboardChanged = false;
+                    var cbsn = GetClipboardSequenceNumber();
+                    if (lastClipboardSN != cbsn)
                     {
-                        // Clipboard image
-                        ClipboardChanged = true;
-                        btnOCR.PerformClick();
+                        lastClipboardSN = cbsn;
+                        // Clipboard's data
+                        IDataObject iData = Clipboard.GetDataObject();
+                        if (iData.GetDataPresent("PNG", true) ||
+                            iData.GetDataPresent("image/png", true) ||
+                            iData.GetDataPresent("image/bmp", true) ||
+                            iData.GetDataPresent(DataFormats.Bitmap, true))
+                        {
+                            // Clipboard image
+                            System.Diagnostics.Debug.WriteLine("ClipboardChanged");
+                            ClipboardChanged = true;
+                            btnOCR.PerformClick();
+                        }
                     }
                 }
             }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"WndProc => {ex.Message}"); }
         }
 
         /// <summary>
@@ -339,25 +611,31 @@ namespace OCR_MS
                 JToken token = JToken.Parse(json);
 
                 #region API Keys
-                IEnumerable<JToken> apis = token.SelectTokens("$..api", false);
-                foreach (var api in apis)
+                JToken apis_azure = token.SelectToken("$..apis_azure", false);
+                if (apis_azure is JToken)
                 {
-                    foreach(var kv in api)
-                    {
-                        var apikey = kv.SelectTokens("$..key", false).First().ToString();
-                        var apiname = kv.SelectTokens("$..name", false).First().ToString();
-                        var tk_apiendpoint = kv.SelectTokens("$..endpoint", false).FirstOrDefault();
-                        var apiendpoint = tk_apiendpoint != null ? tk_apiendpoint.ToString() : string.Empty;
-                        
-                        if (!string.IsNullOrEmpty(apikey) && !string.IsNullOrEmpty(apiname))
-                        {
-                            ApiKey[apiname] = apikey;
-                        }
-                        if (!string.IsNullOrEmpty(apiendpoint) && !string.IsNullOrEmpty(apiname))
-                        {
-                            ApiEndpoint[apiname] = apiendpoint;
-                        }
-                    }
+                    var azure = apis_azure.ToObject<List<AzureAPI>>();
+                    AzureApi = azure.ToDictionary(api => api.Name, api => api);
+                }
+                JToken apis_baidu = token.SelectToken("$..apis_baidu", false);
+                if (apis_baidu is JToken)
+                {
+                    var baidu = apis_baidu.ToObject<List<BaiduAPI>>();
+                    BaiduApi = baidu.ToDictionary(api => api.Name, api => api);
+                }
+                JToken ocr_engine = token.SelectToken("$..ocr_engine", false);
+                if(ocr_engine is JToken)
+                {
+                    var engine = ocr_engine.Value<string>().ToLower();
+                    if (engine.Equals("azure")) { tsmiOcrEngineAzure.Checked = true; tsmiOcrEngineBaidu.Checked = false; }
+                    else if (engine.Equals("baidu")) { tsmiOcrEngineAzure.Checked = false; tsmiOcrEngineBaidu.Checked = true; }
+                }
+                JToken translate_engine = token.SelectToken("$..translate_engine", false);
+                if (translate_engine is JToken)
+                {
+                    var engine = translate_engine.Value<string>().ToLower();
+                    if (engine.Equals("azure")) { tsmiTranslateEngineAzure.Checked = true; tsmiTranslateEngineBaidu.Checked = false; }
+                    else if (engine.Equals("baidu")) { tsmiTranslateEngineAzure.Checked = false; tsmiTranslateEngineBaidu.Checked = true; }
                 }
                 #endregion
 
@@ -502,9 +780,9 @@ namespace OCR_MS
                     try
                     {
                         tsmiTranslateDst.Tag = Convert.ToString(trans_to);
-                        foreach(var item in tsmiTranslateDst.DropDownItems)
+                        foreach (var item in tsmiTranslateDst.DropDownItems)
                         {
-                            if(item is ToolStripMenuItem)
+                            if (item is ToolStripMenuItem)
                             {
                                 var tsmi = item as ToolStripMenuItem;
                                 if (((string)tsmi.Tag).Equals((string)tsmiTranslateDst.Tag, StringComparison.CurrentCultureIgnoreCase))
@@ -617,34 +895,14 @@ namespace OCR_MS
                         {"font", (new FontConverter()).ConvertToInvariantString(edResult.Font)}
                     }
                 },
-                { "api", ApiKey.Select( o => new Dictionary<string, string>() { { "name", o.Key }, { "key", o.Value }, { "endpoint", ApiEndpoint.ContainsKey(o.Key) ? ApiEndpoint[o.Key] : string.Empty } } ).ToList() }
+                {"ocr_engine", tsmiOcrEngineBaidu.Checked ? "baidu" : "azure" },
+                {"translate_engine", tsmiTranslateEngineBaidu.Checked ? "baidu" : "azure" },
+                { "api_azure", AzureApi.Values.ToList()},
+                { "api_baidu", BaiduApi.Values.ToList()}
             };
 
             File.WriteAllText(cfg, JsonConvert.SerializeObject(json, Formatting.Indented));
         }
-
-        #region OCR
-        private async Task<string> Run_OCR(Bitmap src, string lang = "unk")
-        {
-            try
-            {
-                edResult.Text = await MakeRequest_OCR(src, lang);
-                if (tsmiTextAutoSpeech.Checked) btnSpeech.PerformClick();
-                if (tsmiTranslateAuto.Checked) btnTranslate.PerformClick();
-                if (!string.IsNullOrEmpty(edResult.Text))
-                {
-                    tsmiShowWindow.PerformClick();
-                    if (OCR_HISTORY)
-                    {
-                        if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
-                        ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
-                    }
-                }
-            }
-            catch(Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
-            return (edResult.Text);
-        }
-        #endregion
 
         private double font_size_default = 9;
         private void FontSizeChange(int action, int max = 48, int min = 9)
@@ -737,7 +995,7 @@ namespace OCR_MS
 
             notify.Icon = Icon;
             notify.BalloonTipTitle = this.Text;
-            notify.BalloonTipText = $"Using \"{APIKEYTITLE_CV}\" OCR feature.";
+            notify.BalloonTipText = $"Using \"{API_TITLE_CV}\" OCR feature.";
             notify.Text = this.Text;
 
             hint.ToolTipTitle = this.Text;
@@ -747,13 +1005,13 @@ namespace OCR_MS
 
             ////init_ocr_lang();
             cbLanguage.Items.Clear();
-            cbLanguage.DataSource = new BindingSource(ocr_languages, null);
+            cbLanguage.DataSource = new BindingSource(azure_languages, null);
             cbLanguage.DisplayMember = "Value";
             cbLanguage.ValueMember = "Key";
 
             tsmiTranslateSrc.DropDownItems.Clear();
             tsmiTranslateDst.DropDownItems.Clear();
-            foreach (var kv in ocr_languages)
+            foreach (var kv in azure_languages)
             {
                 var cv = kv.Key.Equals("unk", StringComparison.CurrentCultureIgnoreCase);
                 tsmiTranslateSrc.DropDownItems.Add(new ToolStripMenuItem(kv.Value, null, tsmiTranslateLanguage_Click, $"tsmiTranslateSrc_{kv.Key}") { Tag = kv.Key, Checked = cv });
@@ -761,6 +1019,9 @@ namespace OCR_MS
             }
             tsmiTranslateSrc.Tag = "unk";
             tsmiTranslateDst.Tag = "unk";
+
+            tsmiTranslateEngineAzure.Checked = true;
+            tsmiOcrEngineAzure.Checked = true;
 
             edResult.AcceptsReturn = true;
             edResult.AcceptsTab = true;
@@ -863,13 +1124,13 @@ namespace OCR_MS
                 {
                     var src = (Bitmap)(e.Data.GetData("PNG"));
                     string lang = cbLanguage.SelectedValue.ToString();
-                    edResult.Text = await Run_OCR(src, lang);
+                    edResult.Text = await Run_Azure_OCR(src, lang);
                 }
                 else if (fmts.Contains("Bitmap"))
                 {
                     var src = (Bitmap)e.Data.GetData("Bitmap");
                     string lang = cbLanguage.SelectedValue.ToString();
-                    edResult.Text = await Run_OCR(src, lang);
+                    edResult.Text = await Run_Azure_OCR(src, lang);
                 }
                 else if (fmts.Contains("FileName"))
                 {
@@ -891,7 +1152,7 @@ namespace OCR_MS
                                     try
                                     {
                                         string[] lines = File.ReadAllLines(fn);
-                                        foreach(var l in lines)
+                                        foreach (var l in lines)
                                         {
                                             sb.AppendLine(l);
                                         }
@@ -905,7 +1166,7 @@ namespace OCR_MS
                                         using (Bitmap src = (Bitmap)Image.FromFile(fn))
                                         {
                                             string lang = cbLanguage.SelectedValue.ToString();
-                                            sb.AppendLine(await Run_OCR(src, lang));
+                                            sb.AppendLine(await Run_Azure_OCR(src, lang));
                                             src.Dispose();
                                         }
                                     }
@@ -1007,38 +1268,59 @@ namespace OCR_MS
 
         private async void btnOCR_Click(object sender, EventArgs e)
         {
-            if (ApiKey.ContainsKey(APIKEYTITLE_CV) && btnOCR.Enabled)
+            try
             {
-                IDataObject iData = Clipboard.GetDataObject();
-                if (iData.GetDataPresent(DataFormats.Bitmap))
-                {
-                    try
-                    {
-                        btnOCR.Enabled = false;
-                        pbar.Style = ProgressBarStyle.Marquee;
+                btnOCR.Enabled = false;
+                pbar.Style = ProgressBarStyle.Marquee;
+                System.Diagnostics.Debug.WriteLine("OCR Starting...");
+                Task.Delay(20).GetAwaiter().GetResult();
 
-                        //(Bitmap) iData.GetData( DataFormats.Bitmap );
-                        Bitmap src = (Bitmap)Clipboard.GetImage();
-                        string lang = cbLanguage.SelectedValue.ToString();
-                        await Run_OCR(src, lang);
-                        if (CLIPBOARD_CLEAR && !string.IsNullOrEmpty(edResult.Text)) Clipboard.Clear();
-                    }
-                    catch (Exception) { }
-                    finally
+                IDataObject iData = Clipboard.GetDataObject();
+                var fmts_c = iData.GetFormats();
+                var fmts = new List<string>() { "PNG", "image/png", "image/jpg", "image/jpeg", "image/bmp", "image/tif", "image/tiff", "Bitmap" };
+                foreach (var fmt in fmts)
+                {
+                    if (fmts_c.Contains(fmt) && iData.GetDataPresent(fmt, true))
                     {
-                        ClipboardChanged = false;
-                        pbar.Style = ProgressBarStyle.Blocks;
-                        btnOCR.Enabled = true;
+                        try
+                        {
+                            using (var png = (MemoryStream)iData.GetData(fmt, true))
+                            {
+                                using (Image src = Image.FromStream(png))
+                                {
+                                    string lang = cbLanguage.SelectedValue.ToString();
+                                    if(tsmiOcrEngineAzure.Checked)
+                                        edResult.Text = await Run_Azure_OCR(src, lang);
+                                    else if(tsmiOcrEngineBaidu.Checked)
+                                        edResult.Text = await Run_Baidu_OCR(src, lang);
+                                }
+                            }
+                            break;
+                        }
+                        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"OCR GetClipData[{fmt}] => {ex.Message}"); }
+                    }
+                }
+                if (tsmiTextAutoSpeech.Checked) btnSpeech.PerformClick();
+                if (tsmiTranslateAuto.Checked) btnTranslate.PerformClick();
+                if (!string.IsNullOrEmpty(edResult.Text))
+                {
+                    tsmiShowWindow.PerformClick();
+                    if (OCR_HISTORY)
+                    {
+                        if (ResultHistory.Count >= ResultHistoryLimit) ResultHistory.RemoveAt(0);
+                        ResultHistory.Add(new KeyValuePair<string, string>(edResult.Text, Result_Lang));
                     }
                 }
             }
-
-            if (CFGLOADED && !ApiKey.ContainsKey(APIKEYTITLE_CV))
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"OCR => {ex.Message}"); }
+            finally
             {
-                MessageBox.Show("Microsoft Azure Cognitive Servise Computer Vision API key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (CLIPBOARD_CLEAR && !string.IsNullOrEmpty(edResult.Text)) Clipboard.Clear();
+                ClipboardChanged = false;
+                pbar.Style = ProgressBarStyle.Blocks;
+                btnOCR.Enabled = true;
+                edResult.Focus();
             }
-
-            edResult.Focus();
         }
 
         private void btnShowJSON_Click(object sender, EventArgs e)
@@ -1081,50 +1363,29 @@ namespace OCR_MS
 
         private async void btnTranslate_Click(object sender, EventArgs e)
         {
-            if (ApiKey.ContainsKey(APIKEYTITLE_TT) && !string.IsNullOrEmpty(edResult.Text))
+            try
             {
-                try
+                pbar.Style = ProgressBarStyle.Marquee;
+                string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
+                var result = string.Empty;
+                if(tsmiTranslateEngineAzure.Checked)
+                    result = await Run_Azure_Translate(text);
+                else if(tsmiTranslateEngineBaidu.Checked)
+                    result = await Run_Baidu_Translate(text);
+                if (!string.IsNullOrEmpty(result))
                 {
-                    pbar.Style = ProgressBarStyle.Marquee;
-
-                    string lang = cbLanguage.SelectedValue.ToString();
-                    var langSrc = Result_Lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ? string.Empty : Result_Lang;
-                    var langDst = string.Empty;
-                    var ls = (string)tsmiTranslateSrc.Tag;
-                    var ld = (string)tsmiTranslateDst.Tag;
-                    if (!ls.Equals("unk", StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(ls))
-                        langSrc = ls;
-                    //else langSrc = string.Empty;
-                    if (string.IsNullOrEmpty(langSrc) && !lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase)) langSrc = lang;
-
-                    if (!ld.Equals("unk", StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(ld))
-                        langDst = ld;
-                    else
-                    {
-                        var cl = CultureInfo.CurrentCulture;
-                        langDst = cl.Parent.IetfLanguageTag;
-                    }
-
-                    string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
-
                     StringBuilder sb = new StringBuilder();
                     sb.AppendLine(edResult.Text.Trim());
                     sb.AppendLine();
-                    sb.AppendLine(await MakeRequest_Translate(text, langDst, langSrc));
+                    sb.AppendLine(result);
                     edResult.Text = sb.ToString();
                 }
-                catch (Exception) { }
-                finally
-                {
-                    pbar.Style = ProgressBarStyle.Blocks;
-                }
             }
-
-            if (CFGLOADED && !ApiKey.ContainsKey(APIKEYTITLE_TT))
+            catch (Exception) { }
+            finally
             {
-                MessageBox.Show($"Microsoft Azure Cognitive Servise {APIKEYTITLE_TT} key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                pbar.Style = ProgressBarStyle.Blocks;
             }
-
             edResult.Focus();
         }
 
@@ -1190,9 +1451,11 @@ namespace OCR_MS
             //if ( !ApiKey.ContainsKey( "Computer Vision API" ) && edResult.Text.Trim().Length == 32 )
             if (edResult.Text.Trim().Length == 32)
             {
-                var dlgResult = MessageBox.Show( $"Text in result box will be saved as {APIKEYTITLE_CV} Key!", "Note", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning );
+                var dlgResult = MessageBox.Show( $"Text in result box will be saved as {API_TITLE_CV} Key!", "Note", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning );
                 if (dlgResult == DialogResult.OK)
-                    ApiKey[APIKEYTITLE_CV] = edResult.Text.Trim();
+                {
+                    AzureApi[API_TITLE_CV] = new AzureAPI() { Name = API_TITLE_CV, ApiKey = edResult.Text.Trim() };
+                }
             }
             SaveConfig();
         }
@@ -1298,16 +1561,16 @@ namespace OCR_MS
         {
             OptionsForm opt = new OptionsForm() {
                 Icon = Icon,
-                APIKEYTITLE_CV = APIKEYTITLE_CV,
-                APIKEYTITLE_TT = APIKEYTITLE_TT,
-                APIKEY_CV = ApiKey.ContainsKey(APIKEYTITLE_CV) ? ApiKey[APIKEYTITLE_CV] : string.Empty,
-                APIKEY_TT = ApiKey.ContainsKey(APIKEYTITLE_TT) ? ApiKey[APIKEYTITLE_TT] : string.Empty
+                APIKEYTITLE_CV = API_TITLE_CV,
+                APIKEYTITLE_TT = API_TITLE_TT,
+                APIKEY_CV = AzureApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(AzureApi[API_TITLE_CV].ApiKey) ? AzureApi[API_TITLE_CV].ApiKey : string.Empty,
+                APIKEY_TT = AzureApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey) ? AzureApi[API_TITLE_TT].ApiKey : string.Empty
             };
             
             if(opt.ShowDialog() == DialogResult.OK)
             {
-                ApiKey[APIKEYTITLE_CV] = opt.APIKEY_CV;
-                ApiKey[APIKEYTITLE_TT] = opt.APIKEY_TT;
+                AzureApi[API_TITLE_CV] = new AzureAPI() { Name = API_TITLE_CV, ApiKey = opt.APIKEY_CV };
+                AzureApi[API_TITLE_TT] = new AzureAPI() { Name = API_TITLE_TT, ApiKey = opt.APIKEY_TT };
                 SaveConfig();
             }
             opt.Dispose();
@@ -1366,5 +1629,50 @@ namespace OCR_MS
             Speech.AutoChangeSpeechSpeed = tsmiTextAutoSpeech.Checked;
         }
 
+        private void tsmiOcrEngine_Click(object sender, EventArgs e)
+        {
+            if (sender == tsmiOcrEngineAzure)
+            {
+                tsmiOcrEngineAzure.Checked = true;
+                tsmiOcrEngineBaidu.Checked = false;
+            }
+            else if (sender == tsmiOcrEngineBaidu)
+            {
+                tsmiOcrEngineAzure.Checked = false;
+                tsmiOcrEngineBaidu.Checked = true;
+            }
+        }
+
+        private void tsmiTranslateEngine_Click(object sender, EventArgs e)
+        {
+            if (sender == tsmiTranslateEngineAzure)
+            {
+                tsmiTranslateEngineAzure.Checked = true;
+                tsmiTranslateEngineBaidu.Checked = false;
+            }
+            else if (sender == tsmiTranslateEngineBaidu)
+            {
+                tsmiTranslateEngineAzure.Checked = false;
+                tsmiTranslateEngineBaidu.Checked = true;
+            }
+        }
     }
+
+    public class AzureAPI
+    {
+        public string Name { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
+        public string EndPoint { get; set; } = string.Empty;
+    }
+
+    public class BaiduAPI
+    {
+        public string Name { get; set; } = string.Empty;
+        public string TokenURL { get; set; } = string.Empty;
+        public string EndPoint { get; set; } = string.Empty;
+        public string AppId { get; set; } = string.Empty;
+        public string AppKey { get; set; } = string.Empty;
+        public string SecretKey { get; set; } = string.Empty;
+    }
+
 }
