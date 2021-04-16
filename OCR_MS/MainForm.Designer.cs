@@ -404,18 +404,18 @@
             this.tsmiTranslateEngine.Name = "tsmiTranslateEngine";
             resources.ApplyResources(this.tsmiTranslateEngine, "tsmiTranslateEngine");
             // 
-            // tsmiTranslateAzure
+            // tsmiTranslateEngineAzure
             // 
             this.tsmiTranslateEngineAzure.Checked = true;
             this.tsmiTranslateEngineAzure.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.tsmiTranslateEngineAzure.Name = "tsmiTranslateAzure";
-            resources.ApplyResources(this.tsmiTranslateEngineAzure, "tsmiTranslateAzure");
+            this.tsmiTranslateEngineAzure.Name = "tsmiTranslateEngineAzure";
+            resources.ApplyResources(this.tsmiTranslateEngineAzure, "tsmiTranslateEngineAzure");
             this.tsmiTranslateEngineAzure.Click += new System.EventHandler(this.tsmiTranslateEngine_Click);
             // 
-            // tsmiTranslateBaidu
+            // tsmiTranslateEngineBaidu
             // 
-            this.tsmiTranslateEngineBaidu.Name = "tsmiTranslateBaidu";
-            resources.ApplyResources(this.tsmiTranslateEngineBaidu, "tsmiTranslateBaidu");
+            this.tsmiTranslateEngineBaidu.Name = "tsmiTranslateEngineBaidu";
+            resources.ApplyResources(this.tsmiTranslateEngineBaidu, "tsmiTranslateEngineBaidu");
             this.tsmiTranslateEngineBaidu.Click += new System.EventHandler(this.tsmiTranslateEngine_Click);
             // 
             // tsmiTranslate
@@ -524,6 +524,7 @@
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Name = "MainForm";
+            this.Opacity = 0.99900000000000011D;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);

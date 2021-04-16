@@ -234,9 +234,9 @@ namespace OCR_MS
                 }
                 catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
             }
-            if (CFGLOADED && (!AzureApi.ContainsKey(API_TITLE_TT) || string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey)))
+            if (CFGLOADED && (!AzureApi.ContainsKey(API_TITLE_CV) || string.IsNullOrEmpty(AzureApi[API_TITLE_CV].ApiKey)))
             {
-                MessageBox.Show($"Microsoft Azure Cognitive Servise {API_TITLE_TT} key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"Microsoft Azure Cognitive Servise {API_TITLE_CV} key is required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return (result);
         }
@@ -692,8 +692,8 @@ namespace OCR_MS
                 JToken opacity = token.SelectToken("$..opacity", false);
                 if (opacity != null)
                 {
-                    this.Opacity = Convert.ToDouble(opacity.ToString());
-                    string os = $"{Math.Round(this.Opacity * 100, 0)}%";
+                    Opacity = Convert.ToDouble(opacity.ToString());
+                    string os = $"{Math.Round(Opacity * 100, 0)}%";
                     foreach (ToolStripMenuItem mi in tsmiOpacity.DropDownItems)
                     {
                         if (mi.Text == os)
@@ -897,8 +897,8 @@ namespace OCR_MS
                 },
                 {"ocr_engine", tsmiOcrEngineBaidu.Checked ? "baidu" : "azure" },
                 {"translate_engine", tsmiTranslateEngineBaidu.Checked ? "baidu" : "azure" },
-                { "api_azure", AzureApi.Values.ToList()},
-                { "api_baidu", BaiduApi.Values.ToList()}
+                { "apis_azure", AzureApi.Values.ToList()},
+                { "apis_baidu", BaiduApi.Values.ToList()}
             };
 
             File.WriteAllText(cfg, JsonConvert.SerializeObject(json, Formatting.Indented));
@@ -1420,12 +1420,12 @@ namespace OCR_MS
 
         private void tsmiShowWindow_Click(object sender, EventArgs e)
         {
-            this.Show();
-            if (this.WindowState == FormWindowState.Minimized)
+            Show();
+            if (WindowState == FormWindowState.Minimized)
             {
-                this.WindowState = FormWindowState.Normal;
+                WindowState = FormWindowState.Normal;
             }
-            this.Activate();
+            Activate();
             edResult.SelectAll();
             edResult.Focus();
         }
