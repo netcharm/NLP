@@ -555,6 +555,8 @@ namespace OCR_MS
         private int lastSelectionStart = 0;
         private int lastSelectionLength  = 0;
 
+        private List<ToolStripMenuItem> AzureOCR_Endpoints = new List<ToolStripMenuItem>();
+
         protected override void WndProc(ref Message m)
         {
             try
@@ -636,6 +638,36 @@ namespace OCR_MS
                     var engine = translate_engine.Value<string>().ToLower();
                     if (engine.Equals("azure")) { tsmiTranslateEngineAzure.Checked = true; tsmiTranslateEngineBaidu.Checked = false; }
                     else if (engine.Equals("baidu")) { tsmiTranslateEngineAzure.Checked = false; tsmiTranslateEngineBaidu.Checked = true; }
+                }
+                if (AzureApi.ContainsKey(API_TITLE_CV))
+                {
+                    AzureApi[$"{API_TITLE_CV}_Default"] = new AzureAPI() {
+                        Name = $"{API_TITLE_CV}_Default",
+                        ApiKey = AzureApi[API_TITLE_CV].ApiKey,
+                        EndPoint = AzureApi[API_TITLE_CV].EndPoint,
+                        EndPointName = "Default"
+                    };
+                }
+                foreach (var api in AzureApi.Where(azure => azure.Key.StartsWith($"{API_TITLE_CV}_")))
+                {
+                    if (api.Key.StartsWith(API_TITLE_CV, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        if (string.IsNullOrEmpty(api.Value.EndPointName))
+                        {
+                            var endpoint = Regex.Replace(api.Value.EndPoint, @"https?://(.*?)(\..*?\.com.*)", "$1", RegexOptions.IgnoreCase);
+                            api.Value.EndPointName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(endpoint);
+                        }
+                        var menuitem = new ToolStripMenuItem()
+                        {
+                            Name = $"AzureCV_{api.Value.EndPointName}",
+                            Text = api.Value.EndPointName,
+                            CheckOnClick = false
+                        };
+                        menuitem.Click += tsmiOcrEngine_Click;
+                        tsmiOcrEngineAzure.DropDownItems.Add(menuitem);
+                        if (api.Value.EndPointName.Equals("Default", StringComparison.CurrentCultureIgnoreCase)) menuitem.Checked = true;
+                        AzureOCR_Endpoints.Add(menuitem);
+                    }
                 }
                 #endregion
 
@@ -1641,6 +1673,25 @@ namespace OCR_MS
                 tsmiOcrEngineAzure.Checked = false;
                 tsmiOcrEngineBaidu.Checked = true;
             }
+            else if(sender is ToolStripMenuItem)
+            {
+                foreach(var mi in AzureOCR_Endpoints)
+                {
+                    if (mi == sender)
+                    {
+                        var endpoint = mi.Name.Replace("AzureCV_", "");
+                        var api = AzureApi.Where(cv => cv.Key.StartsWith(API_TITLE_CV) && cv.Value.EndPointName.Equals(endpoint, StringComparison.CurrentCultureIgnoreCase));
+                        if (api.Count() > 0)
+                        {
+                            var azure = api.First();
+                            mi.Checked = true;
+                            AzureApi[API_TITLE_CV].ApiKey = azure.Value.ApiKey;
+                            AzureApi[API_TITLE_CV].EndPoint = azure.Value.EndPoint;
+                        }
+                    }
+                    else mi.Checked = false;
+                }
+            }
         }
 
         private void tsmiTranslateEngine_Click(object sender, EventArgs e)
@@ -1663,6 +1714,7 @@ namespace OCR_MS
         public string Name { get; set; } = string.Empty;
         public string ApiKey { get; set; } = string.Empty;
         public string EndPoint { get; set; } = string.Empty;
+        public string EndPointName { get; set; } = string.Empty;
     }
 
     public class BaiduAPI
