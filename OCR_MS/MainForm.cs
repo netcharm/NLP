@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GI.Screenshot;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -550,6 +552,74 @@ namespace OCR_MS
         private IntPtr _clipboardViewerNext;
         private bool ClipboardChanged = false;
         private int lastClipboardSN = 0;
+        #endregion
+
+        #region Get Image from Clipboard or Screen Capture
+        internal Image GetCaptureScreen()
+        {
+            Image result = null;
+            using (var ms = new MemoryStream())
+            {
+                try
+                {
+                    var capture_opt = new ScreenshotOptions() {
+                        BackgroundOpacity = 0.8,
+                        SelectionRectangleBorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.CadetBlue)
+                    };
+                    var capture = Screenshot.CaptureRegion(capture_opt);
+                    var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                    png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(capture));
+                    png.Save(ms);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    result = Image.FromStream(ms);
+                }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
+            }
+            return (result);
+        }
+
+        internal Image GetClipboardImage()
+        {
+            Image result = null;
+            IDataObject iData = Clipboard.GetDataObject();
+            var fmts_c = iData.GetFormats();
+            var fmts = new List<string>() { "PNG", "image/png", "image/jpg", "image/jpeg", "image/bmp", "image/tif", "image/tiff", "Bitmap" };
+            foreach (var fmt in fmts)
+            {
+                if (fmts_c.Contains(fmt) && iData.GetDataPresent(fmt, true))
+                {
+                    try
+                    {
+                        using (var img = (MemoryStream)iData.GetData(fmt, true))
+                        {
+                            result = Image.FromStream(img);
+                        }
+                        break;
+                    }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"GetClipData[{fmt}] => {ex.Message}"); }
+                }
+            }
+            return (result);
+        }
+
+        internal string GetFirefoxPath()
+        {
+            string result = string.Empty;
+
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Process");
+
+            var firefox_name = "firefox.exe";
+            var items = searcher.Get().Cast<ManagementObject>().Where(p => p["Name"].ToString().Equals(firefox_name)).ToList();
+            foreach(var item in items)
+            {
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine($"{item["ProcessId"]} => {item["Name"]}, {item["ExecutablePath"]}");
+#endif
+                result = item["ExecutablePath"].ToString();
+                break;
+            }
+            return (result);
+        }
         #endregion
 
         private int lastSelectionStart = 0;
@@ -1307,33 +1377,33 @@ namespace OCR_MS
                 System.Diagnostics.Debug.WriteLine("OCR Starting...");
                 Task.Delay(20).GetAwaiter().GetResult();
 
-                IDataObject iData = Clipboard.GetDataObject();
-                var fmts_c = iData.GetFormats();
-                var fmts = new List<string>() { "PNG", "image/png", "image/jpg", "image/jpeg", "image/bmp", "image/tif", "image/tiff", "Bitmap" };
-                foreach (var fmt in fmts)
+                var src = GetClipboardImage();
+                if (!(src is Image)) src = GetCaptureScreen();
+                if (src is Image)
                 {
-                    if (fmts_c.Contains(fmt) && iData.GetDataPresent(fmt, true))
+                    var qr = new ZXing.BarcodeReader();
+                    var qr_result = qr.Decode(new Bitmap(src));
+                    if (string.IsNullOrEmpty(qr_result.Text))
                     {
-                        try
+                        string lang = cbLanguage.SelectedValue.ToString();
+                        if (tsmiOcrEngineAzure.Checked)
+                            edResult.Text = await Run_Azure_OCR(src, lang);
+                        else if (tsmiOcrEngineBaidu.Checked)
+                            edResult.Text = await Run_Baidu_OCR(src, lang);
+                        if (tsmiTextAutoSpeech.Checked) btnSpeech.PerformClick();
+                        if (tsmiTranslateAuto.Checked) btnTranslate.PerformClick();
+                    }
+                    else
+                    {
+                        edResult.Text = qr_result.Text;
+                        if(Regex.IsMatch(qr_result.Text, @"^https?://", RegexOptions.IgnoreCase))
                         {
-                            using (var png = (MemoryStream)iData.GetData(fmt, true))
-                            {
-                                using (Image src = Image.FromStream(png))
-                                {
-                                    string lang = cbLanguage.SelectedValue.ToString();
-                                    if(tsmiOcrEngineAzure.Checked)
-                                        edResult.Text = await Run_Azure_OCR(src, lang);
-                                    else if(tsmiOcrEngineBaidu.Checked)
-                                        edResult.Text = await Run_Baidu_OCR(src, lang);
-                                }
-                            }
-                            break;
+                            var firefox = GetFirefoxPath();
+                            if (string.IsNullOrEmpty(firefox)) System.Diagnostics.Process.Start($"\"{qr_result.Text}\""); 
+                            else System.Diagnostics.Process.Start(firefox, $"\"{qr_result.Text}\"");
                         }
-                        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"OCR GetClipData[{fmt}] => {ex.Message}"); }
                     }
                 }
-                if (tsmiTextAutoSpeech.Checked) btnSpeech.PerformClick();
-                if (tsmiTranslateAuto.Checked) btnTranslate.PerformClick();
                 if (!string.IsNullOrEmpty(edResult.Text))
                 {
                     tsmiShowWindow.PerformClick();
