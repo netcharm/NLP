@@ -1383,7 +1383,7 @@ namespace OCR_MS
                 {
                     var qr = new ZXing.BarcodeReader();
                     var qr_result = qr.Decode(new Bitmap(src));
-                    if (string.IsNullOrEmpty(qr_result.Text))
+                    if (qr_result == null || string.IsNullOrEmpty(qr_result.Text))
                     {
                         string lang = cbLanguage.SelectedValue.ToString();
                         if (tsmiOcrEngineAzure.Checked)
