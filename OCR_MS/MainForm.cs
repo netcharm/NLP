@@ -96,7 +96,7 @@ namespace OCR_MS
 
             if (!AzureApi.ContainsKey(API_TITLE_CV))
                 AzureApi.Add(API_TITLE_CV, new AzureAPI() { ApiKey = ApiKey_CV, EndPoint = ApiEndpoint_CV });
-            else if(string.IsNullOrEmpty(AzureApi[API_TITLE_CV].EndPoint))
+            else if (string.IsNullOrEmpty(AzureApi[API_TITLE_CV].EndPoint))
                 AzureApi[API_TITLE_CV].EndPoint = ApiEndpoint_CV;
 
             if (string.IsNullOrEmpty(ApiKey_CV)) return (result);
@@ -319,9 +319,9 @@ namespace OCR_MS
                 {
                     pbar.Style = ProgressBarStyle.Marquee;
 
-                    var langSrc = GetLangiageFrom();                   
+                    var langSrc = GetLangiageFrom();
                     var langDst = GetLangiageTo();
-                    
+
                     result = await MakeRequest_Azure_Translate(src, langDst, langSrc);
                 }
                 catch (Exception) { }
@@ -338,7 +338,7 @@ namespace OCR_MS
         private static Dictionary<string, BaiduAPI> BaiduApi = new Dictionary<string, BaiduAPI>();
         internal Dictionary<string, string> baidu_languages = new Dictionary<string, string>() {
             { "unk", "auto" },
-            { "zh-hans", "zh" }, { "zh-hant", "zh" }, {"yue", "yue" }, {"wyw", "wyw" },            
+            { "zh-hans", "zh" }, { "zh-hant", "zh" }, {"yue", "yue" }, {"wyw", "wyw" },
             { "en", "en" }, { "ja", "jp" }, { "ko", "kor" }, { "fr", "fra" }, { "es", "spa" }, { "th", "th" },
             { "ar", "ara" }, { "ru", "ru" }, { "pt", "pt" }, { "de", "de" }, { "it", "it" }, { "el", "el" }, { "nl", "nl" }, { "pl", "pl" }
         };
@@ -351,7 +351,7 @@ namespace OCR_MS
             { "fr", "FRE" }, { "fra", "FRE" }, { "es", "SPA" }, { "spa", "SPA" }, { "po", "POR" }, { "por", "POR" },
             { "it", "ITA" }, { "ita", "ITA" }, { "ru", "RUS" }, { "rus", "RUS" }, { "da", "DAN" }, { "dan", "DAN" },
             { "nl", "DUT" }, { "dut", "DUT" }, { "sv", "SWE" }, { "swe", "SWE" }, { "pl", "POL" }, { "pol", "POL"},
-            { "ar", "ara" }, { "pt", "pt" }, { "de", "de" }, { "el", "el" }, 
+            { "ar", "ara" }, { "pt", "pt" }, { "de", "de" }, { "el", "el" },
         };
 
         internal async Task<string> Run_Baidu_OCR(Image src, string lang = "unk")
@@ -555,6 +555,11 @@ namespace OCR_MS
         #endregion
 
         #region Get Image from Clipboard or Screen Capture
+        internal System.Windows.Media.Color CaptureBorderColor { get; set; } = System.Windows.Media.Colors.CadetBlue;
+        internal int CaptureBorderThickness { get; set; } = 2;
+        internal double CaptureBackgroundOpacity { get; set; } = 0.50;
+        internal ScreenshotOptions CaptureOption { get; set; } = null;
+
         internal Image GetCaptureScreen()
         {
             Image result = null;
@@ -562,11 +567,13 @@ namespace OCR_MS
             {
                 try
                 {
-                    var capture_opt = new ScreenshotOptions() {
-                        BackgroundOpacity = 0.8,
-                        SelectionRectangleBorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.CadetBlue)
+                    if (CaptureOption == null) CaptureOption = new ScreenshotOptions()
+                    {
+                        BackgroundOpacity = CaptureBackgroundOpacity,
+                        SelectionRectangleBorderBrush = new System.Windows.Media.SolidColorBrush(CaptureBorderColor)
                     };
-                    var capture = Screenshot.CaptureRegion(capture_opt);
+
+                    var capture = Screenshot.CaptureRegion(CaptureOption);
                     var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
                     png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(capture));
                     png.Save(ms);
@@ -610,7 +617,7 @@ namespace OCR_MS
 
             var firefox_name = "firefox.exe";
             var items = searcher.Get().Cast<ManagementObject>().Where(p => p["Name"].ToString().Equals(firefox_name)).ToList();
-            foreach(var item in items)
+            foreach (var item in items)
             {
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine($"{item["ProcessId"]} => {item["Name"]}, {item["ExecutablePath"]}");
@@ -677,270 +684,330 @@ namespace OCR_MS
         private void LoadConfig()
         {
             var cfg = Path.Combine( AppPath, AppName + ".json" );
-            if (File.Exists(cfg))
+            try
             {
-                var json = File.ReadAllText(cfg);
-                JToken token = JToken.Parse(json);
-
-                #region API Keys
-                JToken apis_azure = token.SelectToken("$..apis_azure", false);
-                if (apis_azure is JToken)
+                if (File.Exists(cfg))
                 {
-                    var azure = apis_azure.ToObject<List<AzureAPI>>();
-                    AzureApi = azure.ToDictionary(api => api.Name, api => api);
-                }
-                JToken apis_baidu = token.SelectToken("$..apis_baidu", false);
-                if (apis_baidu is JToken)
-                {
-                    var baidu = apis_baidu.ToObject<List<BaiduAPI>>();
-                    BaiduApi = baidu.ToDictionary(api => api.Name, api => api);
-                }
-                JToken ocr_engine = token.SelectToken("$..ocr_engine", false);
-                if(ocr_engine is JToken)
-                {
-                    var engine = ocr_engine.Value<string>().ToLower();
-                    if (engine.Equals("azure")) { tsmiOcrEngineAzure.Checked = true; tsmiOcrEngineBaidu.Checked = false; }
-                    else if (engine.Equals("baidu")) { tsmiOcrEngineAzure.Checked = false; tsmiOcrEngineBaidu.Checked = true; }
-                }
-                JToken translate_engine = token.SelectToken("$..translate_engine", false);
-                if (translate_engine is JToken)
-                {
-                    var engine = translate_engine.Value<string>().ToLower();
-                    if (engine.Equals("azure")) { tsmiTranslateEngineAzure.Checked = true; tsmiTranslateEngineBaidu.Checked = false; }
-                    else if (engine.Equals("baidu")) { tsmiTranslateEngineAzure.Checked = false; tsmiTranslateEngineBaidu.Checked = true; }
-                }
-                if (AzureApi.ContainsKey(API_TITLE_CV))
-                {
-                    AzureApi[$"{API_TITLE_CV}_Default"] = new AzureAPI() {
-                        Name = $"{API_TITLE_CV}_Default",
-                        ApiKey = AzureApi[API_TITLE_CV].ApiKey,
-                        EndPoint = AzureApi[API_TITLE_CV].EndPoint,
-                        EndPointName = "Default"
-                    };
-                }
-                foreach (var api in AzureApi.Where(azure => azure.Key.StartsWith($"{API_TITLE_CV}_")))
-                {
-                    if (api.Key.StartsWith(API_TITLE_CV, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        if (string.IsNullOrEmpty(api.Value.EndPointName))
-                        {
-                            var endpoint = Regex.Replace(api.Value.EndPoint, @"https?://(.*?)(\..*?\.com.*)", "$1", RegexOptions.IgnoreCase);
-                            api.Value.EndPointName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(endpoint);
-                        }
-                        var menuitem = new ToolStripMenuItem()
-                        {
-                            Name = $"AzureCV_{api.Value.EndPointName}",
-                            Text = api.Value.EndPointName,
-                            CheckOnClick = false
-                        };
-                        menuitem.Click += tsmiOcrEngine_Click;
-                        tsmiOcrEngineAzure.DropDownItems.Add(menuitem);
-                        if (api.Value.EndPointName.Equals("Default", StringComparison.CurrentCultureIgnoreCase)) menuitem.Checked = true;
-                        AzureOCR_Endpoints.Add(menuitem);
-                    }
-                }
-                #endregion
-
-                #region Form Position
-                JToken pos = token.SelectToken("$..pos", false);
-                if (pos != null)
-                {
-                    var x = pos.SelectToken("$..x", false).ToString();
-                    var y = pos.SelectToken("$..y", false).ToString();
-                    if (x != null && y != null)
+                    var json = File.ReadAllText(cfg);
+                    JToken token = JToken.Parse(json);
+                    #region Close Form to Notify Tray Area
+                    JToken tray = token.SelectToken("$..close_to_tray", false);
+                    if (tray != null)
                     {
                         try
                         {
-                            this.Left = Convert.ToInt32(x);
-                            this.Top = Convert.ToInt32(y);
-                        }
-                        catch (Exception)
-                        {
-                            //throw;
-                        }
-                    }
-                }
-                JToken ontop = token.SelectToken("$..topmost", false);
-                if (ontop != null)
-                {
-                    bool.TryParse(ontop.ToString(), out ALWAYS_ON_TOP);
-                    tsmiTopMost.Checked = ALWAYS_ON_TOP;
-                    this.TopMost = ALWAYS_ON_TOP;
-                }
-                #endregion
-
-                #region Form Size
-                JToken size = token.SelectToken("$..size", false);
-                if (size != null)
-                {
-                    var w = size.SelectToken("$..w", false).ToString();
-                    var h = size.SelectToken("$..h", false).ToString();
-                    if (w != null && h != null)
-                    {
-                        try
-                        {
-                            this.Width = Math.Max(this.MinimumSize.Width, Convert.ToInt32(w));
-                            this.Height = Math.Max(this.MinimumSize.Height, Convert.ToInt32(h));
-                        }
-                        catch (Exception)
-                        {
-                            //throw;
-                        }
-                    }
-                }
-                #endregion
-
-                #region Form Opacity
-                JToken opacity = token.SelectToken("$..opacity", false);
-                if (opacity != null)
-                {
-                    Opacity = Convert.ToDouble(opacity.ToString());
-                    string os = $"{Math.Round(Opacity * 100, 0)}%";
-                    foreach (ToolStripMenuItem mi in tsmiOpacity.DropDownItems)
-                    {
-                        if (mi.Text == os)
-                            mi.Checked = true;
-                        else
-                            mi.Checked = false;
-                    }
-                }
-                #endregion
-
-                #region Close Form to Notify Tray Area
-                JToken tray = token.SelectToken("$..close_to_tray", false);
-                if (tray != null)
-                {
-                    try
-                    {
-                        CLOSE_TO_TRAY = Convert.ToBoolean(tray);
-                        tsmiCloseToTray.Checked = CLOSE_TO_TRAY;
-                    }
-                    catch (Exception) { }
-                }
-                #endregion
-
-                #region Clipboard Options
-                JToken clipboard = token.SelectToken("$..clipboard", false);
-                if (clipboard != null)
-                {
-                    var clear = clipboard.SelectToken("$..clear", false).ToString();
-                    if (clear != null)
-                    {
-                        try
-                        {
-                            CLIPBOARD_CLEAR = Convert.ToBoolean(clear);
-                            tsmiClearClipboard.Checked = CLIPBOARD_CLEAR;
+                            CLOSE_TO_TRAY = Convert.ToBoolean(tray);
+                            tsmiCloseToTray.Checked = CLOSE_TO_TRAY;
                         }
                         catch (Exception) { }
                     }
-                    var watch = clipboard.SelectToken("$..watch", false).ToString();
-                    if (watch != null)
+                    #endregion
+
+                    #region Form Position
+                    JToken pos = token.SelectToken("$..pos", false);
+                    if (pos != null)
                     {
-                        try
+                        var x = pos.SelectToken("$..x", false).ToString();
+                        var y = pos.SelectToken("$..y", false).ToString();
+                        if (x != null && y != null)
                         {
-                            CLIPBOARD_WATCH = Convert.ToBoolean(watch);
-                            tsmiWatchClipboard.Checked = CLIPBOARD_WATCH;
-                            chkAutoClipboard.Checked = CLIPBOARD_WATCH;
-                        }
-                        catch (Exception) { }
-                    }
-                }
-                #endregion
-
-                #region OCR History
-                JToken ocrhist = token.SelectToken("$..ocr.log_history", false);
-                if (ocrhist != null)
-                {
-                    try
-                    {
-                        OCR_HISTORY = Convert.ToBoolean(ocrhist);
-
-                    }
-                    catch (Exception) { }
-                }
-                tsmiLogOCRHistory.Checked = OCR_HISTORY;
-                tsmiHistory.Visible = OCR_HISTORY;
-                tsmiHistory.Enabled = OCR_HISTORY;
-                tsmiHistoryClear.Visible = OCR_HISTORY;
-                tsmiHistoryClear.Enabled = OCR_HISTORY;
-                #endregion
-
-                #region Translate Options
-                JToken autotrans = token.SelectToken("$..translate.auto_translate", false);
-                if (autotrans != null)
-                {
-                    try
-                    {
-                        TRANSLATING_AUTO = Convert.ToBoolean(autotrans);
-                        tsmiTranslateAuto.Checked = TRANSLATING_AUTO;
-                    }
-                    catch (Exception) { }
-                }
-                JToken trans_to = token.SelectToken("$..translate.translate_to", false);
-                if (trans_to != null)
-                {
-                    try
-                    {
-                        tsmiTranslateDst.Tag = Convert.ToString(trans_to);
-                        foreach (var item in tsmiTranslateDst.DropDownItems)
-                        {
-                            if (item is ToolStripMenuItem)
+                            try
                             {
-                                var tsmi = item as ToolStripMenuItem;
-                                if (((string)tsmi.Tag).Equals((string)tsmiTranslateDst.Tag, StringComparison.CurrentCultureIgnoreCase))
-                                    tsmi.Checked = true;
-                                else tsmi.Checked = false;
+                                this.Left = Convert.ToInt32(x);
+                                this.Top = Convert.ToInt32(y);
+                            }
+                            catch (Exception)
+                            {
+                                //throw;
                             }
                         }
                     }
-                    catch (Exception) { }
-                }
-                #endregion
+                    JToken ontop = token.SelectToken("$..topmost", false);
+                    if (ontop != null)
+                    {
+                        bool.TryParse(ontop.ToString(), out ALWAYS_ON_TOP);
+                        tsmiTopMost.Checked = ALWAYS_ON_TOP;
+                        this.TopMost = ALWAYS_ON_TOP;
+                    }
+                    #endregion
 
-                #region Speech Options
-                JToken autospeech = token.SelectToken("$..speech.auto_speech", false);
-                if (autospeech != null)
-                {
-                    try
+                    #region Form Opacity
+                    JToken form_opacity = token.SelectToken("$..opacity", false);
+                    if (form_opacity != null)
                     {
-                        tsmiTextAutoSpeech.Checked = autospeech.Value<bool>();
+                        Opacity = Convert.ToDouble(form_opacity.ToString());
+                        string os = $"{Math.Round(Opacity * 100, 0)}%";
+                        foreach (ToolStripMenuItem mi in tsmiOpacity.DropDownItems)
+                        {
+                            if (mi.Text == os)
+                                mi.Checked = true;
+                            else
+                                mi.Checked = false;
+                        }
                     }
-                    catch (Exception) { }
-                }
-                JToken altmixedculture = token.SelectToken("$..speech.alt_play_mixed_culture", false);
-                if (altmixedculture != null)
-                {
-                    try
-                    {
-                        Speech.AltPlayMixedCulture = altmixedculture.Value<bool>();
-                    }
-                    catch (Exception) { }
-                }
-                JToken simpledetectculture = token.SelectToken("$..speech.simple_detect_culture", false);
-                if (simpledetectculture != null)
-                {
-                    try
-                    {
-                        Speech.AltPlayMixedCulture = simpledetectculture.Value<bool>();
-                    }
-                    catch (Exception) { }
-                }
-                #endregion
+                    #endregion
 
-                #region Result Editor Option
-                JToken editor = token.SelectToken("$..result.font", false);
-                if (editor != null)
-                {
-                    try
+                    #region Form Size
+                    JToken size = token.SelectToken("$..size", false);
+                    if (size != null)
                     {
-                        var s = Convert.ToString(editor);
-                        var cvt = new FontConverter();
-                        edResult.Font = cvt.ConvertFromInvariantString(s) as Font;
+                        var w = size.SelectToken("$..w", false).ToString();
+                        var h = size.SelectToken("$..h", false).ToString();
+                        if (w != null && h != null)
+                        {
+                            try
+                            {
+                                this.Width = Math.Max(this.MinimumSize.Width, Convert.ToInt32(w));
+                                this.Height = Math.Max(this.MinimumSize.Height, Convert.ToInt32(h));
+                            }
+                            catch (Exception)
+                            {
+                                //throw;
+                            }
+                        }
                     }
-                    catch (Exception) { }
+                    #endregion
+
+                    #region Clipboard Options
+                    JToken clipboard = token.SelectToken("$..clipboard", false);
+                    if (clipboard != null)
+                    {
+                        var clear = clipboard.SelectToken("$..clear", false).ToString();
+                        if (clear != null)
+                        {
+                            try
+                            {
+                                CLIPBOARD_CLEAR = Convert.ToBoolean(clear);
+                                tsmiClearClipboard.Checked = CLIPBOARD_CLEAR;
+                            }
+                            catch (Exception) { }
+                        }
+                        var watch = clipboard.SelectToken("$..watch", false).ToString();
+                        if (watch != null)
+                        {
+                            try
+                            {
+                                CLIPBOARD_WATCH = Convert.ToBoolean(watch);
+                                tsmiWatchClipboard.Checked = CLIPBOARD_WATCH;
+                                chkAutoClipboard.Checked = CLIPBOARD_WATCH;
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    #endregion
+
+                    #region Capture Options
+                    var patten_htmlcolor = @"^#?([0-9a-f]{2}){3,4}$";
+                    JToken capture_opts = token.SelectToken("$..capture", false);
+                    if (capture_opts != null)
+                    {
+                        var capture_opacity = capture_opts.SelectToken("$..BackgroundOpacity", false).ToString();
+                        if (!string.IsNullOrEmpty(capture_opacity))
+                        {
+                            double capture_opacity_value = CaptureBackgroundOpacity;
+                            if (double.TryParse(capture_opacity, out capture_opacity_value)) CaptureBackgroundOpacity = capture_opacity_value;
+                        }
+                        var capture_borderthickness = capture_opts.SelectToken("$..BorderThickness", false).ToString();
+                        if (!string.IsNullOrEmpty(capture_borderthickness))
+                        {
+                            int capture_borderthickness_value = CaptureBorderThickness;
+                            if (int.TryParse(capture_borderthickness, out capture_borderthickness_value)) CaptureBorderThickness = capture_borderthickness_value;
+                        }
+                        var capture_bordercolor = capture_opts.SelectToken("$..BorderColor", false).ToString();
+                        if (!string.IsNullOrEmpty(capture_bordercolor))
+                        {
+                            try
+                            {
+                                if (Regex.IsMatch(capture_bordercolor, patten_htmlcolor, RegexOptions.IgnoreCase))
+                                {
+                                    var capture_bordercolor_value = System.Windows.Media.ColorConverter.ConvertFromString(capture_bordercolor);
+                                    if (capture_bordercolor_value is System.Windows.Media.Color)
+                                        CaptureBorderColor = (System.Windows.Media.Color)capture_bordercolor_value;
+                                }
+                                else
+                                {
+                                    var color = Color.FromName(capture_bordercolor);
+                                    if (color.ToArgb() != 0)
+                                        CaptureBorderColor = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                if (Regex.IsMatch(capture_bordercolor, patten_htmlcolor, RegexOptions.IgnoreCase))
+                                {
+                                    var colors = Regex.Replace(capture_bordercolor.Trim('#'), @"..(?!$)", "$0,", RegexOptions.IgnoreCase).Split(',');
+                                    if (colors.Length == 4) CaptureBorderColor = System.Windows.Media.Color.FromArgb(
+                                        byte.Parse(colors[0], NumberStyles.HexNumber),
+                                        byte.Parse(colors[1], NumberStyles.HexNumber),
+                                        byte.Parse(colors[2], NumberStyles.HexNumber),
+                                        byte.Parse(colors[3], NumberStyles.HexNumber));
+                                    else if (colors.Length == 3) CaptureBorderColor = System.Windows.Media.Color.FromRgb(
+                                        byte.Parse(colors[0], NumberStyles.HexNumber),
+                                        byte.Parse(colors[1], NumberStyles.HexNumber),
+                                        byte.Parse(colors[2], NumberStyles.HexNumber));
+                                }
+                            }
+                        }
+                    }
+                    #endregion
+
+                    #region OCR History
+                    JToken ocrhist = token.SelectToken("$..ocr.log_history", false);
+                    if (ocrhist != null)
+                    {
+                        try
+                        {
+                            OCR_HISTORY = Convert.ToBoolean(ocrhist);
+
+                        }
+                        catch (Exception) { }
+                    }
+                    tsmiLogOCRHistory.Checked = OCR_HISTORY;
+                    tsmiHistory.Visible = OCR_HISTORY;
+                    tsmiHistory.Enabled = OCR_HISTORY;
+                    tsmiHistoryClear.Visible = OCR_HISTORY;
+                    tsmiHistoryClear.Enabled = OCR_HISTORY;
+                    #endregion
+
+                    #region Translate Options
+                    JToken autotrans = token.SelectToken("$..translate.auto_translate", false);
+                    if (autotrans != null)
+                    {
+                        try
+                        {
+                            TRANSLATING_AUTO = Convert.ToBoolean(autotrans);
+                            tsmiTranslateAuto.Checked = TRANSLATING_AUTO;
+                        }
+                        catch (Exception) { }
+                    }
+                    JToken trans_to = token.SelectToken("$..translate.translate_to", false);
+                    if (trans_to != null)
+                    {
+                        try
+                        {
+                            tsmiTranslateDst.Tag = Convert.ToString(trans_to);
+                            foreach (var item in tsmiTranslateDst.DropDownItems)
+                            {
+                                if (item is ToolStripMenuItem)
+                                {
+                                    var tsmi = item as ToolStripMenuItem;
+                                    if (((string)tsmi.Tag).Equals((string)tsmiTranslateDst.Tag, StringComparison.CurrentCultureIgnoreCase))
+                                        tsmi.Checked = true;
+                                    else tsmi.Checked = false;
+                                }
+                            }
+                        }
+                        catch (Exception) { }
+                    }
+                    #endregion
+
+                    #region Speech Options
+                    JToken autospeech = token.SelectToken("$..speech.auto_speech", false);
+                    if (autospeech != null)
+                    {
+                        try
+                        {
+                            tsmiTextAutoSpeech.Checked = autospeech.Value<bool>();
+                        }
+                        catch (Exception) { }
+                    }
+                    JToken altmixedculture = token.SelectToken("$..speech.alt_play_mixed_culture", false);
+                    if (altmixedculture != null)
+                    {
+                        try
+                        {
+                            Speech.AltPlayMixedCulture = altmixedculture.Value<bool>();
+                        }
+                        catch (Exception) { }
+                    }
+                    JToken simpledetectculture = token.SelectToken("$..speech.simple_detect_culture", false);
+                    if (simpledetectculture != null)
+                    {
+                        try
+                        {
+                            Speech.AltPlayMixedCulture = simpledetectculture.Value<bool>();
+                        }
+                        catch (Exception) { }
+                    }
+                    #endregion
+
+                    #region Result Editor Option
+                    JToken editor = token.SelectToken("$..result.font", false);
+                    if (editor != null)
+                    {
+                        try
+                        {
+                            var s = Convert.ToString(editor);
+                            var cvt = new FontConverter();
+                            edResult.Font = cvt.ConvertFromInvariantString(s) as Font;
+                            font_size_default = edResult.Font.SizeInPoints;
+                        }
+                        catch (Exception) { }
+                    }
+                    #endregion
+
+                    #region API Keys
+                    JToken apis_azure = token.SelectToken("$..apis_azure", false);
+                    if (apis_azure is JToken)
+                    {
+                        var azure = apis_azure.ToObject<List<AzureAPI>>();
+                        AzureApi = azure.ToDictionary(api => api.Name, api => api);
+                    }
+                    JToken apis_baidu = token.SelectToken("$..apis_baidu", false);
+                    if (apis_baidu is JToken)
+                    {
+                        var baidu = apis_baidu.ToObject<List<BaiduAPI>>();
+                        BaiduApi = baidu.ToDictionary(api => api.Name, api => api);
+                    }
+                    JToken ocr_engine = token.SelectToken("$..ocr_engine", false);
+                    if (ocr_engine is JToken)
+                    {
+                        var engine = ocr_engine.Value<string>().ToLower();
+                        if (engine.Equals("azure")) { tsmiOcrEngineAzure.Checked = true; tsmiOcrEngineBaidu.Checked = false; }
+                        else if (engine.Equals("baidu")) { tsmiOcrEngineAzure.Checked = false; tsmiOcrEngineBaidu.Checked = true; }
+                    }
+                    JToken translate_engine = token.SelectToken("$..translate_engine", false);
+                    if (translate_engine is JToken)
+                    {
+                        var engine = translate_engine.Value<string>().ToLower();
+                        if (engine.Equals("azure")) { tsmiTranslateEngineAzure.Checked = true; tsmiTranslateEngineBaidu.Checked = false; }
+                        else if (engine.Equals("baidu")) { tsmiTranslateEngineAzure.Checked = false; tsmiTranslateEngineBaidu.Checked = true; }
+                    }
+                    if (AzureApi.ContainsKey(API_TITLE_CV))
+                    {
+                        AzureApi[$"{API_TITLE_CV}_Default"] = new AzureAPI()
+                        {
+                            Name = $"{API_TITLE_CV}_Default",
+                            ApiKey = AzureApi[API_TITLE_CV].ApiKey,
+                            EndPoint = AzureApi[API_TITLE_CV].EndPoint,
+                            EndPointName = "Default"
+                        };
+                    }
+                    foreach (var api in AzureApi.Where(azure => azure.Key.StartsWith($"{API_TITLE_CV}_")))
+                    {
+                        if (api.Key.StartsWith(API_TITLE_CV, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            if (string.IsNullOrEmpty(api.Value.EndPointName))
+                            {
+                                var endpoint = Regex.Replace(api.Value.EndPoint, @"https?://(.*?)(\..*?\.com.*)", "$1", RegexOptions.IgnoreCase);
+                                api.Value.EndPointName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(endpoint);
+                            }
+                            var menuitem = new ToolStripMenuItem()
+                            {
+                                Name = $"AzureCV_{api.Value.EndPointName}",
+                                Text = api.Value.EndPointName,
+                                CheckOnClick = false
+                            };
+                            menuitem.Click += tsmiOcrEngine_Click;
+                            tsmiOcrEngineAzure.DropDownItems.Add(menuitem);
+                            if (api.Value.EndPointName.Equals("Default", StringComparison.CurrentCultureIgnoreCase)) menuitem.Checked = true;
+                            AzureOCR_Endpoints.Add(menuitem);
+                        }
+                    }
+                    #endregion
                 }
-                #endregion
             }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"LoadConfig => {ex.Message}"); }
             CFGLOADED = true;
         }
 
@@ -974,7 +1041,14 @@ namespace OCR_MS
                         { "h", this.Height }
                     }
                 },
-                { "ocr",new Dictionary<string, object>()
+                { "capture", new Dictionary<string, string>()
+                    {
+                        { "BackgroundOpacity", $"{CaptureBackgroundOpacity}" },
+                        { "BorderThickness", $"{CaptureBorderThickness}" },
+                        { "BorderColor", CaptureBorderColor.ToString() }
+                    }
+                },
+                { "ocr", new Dictionary<string, object>()
                     {
                         { "log_history", OCR_HISTORY },
                     }
@@ -1006,7 +1080,7 @@ namespace OCR_MS
             File.WriteAllText(cfg, JsonConvert.SerializeObject(json, Formatting.Indented));
         }
 
-        private double font_size_default = 9;
+        private double font_size_default { get; set; } = 9;
         private void FontSizeChange(int action, int max = 48, int min = 9)
         {
             var font_old = edResult.Font;
@@ -1321,15 +1395,15 @@ namespace OCR_MS
 
         private void edResult_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Control && e.KeyCode == Keys.OemMinus)
+            if (e.Control && (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Subtract))
             {
                 FontSizeChange(-1);
             }
-            else if (e.Control && e.KeyCode == Keys.Oemplus)
+            else if (e.Control && (e.KeyCode == Keys.Oemplus || e.KeyCode == Keys.Add))
             {
                 FontSizeChange(+1);
             }
-            else if (e.Control && e.KeyCode == Keys.D0)
+            else if (e.Control && (e.KeyCode == Keys.D0 || e.KeyCode == Keys.NumPad0))
             {
                 FontSizeChange(0);
             }
@@ -1396,10 +1470,10 @@ namespace OCR_MS
                     else
                     {
                         edResult.Text = qr_result.Text;
-                        if(Regex.IsMatch(qr_result.Text, @"^https?://", RegexOptions.IgnoreCase))
+                        if (Regex.IsMatch(qr_result.Text, @"^https?://", RegexOptions.IgnoreCase))
                         {
                             var firefox = GetFirefoxPath();
-                            if (string.IsNullOrEmpty(firefox)) System.Diagnostics.Process.Start($"\"{qr_result.Text}\""); 
+                            if (string.IsNullOrEmpty(firefox)) System.Diagnostics.Process.Start($"\"{qr_result.Text}\"");
                             else System.Diagnostics.Process.Start(firefox, $"\"{qr_result.Text}\"");
                         }
                     }
@@ -1470,9 +1544,9 @@ namespace OCR_MS
                 pbar.Style = ProgressBarStyle.Marquee;
                 string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
                 var result = string.Empty;
-                if(tsmiTranslateEngineAzure.Checked)
+                if (tsmiTranslateEngineAzure.Checked)
                     result = await Run_Azure_Translate(text);
-                else if(tsmiTranslateEngineBaidu.Checked)
+                else if (tsmiTranslateEngineBaidu.Checked)
                     result = await Run_Baidu_Translate(text);
                 if (!string.IsNullOrEmpty(result))
                 {
@@ -1661,15 +1735,16 @@ namespace OCR_MS
 
         private void tsmiOptions_Click(object sender, EventArgs e)
         {
-            OptionsForm opt = new OptionsForm() {
+            OptionsForm opt = new OptionsForm()
+            {
                 Icon = Icon,
                 APIKEYTITLE_CV = API_TITLE_CV,
                 APIKEYTITLE_TT = API_TITLE_TT,
                 APIKEY_CV = AzureApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(AzureApi[API_TITLE_CV].ApiKey) ? AzureApi[API_TITLE_CV].ApiKey : string.Empty,
                 APIKEY_TT = AzureApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey) ? AzureApi[API_TITLE_TT].ApiKey : string.Empty
             };
-            
-            if(opt.ShowDialog() == DialogResult.OK)
+
+            if (opt.ShowDialog() == DialogResult.OK)
             {
                 AzureApi[API_TITLE_CV] = new AzureAPI() { Name = API_TITLE_CV, ApiKey = opt.APIKEY_CV };
                 AzureApi[API_TITLE_TT] = new AzureAPI() { Name = API_TITLE_TT, ApiKey = opt.APIKEY_TT };
@@ -1680,19 +1755,19 @@ namespace OCR_MS
 
         private void tsmiTranslateLanguage_Click(object sender, EventArgs e)
         {
-            if(sender is ToolStripMenuItem)
+            if (sender is ToolStripMenuItem)
             {
                 var obj = sender as ToolStripMenuItem;
-                if(obj.Name.StartsWith("tsmiTranslateSrc_", StringComparison.CurrentCultureIgnoreCase))
+                if (obj.Name.StartsWith("tsmiTranslateSrc_", StringComparison.CurrentCultureIgnoreCase))
                 {
                     foreach (var item in tsmiTranslateSrc.DropDownItems)
                     {
-                        if(item is ToolStripMenuItem)
+                        if (item is ToolStripMenuItem)
                         {
                             var tsmi = item as ToolStripMenuItem;
                             if (tsmi == sender) tsmi.Checked = true;
                             else tsmi.Checked = false;
-                        }                        
+                        }
                     }
                     tsmiTranslateSrc.Tag = obj.Tag;
                 }
@@ -1743,9 +1818,9 @@ namespace OCR_MS
                 tsmiOcrEngineAzure.Checked = false;
                 tsmiOcrEngineBaidu.Checked = true;
             }
-            else if(sender is ToolStripMenuItem)
+            else if (sender is ToolStripMenuItem)
             {
-                foreach(var mi in AzureOCR_Endpoints)
+                foreach (var mi in AzureOCR_Endpoints)
                 {
                     if (mi == sender)
                     {
@@ -1781,20 +1856,39 @@ namespace OCR_MS
 
     public class AzureAPI
     {
+        [JsonProperty("name")]
         public string Name { get; set; } = string.Empty;
+        [JsonProperty("apikey")]
         public string ApiKey { get; set; } = string.Empty;
+        [JsonProperty("endpoint")]
         public string EndPoint { get; set; } = string.Empty;
+        [JsonProperty("endpointname")]
         public string EndPointName { get; set; } = string.Empty;
     }
 
     public class BaiduAPI
     {
+        [JsonProperty("name")]
         public string Name { get; set; } = string.Empty;
+        [JsonProperty("tokenurl")]
         public string TokenURL { get; set; } = string.Empty;
+        [JsonProperty("endpoint")]
         public string EndPoint { get; set; } = string.Empty;
+        [JsonProperty("appid")]
         public string AppId { get; set; } = string.Empty;
+        [JsonProperty("appkey")]
         public string AppKey { get; set; } = string.Empty;
+        [JsonProperty("secretkey")]
         public string SecretKey { get; set; } = string.Empty;
     }
 
+    public class CaptureOption
+    {
+        [JsonProperty("bordercolor")]
+        public System.Windows.Media.Color CaptureBorderColor { get; set; } = System.Windows.Media.Colors.CadetBlue;
+        [JsonProperty("borderthickness")]
+        public int BorderThickness { get; set; } = 2;
+        [JsonProperty("backgroundopacity")]
+        public double BackgroundOpacity { get; set; } = 0.75;
+    }
 }
