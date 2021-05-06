@@ -32,6 +32,8 @@ namespace OCR_MS
         private static string[] exts_img = new string[] { ".bmp", ".jpg", ".png", ".jpeg", ".tif", ".tiff", ".gif" };
         private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
 
+        private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
+
         private bool CFGLOADED = false;
         private bool ALWAYS_ON_TOP = false;
         private bool CLOSE_TO_TRAY = false;
@@ -902,6 +904,15 @@ namespace OCR_MS
                     #endregion
 
                     #region Speech Options
+                    JToken autospeechrate = token.SelectToken("$..speech.auto_rate", false);
+                    if (autospeechrate != null)
+                    {
+                        try
+                        {
+                            tsmiTextAutoSpeechingRate.Checked = autospeechrate.Value<bool>();
+                        }
+                        catch (Exception) { }
+                    }
                     JToken autospeech = token.SelectToken("$..speech.auto_speech", false);
                     if (autospeech != null)
                     {
@@ -932,12 +943,81 @@ namespace OCR_MS
                     #endregion
 
                     #region Result Editor Option
-                    JToken editor = token.SelectToken("$..result.font", false);
-                    if (editor != null)
+                    JToken editor_use_ime = token.SelectToken("$..result.use_last_ime", false);
+                    if (editor_use_ime != null)
                     {
                         try
                         {
-                            var s = Convert.ToString(editor);
+                            tsmiUseLastIme.Checked = editor_use_ime.Value<bool>();
+                        }
+                        catch (Exception) { }
+                    }
+                    if (tsmiUseLastIme.Checked)
+                    {
+                        JToken editor_ime = token.SelectToken("$..result.ime", false);
+                        if (editor_ime != null)
+                        {
+                            try
+                            {
+                                var lang = editor_ime.ToString();
+                                foreach (InputLanguage input in InputLanguage.InstalledInputLanguages)
+                                {
+                                    if (input.LayoutName.Equals(lang, StringComparison.CurrentCultureIgnoreCase))
+                                    {
+                                        CurrentInputLanguage = input;
+                                        InputLanguage.CurrentInputLanguage = input;
+                                        break;
+                                    }
+                                }
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    JToken editor_use_lang = token.SelectToken("$..result.use_last_language", false);
+                    if (editor_use_lang != null)
+                    {
+                        try
+                        {
+                            tsmiUseLastOCRLanguage.Checked = editor_use_lang.Value<bool>();
+                        }
+                        catch (Exception) { }
+                    }
+                    if (tsmiUseLastOCRLanguage.Checked)
+                    {
+                        JToken editor_lang = token.SelectToken("$..result.language", false);
+                        if (editor_lang != null)
+                        {
+                            try
+                            {
+                                var lang = editor_lang.ToString();
+                                foreach (var item in cbLanguage.Items)
+                                {
+                                    if (item is string && item.ToString().Equals(lang, StringComparison.CurrentCultureIgnoreCase))
+                                    {
+                                        cbLanguage.Text = lang;
+                                        break;
+                                    }
+                                    else if (item is KeyValuePair<string, string>)
+                                    {
+                                        var kv = (KeyValuePair<string, string>)item;
+                                        if (lang.Equals(kv.Key, StringComparison.CurrentCultureIgnoreCase) ||
+                                            lang.Equals(kv.Value, StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            cbLanguage.Text = lang;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    JToken editor_font = token.SelectToken("$..result.font", false);
+                    if (editor_font != null)
+                    {
+                        try
+                        {
+                            var s = Convert.ToString(editor_font);
                             var cvt = new FontConverter();
                             edResult.Font = cvt.ConvertFromInvariantString(s) as Font;
                             font_size_default = edResult.Font.SizeInPoints;
@@ -1005,7 +1085,7 @@ namespace OCR_MS
                         }
                     }
                     #endregion
-                }
+                }                
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"LoadConfig => {ex.Message}"); }
             CFGLOADED = true;
@@ -1053,26 +1133,31 @@ namespace OCR_MS
                         { "log_history", OCR_HISTORY },
                     }
                 },
-                {"translate", new Dictionary<string, object>()
+                { "translate", new Dictionary<string, object>()
                     {
-                        {"auto_translate", tsmiTranslateAuto.Checked },
-                        {"translate_to", (string)tsmiTranslateDst.Tag }
+                        { "auto_translate", tsmiTranslateAuto.Checked },
+                        { "translate_to", (string)tsmiTranslateDst.Tag }
                     }
                 },
-                {"speech",  new Dictionary<string, object>()
+                { "speech",  new Dictionary<string, object>()
                     {
-                        {"auto_speech", tsmiTextAutoSpeech.Checked },
-                        {"alt_play_mixed_culture", Speech.AltPlayMixedCulture },
-                        {"simple_detect_culture", Speech.SimpleCultureDetect }
+                        { "auto_rate", tsmiTextAutoSpeechingRate.Checked },
+                        { "auto_speech", tsmiTextAutoSpeech.Checked },
+                        { "alt_play_mixed_culture", Speech.AltPlayMixedCulture },
+                        { "simple_detect_culture", Speech.SimpleCultureDetect }
                     }
                 },
-                {"result", new Dictionary<string, string>()
+                { "result", new Dictionary<string, object>()
                     {
-                        {"font", (new FontConverter()).ConvertToInvariantString(edResult.Font)}
+                        { "use_last_ime", tsmiUseLastIme.Checked },
+                        { "ime", CurrentInputLanguage.LayoutName },
+                        { "use_last_language", tsmiUseLastOCRLanguage.Checked },
+                        { "language", cbLanguage.Text },
+                        { "font", (new FontConverter()).ConvertToInvariantString(edResult.Font)}
                     }
                 },
-                {"ocr_engine", tsmiOcrEngineBaidu.Checked ? "baidu" : "azure" },
-                {"translate_engine", tsmiTranslateEngineBaidu.Checked ? "baidu" : "azure" },
+                { "ocr_engine", tsmiOcrEngineBaidu.Checked ? "baidu" : "azure" },
+                { "translate_engine", tsmiTranslateEngineBaidu.Checked ? "baidu" : "azure" },
                 { "apis_azure", AzureApi.Values.ToList()},
                 { "apis_baidu", BaiduApi.Values.ToList()}
             };
@@ -1220,6 +1305,11 @@ namespace OCR_MS
                 if (_clipboardViewerNext != IntPtr.Zero)
                     ChangeClipboardChain(this.Handle, _clipboardViewerNext);
             }
+        }
+
+        private void MainForm_InputLanguageChanged(object sender, InputLanguageChangedEventArgs e)
+        {
+            CurrentInputLanguage = e.InputLanguage;
         }
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
@@ -1713,6 +1803,7 @@ namespace OCR_MS
         {
             if (sender == tsmiTextPlay)
             {
+                Speech.AutoChangeSpeechSpeed = tsmiTextAutoSpeechingRate.Checked;
                 btnSpeech.PerformClick();
             }
             else if (sender == tsmiTextPause)

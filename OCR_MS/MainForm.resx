@@ -150,9 +150,6 @@
   <data name="&gt;&gt;edResult.ZOrder" xml:space="preserve">
     <value>8</value>
   </data>
-  <metadata name="hint.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="cbLanguage.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
   </data>
@@ -168,6 +165,9 @@
   <data name="cbLanguage.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
+  <metadata name="hint.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <data name="cbLanguage.ToolTip" xml:space="preserve">
     <value>Select OCR Target Language</value>
   </data>
@@ -246,9 +246,6 @@
   <data name="&gt;&gt;pbar.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
-  <metadata name="hint.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="btnOCR.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
@@ -432,18 +429,6 @@
   <metadata name="notifyMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>264, 17</value>
   </metadata>
-  <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 546</value>
-  </data>
-  <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
-    <value>notifyMenu</value>
-  </data>
-  <data name="&gt;&gt;notifyMenu.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="notify.Visible" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
   <data name="tsmiShowWindow.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
   </data>
@@ -455,12 +440,6 @@
   </data>
   <data name="tsmiTopMost.Text" xml:space="preserve">
     <value>Always On Top</value>
-  </data>
-  <data name="tsmiOpacity.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
-  </data>
-  <data name="tsmiOpacity.Text" xml:space="preserve">
-    <value>Window Opacity</value>
   </data>
   <data name="tsmiOpacity100.Size" type="System.Drawing.Size, System.Drawing">
     <value>108, 22</value>
@@ -522,6 +501,12 @@
   <data name="tsmiOpacity10.Text" xml:space="preserve">
     <value>10%</value>
   </data>
+  <data name="tsmiOpacity.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 22</value>
+  </data>
+  <data name="tsmiOpacity.Text" xml:space="preserve">
+    <value>Window Opacity</value>
+  </data>
   <data name="tsmiCloseToTray.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
   </data>
@@ -558,6 +543,12 @@
   <data name="tsmiSep1.Size" type="System.Drawing.Size, System.Drawing">
     <value>237, 6</value>
   </data>
+  <data name="tsmiTextAutoSpeechingRate.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 22</value>
+  </data>
+  <data name="tsmiTextAutoSpeechingRate.Text" xml:space="preserve">
+    <value>Auto Speeching Speed</value>
+  </data>
   <data name="tsmiTextAutoSpeech.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
   </data>
@@ -591,12 +582,6 @@
   <data name="tsmiTranslateAuto.Text" xml:space="preserve">
     <value>Auto Translating OCR Result</value>
   </data>
-  <data name="tsmiTranslateEngine.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
-  </data>
-  <data name="tsmiTranslateEngine.Text" xml:space="preserve">
-    <value>Translate Engine</value>
-  </data>
   <data name="tsmiTranslateEngineAzure.Size" type="System.Drawing.Size, System.Drawing">
     <value>109, 22</value>
   </data>
@@ -608,6 +593,12 @@
   </data>
   <data name="tsmiTranslateEngineBaidu.Text" xml:space="preserve">
     <value>Baidu</value>
+  </data>
+  <data name="tsmiTranslateEngine.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 22</value>
+  </data>
+  <data name="tsmiTranslateEngine.Text" xml:space="preserve">
+    <value>Translate Engine</value>
   </data>
   <data name="tsmiTranslate.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
@@ -630,12 +621,6 @@
   <data name="tsmiSep3.Size" type="System.Drawing.Size, System.Drawing">
     <value>237, 6</value>
   </data>
-  <data name="tsmiOcrEngine.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
-  </data>
-  <data name="tsmiOcrEngine.Text" xml:space="preserve">
-    <value>OCR Engine</value>
-  </data>
   <data name="tsmiOcrEngineAzure.Size" type="System.Drawing.Size, System.Drawing">
     <value>109, 22</value>
   </data>
@@ -648,6 +633,12 @@
   <data name="tsmiOcrEngineBaidu.Text" xml:space="preserve">
     <value>Baidu</value>
   </data>
+  <data name="tsmiOcrEngine.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 22</value>
+  </data>
+  <data name="tsmiOcrEngine.Text" xml:space="preserve">
+    <value>OCR Engine</value>
+  </data>
   <data name="tsmiWatchClipboard.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
   </data>
@@ -659,6 +650,18 @@
   </data>
   <data name="tsmiClearClipboard.Text" xml:space="preserve">
     <value>Auto Clear Clipboard</value>
+  </data>
+  <data name="tsmiUseLastIme.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 22</value>
+  </data>
+  <data name="tsmiUseLastIme.Text" xml:space="preserve">
+    <value>Restore Last IME</value>
+  </data>
+  <data name="tsmiUseLastOCRLanguage.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 22</value>
+  </data>
+  <data name="tsmiUseLastOCRLanguage.Text" xml:space="preserve">
+    <value>Restore Last OCR Language</value>
   </data>
   <data name="tsmiSep4.Size" type="System.Drawing.Size, System.Drawing">
     <value>237, 6</value>
@@ -684,8 +687,23 @@
   <data name="tsmiExit.Text" xml:space="preserve">
     <value>Exit</value>
   </data>
+  <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>241, 634</value>
+  </data>
+  <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
+    <value>notifyMenu</value>
+  </data>
+  <data name="&gt;&gt;notifyMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="notify.Visible" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
+  </metadata>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>53</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>6, 12</value>
@@ -840,6 +858,12 @@
   <data name="&gt;&gt;tsmiSep1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;tsmiTextAutoSpeechingRate.Name" xml:space="preserve">
+    <value>tsmiTextAutoSpeechingRate</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextAutoSpeechingRate.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;tsmiTextAutoSpeech.Name" xml:space="preserve">
     <value>tsmiTextAutoSpeech</value>
   </data>
@@ -946,6 +970,18 @@
     <value>tsmiClearClipboard</value>
   </data>
   <data name="&gt;&gt;tsmiClearClipboard.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiUseLastIme.Name" xml:space="preserve">
+    <value>tsmiUseLastIme</value>
+  </data>
+  <data name="&gt;&gt;tsmiUseLastIme.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiUseLastOCRLanguage.Name" xml:space="preserve">
+    <value>tsmiUseLastOCRLanguage</value>
+  </data>
+  <data name="&gt;&gt;tsmiUseLastOCRLanguage.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tsmiSep4.Name" xml:space="preserve">

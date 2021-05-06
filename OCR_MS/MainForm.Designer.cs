@@ -63,6 +63,7 @@
             this.tsmiHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiHistoryClear = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiTextAutoSpeechingRate = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextAutoSpeech = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextPlay = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextPause = new System.Windows.Forms.ToolStripMenuItem();
@@ -81,6 +82,8 @@
             this.tsmiOcrEngineBaidu = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiClearClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiUseLastIme = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiUseLastOCRLanguage = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep4 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
@@ -200,6 +203,7 @@
             this.tsmiHistory,
             this.tsmiHistoryClear,
             this.tsmiSep1,
+            this.tsmiTextAutoSpeechingRate,
             this.tsmiTextAutoSpeech,
             this.tsmiTextPlay,
             this.tsmiTextPause,
@@ -214,6 +218,8 @@
             this.tsmiOcrEngine,
             this.tsmiWatchClipboard,
             this.tsmiClearClipboard,
+            this.tsmiUseLastIme,
+            this.tsmiUseLastOCRLanguage,
             this.tsmiSep4,
             this.tsmiOptions,
             this.tsmiSaveState,
@@ -357,6 +363,12 @@
             this.tsmiSep1.Name = "tsmiSep1";
             resources.ApplyResources(this.tsmiSep1, "tsmiSep1");
             // 
+            // tsmiTextAutoSpeechingRate
+            // 
+            this.tsmiTextAutoSpeechingRate.CheckOnClick = true;
+            this.tsmiTextAutoSpeechingRate.Name = "tsmiTextAutoSpeechingRate";
+            resources.ApplyResources(this.tsmiTextAutoSpeechingRate, "tsmiTextAutoSpeechingRate");
+            // 
             // tsmiTextAutoSpeech
             // 
             this.tsmiTextAutoSpeech.CheckOnClick = true;
@@ -477,6 +489,18 @@
             resources.ApplyResources(this.tsmiClearClipboard, "tsmiClearClipboard");
             this.tsmiClearClipboard.CheckedChanged += new System.EventHandler(this.chkAutoClipboard_CheckedChanged);
             // 
+            // tsmiUseLastIme
+            // 
+            this.tsmiUseLastIme.CheckOnClick = true;
+            this.tsmiUseLastIme.Name = "tsmiUseLastIme";
+            resources.ApplyResources(this.tsmiUseLastIme, "tsmiUseLastIme");
+            // 
+            // tsmiUseLastOCRLanguage
+            // 
+            this.tsmiUseLastOCRLanguage.CheckOnClick = true;
+            this.tsmiUseLastOCRLanguage.Name = "tsmiUseLastOCRLanguage";
+            resources.ApplyResources(this.tsmiUseLastOCRLanguage, "tsmiUseLastOCRLanguage");
+            // 
             // tsmiSep4
             // 
             this.tsmiSep4.Name = "tsmiSep4";
@@ -527,6 +551,7 @@
             this.Opacity = 0.99900000000000011D;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.InputLanguageChanged += new System.Windows.Forms.InputLanguageChangedEventHandler(this.MainForm_InputLanguageChanged);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
@@ -594,6 +619,9 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiOcrEngine;
         private System.Windows.Forms.ToolStripMenuItem tsmiOcrEngineAzure;
         private System.Windows.Forms.ToolStripMenuItem tsmiOcrEngineBaidu;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextAutoSpeechingRate;
+        private System.Windows.Forms.ToolStripMenuItem tsmiUseLastIme;
+        private System.Windows.Forms.ToolStripMenuItem tsmiUseLastOCRLanguage;
     }
 }
 
