@@ -1612,6 +1612,8 @@ namespace OCR_MS
                 else
                     Speech.AltPlayMixedCulture = false;
 
+                Speech.AutoChangeSpeechSpeed = tsmiTextAutoSpeechingRate.Checked;
+
                 string lang = cbLanguage.SelectedValue.ToString();
                 string culture = string.IsNullOrEmpty(lang) ? "unk" : lang;
 
@@ -1803,7 +1805,6 @@ namespace OCR_MS
         {
             if (sender == tsmiTextPlay)
             {
-                Speech.AutoChangeSpeechSpeed = tsmiTextAutoSpeechingRate.Checked;
                 btnSpeech.PerformClick();
             }
             else if (sender == tsmiTextPause)

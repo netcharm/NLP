@@ -547,7 +547,7 @@
     <value>240, 22</value>
   </data>
   <data name="tsmiTextAutoSpeechingRate.Text" xml:space="preserve">
-    <value>Auto Speeching Speed</value>
+    <value>Auto Change Speech Speed</value>
   </data>
   <data name="tsmiTextAutoSpeech.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
@@ -688,7 +688,7 @@
     <value>Exit</value>
   </data>
   <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 634</value>
+    <value>241, 612</value>
   </data>
   <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
     <value>notifyMenu</value>
