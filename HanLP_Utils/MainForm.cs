@@ -129,8 +129,10 @@ namespace HanLP_Utils
                 var custom_dicts = File.ReadAllLines(custom_dicts_file);
                 foreach (var custom_dict in custom_dicts)
                 {
-                    var fullpath = Path.IsPathRooted(custom_dict) ? custom_dict : Path.GetFullPath(Path.Combine(ROOT, custom_dict));
-                    if (File.Exists(fullpath)) CustomDictionaryList.Add(fullpath);
+                    var dict = custom_dict.Trim();
+                    if (dict.StartsWith("#") || string.IsNullOrEmpty(dict)) continue;
+                    var fullpath = Path.IsPathRooted(dict) ? dict : Path.GetFullPath(Path.Combine(ROOT, dict));
+                    CustomDictionaryList.Add(fullpath);
                 }
             }
         }
@@ -174,22 +176,17 @@ namespace HanLP_Utils
                 if (File.Exists(f)) { filelist.Add(f); }
             }
 
-            foreach (var f in CustomDictionaryList)
-            {
-                if (File.Exists(f)) { filelist.Add(f); }
-            }
+            filelist.AddRange(CustomDictionaryList);
 
+            var ROOT_EXISTS = Directory.Exists(ROOT);
             StringBuilder sb = new StringBuilder();
             List<string> ss = new List<string>();
             foreach (string file in filelist)
             {
                 try
                 {
-                    var fn = $"{Path.GetDirectoryName(file)}{Path.DirectorySeparatorChar}{Path.GetFileNameWithoutExtension(file)}.txt";
-                    if (!Directory.Exists(ROOT))
-                    {
-                        fn = fn.Replace(Path.GetFullPath(ROOT), AppPath + Path.DirectorySeparatorChar);
-                    }
+                    var fn = Path.Combine(Path.GetDirectoryName(file), $"{Path.GetFileNameWithoutExtension(file)}.txt");
+                    if (!ROOT_EXISTS) fn = fn.Replace(Path.GetFullPath(ROOT), AppPath + Path.DirectorySeparatorChar);
                     var nt = Path.GetExtension(file).Split();
                     if (File.Exists(fn))
                     {
@@ -197,12 +194,9 @@ namespace HanLP_Utils
                         if (nt.Length > 1)
                         {
                             var nu = string.Join(" ", nt.Skip(1));
-                            for (int i = 0; i < lines.Length; i++)
-                            {
-                                lines[i] = $"{lines[i]} {nu} 1";
-                            }
+                            ss.AddRange(lines.Select(s => $"{s} {nu} 1").ToList());
                         }
-                        ss.AddRange(lines);
+                        else ss.AddRange(lines);
                     }
                 }
                 catch (Exception ex)
@@ -216,8 +210,7 @@ namespace HanLP_Utils
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(w))
-                        continue;
+                    if (string.IsNullOrEmpty(w)) continue;
                     var ws = w.Split();
                     var uw = ws[0].Trim();
                     if (ws.Length == 1)
@@ -255,8 +248,8 @@ namespace HanLP_Utils
                 stopwords.AddRange(new string[] { "。", "、", "，", "　", "　　", "□", "□□", "一", "一一" });
 
                 List<string> stopfile = new List<string>() {
-                    Path.Combine( ROOT, "data", "dictionary", "stopwords.txt" ).Replace("\\", "/"),
-                    Path.Combine( AppPath, "stopwords.txt" ).Replace("\\", "/"),
+                    Path.Combine(ROOT, "data", "dictionary", "stopwords.txt").Replace("\\", "/"),
+                    Path.Combine(AppPath, "stopwords.txt").Replace("\\", "/"),
                 };
                 if (!CWD.Equals(AppPath, StringComparison.CurrentCultureIgnoreCase))
                     stopfile.Add(Path.Combine(CWD, "stopwords.txt"));
