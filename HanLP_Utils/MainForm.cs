@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -40,10 +41,14 @@ namespace HanLP_Utils
         private bool ShowTermNature = true;
 
         private List<string> CustomDictionaryList = new List<string>();
+        private List<string> CustomStopList = new List<string>();
 
         private HanLP_Result HR = new HanLP_Result();
 
-        private Font DefaultOutputFont = null;
+        private Encoding ASCII = Encoding.ASCII;
+        private Encoding CJK = Encoding.GetEncoding("GBK");
+        private Font DefaultOutputFont { get; set; } = null;
+        private double DefaultFontSize { get; set; } = 9;
 
         public MainForm()
         {
@@ -52,6 +57,33 @@ namespace HanLP_Utils
 
         private void LoadConfig()
         {
+            #region Load Application config
+            Configuration appCfg = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+            AppSettingsSection appSection = appCfg.AppSettings;
+            try
+            {
+                if (appSection.Settings.AllKeys.Contains("Font"))
+                {
+                    var font_str = appSection.Settings["Font"].Value;
+                    var cvt = new FontConverter();
+                    DefaultOutputFont = cvt.ConvertFromInvariantString(font_str) as Font;
+                    DefaultOutputFont = new Font(DefaultOutputFont.FontFamily, DefaultOutputFont.Size, DefaultOutputFont.Style, GraphicsUnit.Pixel);
+                    DefaultFontSize = DefaultOutputFont.Size;
+                    edSrc.Font = DefaultOutputFont;
+                    edDst.Font = DefaultOutputFont;
+                }
+                else
+                {
+                    var cvt = new FontConverter();
+                    DefaultOutputFont = new Font(DefaultOutputFont.FontFamily, DefaultOutputFont.Size, DefaultOutputFont.Style, GraphicsUnit.Pixel);
+                    appSection.Settings.Add("Font", cvt.ConvertToInvariantString(DefaultOutputFont));
+                    appCfg.Save();
+                }
+            }
+            catch { }
+            #endregion
+
+            #region Load "hanlp.properties"
             var config = Path.Combine(AppPath, "hanlp.properties");
             if (File.Exists(config))
             {
@@ -122,7 +154,9 @@ namespace HanLP_Utils
             java.lang.System.getProperties().setProperty("java.class.path", $"{ROOT};.");
             HanLP.Config.ShowTermNature = ShowTermNature;
             chkTermNature.Checked = HanLP.Config.ShowTermNature;
+            #endregion
 
+            #region Load custom dictionary list
             var custom_dicts_file = Path.Combine(ROOT, "custom_dicts.txt");
             if (File.Exists(custom_dicts_file))
             {
@@ -135,6 +169,7 @@ namespace HanLP_Utils
                     CustomDictionaryList.Add(fullpath);
                 }
             }
+            #endregion
         }
 
         private void AddCustomDict()
@@ -194,7 +229,17 @@ namespace HanLP_Utils
                         if (nt.Length > 1)
                         {
                             var nu = string.Join(" ", nt.Skip(1));
-                            ss.AddRange(lines.Select(s => $"{s} {nu} 1").ToList());
+                            if (nu.Equals("w", StringComparison.CurrentCultureIgnoreCase) || nu.Equals("sym", StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                foreach (var sym in lines)
+                                {
+                                    if (sym.Trim().Length > 0 &&
+                                        !CustomDictionary.contains(sym.Trim()) &&
+                                        !CoreStopWordDictionary.contains(sym))
+                                        CoreStopWordDictionary.add(sym);
+                                }
+                            }
+                            else ss.AddRange(lines.Where(s => !CoreStopWordDictionary.contains(s)).Select(s => $"{s} {nu} 1").ToList());
                         }
                         else ss.AddRange(lines);
                     }
@@ -254,19 +299,19 @@ namespace HanLP_Utils
                 if (!CWD.Equals(AppPath, StringComparison.CurrentCultureIgnoreCase))
                     stopfile.Add(Path.Combine(CWD, "stopwords.txt"));
 
-                foreach (var f in stopfile)
+                foreach (var file in stopfile)
                 {
-                    if (File.Exists(f))
+                    if (File.Exists(file))
                     {
-                        var lines = File.ReadAllLines( f );
-                        stopwords.AddRange(lines);
+                        var lines = File.ReadAllLines(file);
+                        stopwords.AddRange(lines.Select(w => w.Trim()).Where(w => !string.IsNullOrEmpty(w)));
                     }
                 }
 
                 foreach (var w in stopwords)
                 {
-                    if (w.Trim().Length > 0 && !CustomDictionary.contains(w.Trim()) && !CoreStopWordDictionary.contains(w))
-                        CoreStopWordDictionary.add(w);
+                    if (CustomDictionary.contains(w)) CustomDictionary.remove(w);
+                    if (!CoreStopWordDictionary.contains(w)) CoreStopWordDictionary.add(w);
                 }
             }
             catch (Exception ex)
@@ -377,16 +422,78 @@ namespace HanLP_Utils
             return (segment);
         }
 
+        private int HalfWidthLength(string text)
+        {
+            return (string.IsNullOrEmpty(text) ? 0 : CJK.GetByteCount(text));
+
+            //var width = string.IsNullOrEmpty(text) ? 0 : text.Length;
+            ////var minValue = UnicodeRanges.CjkUnifiedIdeographs.FirstCodePoint;
+            ////var maxValue = minValue + UnicodeRanges.CjkUnifiedIdeographs.Length;
+            ////var cjkCharRegex = new Regex(@"\p{IsCJKUnifiedIdeographs}");
+            //var wd = 0;
+            //foreach (var c in text)
+            //{
+            //    //var wd0 = wd + (cjkCharRegex.IsMatch($"{c}") ? 2 : 1);
+            //    wd = wd + (0x4E00 <= c && c <= 0x2FA1F ? 2 : 1);
+            //}
+            //return (wd > width ? wd : width);
+        }
+
+        private int FullWidthCount(string text)
+        {
+            return (string.IsNullOrEmpty(text) ? 0 : CJK.GetByteCount(text) - text.Length);
+        }
+
+        private void FontSizeChange(object sender, int action, int max = 48, int min = 9)
+        {
+            if (sender is TextBox)
+            {
+                var edBox = sender as TextBox;
+                var font_old = edBox.Font;
+                double font_size = font_old.Size; //font_old.SizeInPoints;
+                if (action < 0)
+                {
+                    font_size -= 1;
+                    font_size = font_size < min ? min : font_size;
+                }
+                else if (action == 0)
+                {
+                    font_size = DefaultFontSize;
+                }
+                else if (action > 0)
+                {
+                    font_size += 1;
+                    font_size = font_size > max ? max : font_size;
+                }
+                if (font_size != font_old.Size)
+                {
+                    var font_new = new Font(font_old.FontFamily, (float)font_size, font_old.Style, GraphicsUnit.Pixel);
+                    edBox.Font = font_new;
+                }
+            }
+        }
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             try
             {
+                if (DefaultOutputFont == null) DefaultOutputFont = DefaultFont;
+                DefaultFontSize = DefaultFont.Size;
+
                 LoadConfig();
                 AddStopWords();
                 AddCustomDict();
 
-                DefaultOutputFont = edDst.Font;
+                edSrc.MouseWheel += edBox_MouseWheel;
+                edSrc.MouseMove += edBox_MouseMove;
+                edSrc.KeyDown += edBox_KeyDown;
+                edSrc.KeyUp += edBox_KeyUp;
+
+                edDst.MouseWheel += edBox_MouseWheel;
+                edDst.MouseMove += edBox_MouseMove;
+                edDst.KeyDown += edBox_KeyDown;
+                edDst.KeyUp += edBox_KeyUp;
 
                 btnOCR.Visible = false;
                 btnOCR.Enabled = false;
@@ -539,19 +646,60 @@ namespace HanLP_Utils
             HanLP.Config.ShowTermNature = chkTermNature.Checked;
         }
 
-        private void edSrc_KeyUp(object sender, KeyEventArgs e)
+        private void edBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Control && e.KeyCode == Keys.A)
+            if (sender is TextBox)
             {
-                edSrc.SelectAll();
+                var delta = 0;
+                if (e.Control && (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Subtract))
+                {
+                    delta = -1;
+                }
+                else if (e.Control && (e.KeyCode == Keys.Oemplus || e.KeyCode == Keys.Add))
+                {
+                    delta = +1;
+                }
+                else if (e.Control && (e.KeyCode == Keys.D0 || e.KeyCode == Keys.NumPad0))
+                {
+                    delta = 0;
+                }
+
+                if (e.KeyCode != Keys.ControlKey)
+                {
+                    new Action(() => { FontSizeChange(sender, delta); }).Invoke();
+                }
             }
         }
 
-        private void edDst_KeyUp(object sender, KeyEventArgs e)
+        private void edBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Control && e.KeyCode == Keys.A)
+            if (sender is TextBox)
             {
-                edDst.SelectAll();
+                var edBox = sender as TextBox;
+                if (e.Control && e.KeyCode == Keys.A)
+                {
+                    edBox.SelectAll();
+                }
+            }
+        }
+
+        private void edBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (sender is TextBox)
+            {
+                var edBox = sender as TextBox;
+                if (ModifierKeys == Keys.Control && e.Button == MouseButtons.Left && edBox.SelectionLength > 0)
+                {
+                    edBox.DoDragDrop(edBox.SelectedText, DragDropEffects.Copy);
+                }
+            }
+        }
+
+        private void edBox_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (ModifierKeys == Keys.Control)
+            {
+                new Action(() => { FontSizeChange(sender, e.Delta); }).Invoke();
             }
         }
 
@@ -576,7 +724,6 @@ namespace HanLP_Utils
                 else
                     sb.AppendLine(string.Join(", ", text).Trim());
             }
-            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
@@ -600,7 +747,6 @@ namespace HanLP_Utils
                 if (text.Length <= 0) continue;
                 sb.AppendLine(string.Join(", ", text).Trim());
             }
-            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
@@ -613,7 +759,6 @@ namespace HanLP_Utils
 
             var text = HanLP.extractKeyword( edSrc.Text, 25 ).toArray();
             if (text.Length <= 0) return;
-            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join(", ", text);
 
             sw.Stop();
@@ -627,7 +772,6 @@ namespace HanLP_Utils
             var text = HanLP.extractSummary( edSrc.Text, 15 ).toArray();
             if (text.Length <= 0) return;
             var ro = RegexOptions.IgnoreCase | RegexOptions.Multiline;
-            edDst.Font = DefaultOutputFont;
             edDst.Text = Regex.Replace(string.Join(", ", text), @"[　| ]{2,}", " ", ro);
 
             sw.Stop();
@@ -645,7 +789,6 @@ namespace HanLP_Utils
                 if (text.Length <= 0) continue;
                 sb.AppendLine(string.Join(", ", text).Trim());
             }
-            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
@@ -680,12 +823,23 @@ namespace HanLP_Utils
                 var sortedword = freq.ToList();
                 sortedword.Sort((pair1, pair2) => pair2.Value.CompareTo(pair1.Value));
 
-                StringBuilder sb = new StringBuilder();
-                foreach (var w in sortedword)
-                {
-                    sb.AppendLine($"{w.Key}\t{w.Value}".Replace("/", "\t"));
-                }
-                edDst.Text = string.Join("\n", sb);
+                var width_k = sortedword.Max(w => HalfWidthLength(w.Key)) + 1;
+                var width_v = sortedword.Max(w => w.Value).ToString().Length + 1;
+                var sb = sortedword.Select(w => {
+                    var k = w.Key.PadRight(width_k - FullWidthCount(w.Key), ' ');
+                    var v = w.Value.ToString().PadLeft(width_v, ' ');
+                    return($"{k}{v}".Replace("/", " "));
+                }).ToList();
+                edDst.Text = string.Join(Environment.NewLine, sb);
+
+                //StringBuilder sb = new StringBuilder();
+                //foreach (var w in sortedword)
+                //{
+                //    var k = w.Key.PadRight(width_k - FullWidthCount(w.Key), ' ');
+                //    var v = w.Value.ToString().PadLeft(width_v, ' ');
+                //    sb.AppendLine($"{k}{v}".Replace("/", " "));
+                //}
+                //edDst.Text = string.Join("\n", sb);
             }
             catch (Exception ex)
             {
@@ -705,7 +859,6 @@ namespace HanLP_Utils
             {
                 sb.AppendLine(HanLP.convertToTraditionalChinese(line).ToString());
             }
-            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
@@ -721,7 +874,6 @@ namespace HanLP_Utils
             {
                 sb.AppendLine(HanLP.convertToSimplifiedChinese(line).ToString());
             }
-            edDst.Font = DefaultOutputFont;
             edDst.Text = string.Join("\n", sb);
 
             sw.Stop();
@@ -757,8 +909,6 @@ namespace HanLP_Utils
                 //if( cmiPyShowPunctuation.Checked )
                 sb.AppendLine(string.Join(conn, text).Trim());
             }
-            //edDst.Font = new Font( "Courier New", 10 );
-            edDst.Font = new Font("Consolas", 10);
             edDst.Text = string.Join("\n", sb);
 
             sw.Stop();

@@ -125,9 +125,6 @@
   <data name="edSrc.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 10pt</value>
   </data>
-  <data name="edSrc.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>On</value>
-  </data>
   <data name="edSrc.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 3</value>
   </data>
@@ -159,9 +156,6 @@
   <data name="&gt;&gt;edSrc.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="btnSegment.Location" type="System.Drawing.Point, System.Drawing">
     <value>9, 6</value>
   </data>
@@ -174,6 +168,9 @@
   <data name="btnSegment.Text" xml:space="preserve">
     <value>Segment</value>
   </data>
+  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <data name="btnSegment.ToolTip" xml:space="preserve">
     <value>Take the Segments from Source Text</value>
   </data>
@@ -194,9 +191,6 @@
   </data>
   <data name="edDst.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 10pt</value>
-  </data>
-  <data name="edDst.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>On</value>
   </data>
   <data name="edDst.Location" type="System.Drawing.Point, System.Drawing">
     <value>359, 3</value>
@@ -309,191 +303,17 @@
   <data name="layoutMain.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
-  <data name="&gt;&gt;pnlTools.Name" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;pnlTools.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;pnlTools.Parent" xml:space="preserve">
-    <value>layoutMain</value>
-  </data>
-  <data name="&gt;&gt;pnlTools.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="layoutMain.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="layoutMain.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="layoutMain.RowCount" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="layoutMain.Size" type="System.Drawing.Size, System.Drawing">
-    <value>712, 453</value>
-  </data>
-  <data name="layoutMain.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="&gt;&gt;layoutMain.Name" xml:space="preserve">
-    <value>layoutMain</value>
-  </data>
-  <data name="&gt;&gt;layoutMain.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;layoutMain.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;layoutMain.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="layoutMain.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnlTools" Row="1" RowSpan="1" Column="0" ColumnSpan="2" /&gt;&lt;Control Name="edSrc" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="edDst" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,100,Absolute,72" /&gt;&lt;/TableLayoutSettings&gt;</value>
-  </data>
-  <data name="&gt;&gt;btnOCR.Name" xml:space="preserve">
-    <value>btnOCR</value>
-  </data>
-  <data name="&gt;&gt;btnOCR.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnOCR.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;btnOCR.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;pnlOption.Name" xml:space="preserve">
-    <value>pnlOption</value>
-  </data>
-  <data name="&gt;&gt;pnlOption.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;pnlOption.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;pnlOption.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;btnWordFreq.Name" xml:space="preserve">
-    <value>btnWordFreq</value>
-  </data>
-  <data name="&gt;&gt;btnWordFreq.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnWordFreq.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;btnWordFreq.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2PyTM.Name" xml:space="preserve">
-    <value>btnSrc2PyTM</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2PyTM.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2PyTM.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2PyTM.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2PyT.Name" xml:space="preserve">
-    <value>btnSrc2PyT</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2PyT.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2PyT.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2PyT.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2Py.Name" xml:space="preserve">
-    <value>btnSrc2Py</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2Py.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2Py.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;btnSrc2Py.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="&gt;&gt;btnTC2SC.Name" xml:space="preserve">
-    <value>btnTC2SC</value>
-  </data>
-  <data name="&gt;&gt;btnTC2SC.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnTC2SC.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;btnTC2SC.ZOrder" xml:space="preserve">
-    <value>6</value>
-  </data>
-  <data name="&gt;&gt;btnSC2TC.Name" xml:space="preserve">
-    <value>btnSC2TC</value>
-  </data>
-  <data name="&gt;&gt;btnSC2TC.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnSC2TC.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;btnSC2TC.ZOrder" xml:space="preserve">
-    <value>7</value>
-  </data>
-  <data name="&gt;&gt;btnPhrase.Name" xml:space="preserve">
-    <value>btnPhrase</value>
-  </data>
-  <data name="&gt;&gt;btnPhrase.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnPhrase.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;btnPhrase.ZOrder" xml:space="preserve">
-    <value>8</value>
-  </data>
-  <data name="pnlTools.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="pnlTools.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 384</value>
-  </data>
-  <data name="pnlTools.Size" type="System.Drawing.Size, System.Drawing">
-    <value>706, 66</value>
-  </data>
-  <data name="pnlTools.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
-  </data>
-  <data name="&gt;&gt;pnlTools.Name" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;pnlTools.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;pnlTools.Parent" xml:space="preserve">
-    <value>layoutMain</value>
-  </data>
-  <data name="&gt;&gt;pnlTools.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
   <data name="btnOCR.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="btnOCR.Location" type="System.Drawing.Point, System.Drawing">
-    <value>414, 36</value>
+    <value>414, 37</value>
   </data>
   <data name="btnOCR.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
   </data>
   <data name="btnOCR.TabIndex" type="System.Int32, mscorlib">
-    <value>15</value>
+    <value>16</value>
   </data>
   <data name="btnOCR.Text" xml:space="preserve">
     <value>OCR Clip</value>
@@ -509,57 +329,6 @@
   </data>
   <data name="&gt;&gt;btnOCR.ZOrder" xml:space="preserve">
     <value>0</value>
-  </data>
-  <data name="&gt;&gt;lblInfo.Name" xml:space="preserve">
-    <value>lblInfo</value>
-  </data>
-  <data name="&gt;&gt;lblInfo.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lblInfo.Parent" xml:space="preserve">
-    <value>pnlOption</value>
-  </data>
-  <data name="&gt;&gt;lblInfo.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Name" xml:space="preserve">
-    <value>chkTermNature</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.Parent" xml:space="preserve">
-    <value>pnlOption</value>
-  </data>
-  <data name="&gt;&gt;chkTermNature.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="pnlOption.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Right</value>
-  </data>
-  <data name="pnlOption.Location" type="System.Drawing.Point, System.Drawing">
-    <value>562, 0</value>
-  </data>
-  <data name="pnlOption.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>8, 8, 8, 8</value>
-  </data>
-  <data name="pnlOption.Size" type="System.Drawing.Size, System.Drawing">
-    <value>144, 66</value>
-  </data>
-  <data name="pnlOption.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="&gt;&gt;pnlOption.Name" xml:space="preserve">
-    <value>pnlOption</value>
-  </data>
-  <data name="&gt;&gt;pnlOption.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;pnlOption.Parent" xml:space="preserve">
-    <value>pnlTools</value>
-  </data>
-  <data name="&gt;&gt;pnlOption.ZOrder" xml:space="preserve">
-    <value>1</value>
   </data>
   <data name="lblInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Bottom</value>
@@ -628,6 +397,33 @@
     <value>pnlOption</value>
   </data>
   <data name="&gt;&gt;chkTermNature.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="pnlOption.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Right</value>
+  </data>
+  <data name="pnlOption.Location" type="System.Drawing.Point, System.Drawing">
+    <value>562, 0</value>
+  </data>
+  <data name="pnlOption.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>8, 8, 8, 8</value>
+  </data>
+  <data name="pnlOption.Size" type="System.Drawing.Size, System.Drawing">
+    <value>144, 66</value>
+  </data>
+  <data name="pnlOption.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="&gt;&gt;pnlOption.Name" xml:space="preserve">
+    <value>pnlOption</value>
+  </data>
+  <data name="&gt;&gt;pnlOption.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;pnlOption.Parent" xml:space="preserve">
+    <value>pnlTools</value>
+  </data>
+  <data name="&gt;&gt;pnlOption.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
   <data name="btnWordFreq.Location" type="System.Drawing.Point, System.Drawing">
@@ -816,6 +612,60 @@
   <data name="&gt;&gt;btnPhrase.ZOrder" xml:space="preserve">
     <value>8</value>
   </data>
+  <data name="pnlTools.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="pnlTools.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 384</value>
+  </data>
+  <data name="pnlTools.Size" type="System.Drawing.Size, System.Drawing">
+    <value>706, 66</value>
+  </data>
+  <data name="pnlTools.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;pnlTools.Name" xml:space="preserve">
+    <value>pnlTools</value>
+  </data>
+  <data name="&gt;&gt;pnlTools.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;pnlTools.Parent" xml:space="preserve">
+    <value>layoutMain</value>
+  </data>
+  <data name="&gt;&gt;pnlTools.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="layoutMain.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="layoutMain.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="layoutMain.RowCount" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="layoutMain.Size" type="System.Drawing.Size, System.Drawing">
+    <value>712, 453</value>
+  </data>
+  <data name="layoutMain.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;layoutMain.Name" xml:space="preserve">
+    <value>layoutMain</value>
+  </data>
+  <data name="&gt;&gt;layoutMain.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;layoutMain.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;layoutMain.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="layoutMain.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnlTools" Row="1" RowSpan="1" Column="0" ColumnSpan="2" /&gt;&lt;Control Name="edSrc" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="edDst" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,100,Absolute,72" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
   <metadata name="cmActions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>93, 20</value>
   </metadata>
@@ -946,7 +796,7 @@
     <value>Reload UserDict, StopWords</value>
   </data>
   <data name="cmActions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>247, 468</value>
+    <value>247, 446</value>
   </data>
   <data name="&gt;&gt;cmActions.Name" xml:space="preserve">
     <value>cmActions</value>
@@ -954,9 +804,6 @@
   <data name="&gt;&gt;cmActions.Type" xml:space="preserve">
     <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -1101,6 +948,12 @@
   <data name="&gt;&gt;cmiPySeprateCommas.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;cmiSepReload.Name" xml:space="preserve">
+    <value>cmiSepReload</value>
+  </data>
+  <data name="&gt;&gt;cmiSepReload.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;cmiCustomDictReload.Name" xml:space="preserve">
     <value>cmiCustomDictReload</value>
   </data>
@@ -1112,12 +965,6 @@
   </data>
   <data name="&gt;&gt;toolTip.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;cmiSepReload.Name" xml:space="preserve">
-    <value>cmiSepReload</value>
-  </data>
-  <data name="&gt;&gt;cmiSepReload.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>MainForm</value>

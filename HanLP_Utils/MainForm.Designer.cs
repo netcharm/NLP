@@ -11,13 +11,13 @@
         /// 清理所有正在使用的资源。
         /// </summary>
         /// <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
-        protected override void Dispose( bool disposing )
+        protected override void Dispose(bool disposing)
         {
-            if ( disposing && ( components != null ) )
+            if (disposing && (components != null))
             {
                 components.Dispose();
             }
-            base.Dispose( disposing );
+            base.Dispose(disposing);
         }
 
         #region Windows 窗体设计器生成的代码
@@ -71,9 +71,9 @@
             this.cmiSepToPy = new System.Windows.Forms.ToolStripSeparator();
             this.cmiPyShowPunctuation = new System.Windows.Forms.ToolStripMenuItem();
             this.cmiPySeprateCommas = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiSepReload = new System.Windows.Forms.ToolStripSeparator();
             this.cmiCustomDictReload = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.cmiSepReload = new System.Windows.Forms.ToolStripSeparator();
             this.layoutMain.SuspendLayout();
             this.pnlTools.SuspendLayout();
             this.pnlOption.SuspendLayout();
@@ -84,7 +84,6 @@
             // 
             resources.ApplyResources(this.edSrc, "edSrc");
             this.edSrc.Name = "edSrc";
-            this.edSrc.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edSrc_KeyUp);
             // 
             // btnSegment
             // 
@@ -98,7 +97,6 @@
             // 
             resources.ApplyResources(this.edDst, "edDst");
             this.edDst.Name = "edDst";
-            this.edDst.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edDst_KeyUp);
             // 
             // btnTokenizer
             // 
@@ -406,16 +404,16 @@
             this.cmiPySeprateCommas.Name = "cmiPySeprateCommas";
             resources.ApplyResources(this.cmiPySeprateCommas, "cmiPySeprateCommas");
             // 
+            // cmiSepReload
+            // 
+            this.cmiSepReload.Name = "cmiSepReload";
+            resources.ApplyResources(this.cmiSepReload, "cmiSepReload");
+            // 
             // cmiCustomDictReload
             // 
             this.cmiCustomDictReload.Name = "cmiCustomDictReload";
             resources.ApplyResources(this.cmiCustomDictReload, "cmiCustomDictReload");
             this.cmiCustomDictReload.Click += new System.EventHandler(this.cmiCustomDictReload_Click);
-            // 
-            // cmiSepReload
-            // 
-            this.cmiSepReload.Name = "cmiSepReload";
-            resources.ApplyResources(this.cmiSepReload, "cmiSepReload");
             // 
             // MainForm
             // 

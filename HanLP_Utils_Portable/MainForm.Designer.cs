@@ -84,7 +84,6 @@
             // 
             resources.ApplyResources(this.edSrc, "edSrc");
             this.edSrc.Name = "edSrc";
-            this.edSrc.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edSrc_KeyUp);
             // 
             // btnSegment
             // 
@@ -98,7 +97,6 @@
             // 
             resources.ApplyResources(this.edDst, "edDst");
             this.edDst.Name = "edDst";
-            this.edDst.KeyUp += new System.Windows.Forms.KeyEventHandler(this.edDst_KeyUp);
             // 
             // btnTokenizer
             // 

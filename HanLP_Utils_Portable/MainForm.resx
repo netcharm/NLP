@@ -125,9 +125,6 @@
   <data name="edSrc.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 10pt</value>
   </data>
-  <data name="edSrc.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>On</value>
-  </data>
   <data name="edSrc.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 3</value>
   </data>
@@ -194,9 +191,6 @@
   </data>
   <data name="edDst.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 10pt</value>
-  </data>
-  <data name="edDst.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>On</value>
   </data>
   <data name="edDst.Location" type="System.Drawing.Point, System.Drawing">
     <value>359, 3</value>
@@ -802,7 +796,7 @@
     <value>Reload UserDict, StopWords</value>
   </data>
   <data name="cmActions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>247, 468</value>
+    <value>247, 446</value>
   </data>
   <data name="&gt;&gt;cmActions.Name" xml:space="preserve">
     <value>cmActions</value>
