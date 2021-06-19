@@ -39,6 +39,8 @@ namespace HanLP_Utils
         private string HMMSegmentModelPath = $"data/model/segment/HMMSegmentModel.bin";
         private bool ShowTermNature = true;
 
+        private List<string> CustomDictionaryList = new List<string>();
+
         private HanLP_Result HR = new HanLP_Result();
 
         private Font DefaultOutputFont = null;
@@ -120,6 +122,17 @@ namespace HanLP_Utils
             java.lang.System.getProperties().setProperty("java.class.path", $"{ROOT};.");
             HanLP.Config.ShowTermNature = ShowTermNature;
             chkTermNature.Checked = HanLP.Config.ShowTermNature;
+
+            var custom_dicts_file = Path.Combine(ROOT, "custom_dicts.txt");
+            if (File.Exists(custom_dicts_file))
+            {
+                var custom_dicts = File.ReadAllLines(custom_dicts_file);
+                foreach (var custom_dict in custom_dicts)
+                {
+                    var fullpath = Path.IsPathRooted(custom_dict) ? custom_dict : Path.GetFullPath(Path.Combine(ROOT, custom_dict));
+                    if (File.Exists(fullpath)) CustomDictionaryList.Add(fullpath);
+                }
+            }
         }
 
         private void AddCustomDict()
@@ -158,10 +171,12 @@ namespace HanLP_Utils
 
             foreach (var f in userdict)
             {
-                if (File.Exists(f))
-                {
-                    filelist.Add(f);
-                }
+                if (File.Exists(f)) { filelist.Add(f); }
+            }
+
+            foreach (var f in CustomDictionaryList)
+            {
+                if (File.Exists(f)) { filelist.Add(f); }
             }
 
             StringBuilder sb = new StringBuilder();
@@ -558,7 +573,7 @@ namespace HanLP_Utils
             {
                 var t = line.Trim().Replace("　", " ").Replace("□", " ");
                 var result = segment.seg(t);
-                foreach(Term r in result.toArray())
+                foreach (Term r in result.toArray())
                 {
                     if (CoreStopWordDictionary.contains(r.word)) result.remove(r);
                 }
@@ -766,7 +781,7 @@ namespace HanLP_Utils
                     Bitmap src = (Bitmap)Clipboard.GetImage();
                     ocr_ms(src);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.ToString());
                 }
