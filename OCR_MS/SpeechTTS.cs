@@ -29,17 +29,17 @@ namespace OCR_MS
         // 韩文：[\uac00-\ud7ff]
         //
         //private string pattern_zh = @"[\u3000-\u303f\ufe00-\ufe4f\u3400-\u4db5\u4e00-\u9fcc\uf900-\ufad9\u20000-\u2cea1]+?";
-        private string pattern_zhs = @"([\u3000-\u303f\ufe00-\ufe4f\uff01-\uffee\u3400-\u4db5\u4e00-\u9fcc\uf900-\ufad9]|([\ud840-\ud873][\udc00-\udfff]))+";
+        private string pattern_zhs = @"([\u3000-\u303f\ufe00-\ufe4f\uff01-\uffee\u3400-\u4db5\u4e00-\u9fcc\uf900-\ufad9\uff61-\uff64]|([\ud840-\ud873][\udc00-\udfff]))+";
         private string pattern_zht = @"[\u3000-\u3003\u3008-\u300F\u3010-\u3011\u3014-\u3015\u301C-\u301E\u3105-\u31ba\ua140-\ua3bf\ua440-\uc67e\uc940-\uf9d5\ue000-\uf848]+";
         //private string pattern_ja = @"[\u0021-\u024f\u0250-\u02af\u0391-\u03d9\u1f00-\u1ffe\u1e00-\u1eff\u2010-\u205e\u2e00-\u2e3b\u2c60-\u2c7f\ua720-\ua7ff]+";
-        private string pattern_ja = @"([\u3041-\u309f\u30a0-\u31ff\u3220-\u325f\u3280-\u32ff\u3300-\u4077]|(\ud83c[\ude01-\ude51]))+";
-        private string pattern_ko = @"[\u1100-\u11ff\u3131-\u318e\u3200-\u321f\u3260-\u327f\ua960-\ua97c\uac00-\ud7a3]+";
+        private string pattern_ja = @"([\u3041-\u309f\u30a0-\u31ff\u3220-\u325f\u3280-\u32ff\u3300-\u4077\uff65-\uff9f]|(\ud83c[\ude01-\ude51]))+";
+        private string pattern_ko = @"[\u1100-\u11ff\u3131-\u318e\u3200-\u321f\u3260-\u327f\ua960-\ua97c\uac00-\ud7a3\uffa0-\uffdf]+";
         private string pattern_en = @"[\u0020-\u007e\u0080-\u02af\u0391-\u03d9\u1f00-\u1ffe\u1e00-\u1eff\u2010-\u205e\u2e00-\u2e3b\u2c60-\u2c7f\ua720-\ua7ff]+";
         private string pattern_dt = @"^[\d: tTzZ+\-\/\\]{4,}$";
         private string pattern_digit = @"^\d+$";
         //private string pattern_emoji = @"[\u2190-\u27bf\u3400-\u4dbf\u4dc0-\u4dff\uf900-\ufad9\u1d300-\u1d356\u1f000-\u1f02b\u1f030-\u1f093\u1f0a0-\u1f0f5\u1f300-\u1f5ff]+";
         private string pattern_emoji = @"([\u2190-\u27bf]|(\ud834[\udf00-\udf56])|(\ud83c[\udc00-\udfff]))+?";
-        private string pattern_symbol = @"[\u0021-\u0040\u005b-\u0060\u007b-\u00ff\u2010-\u2e3b]+";
+        private string pattern_symbol = @"[\u0021-\u0040\u005b-\u0060\u007b-\u00ff\u2010-\u2e3b\uff61-\uff64\uffeb-\uffef]+";
         #endregion
 
         #region Required Encoding types
@@ -329,6 +329,7 @@ namespace OCR_MS
         #endregion
 
         #region Speech Synthesis routines
+        public SemaphoreSlim CanPlay = new SemaphoreSlim(1, 1);
         public static List<InstalledVoice> InstalledVoices { get; private set; } = null;
         private Queue<KeyValuePair<string, CultureInfo>> PlayQueue = new Queue<KeyValuePair<string, CultureInfo>>();
 
@@ -339,10 +340,18 @@ namespace OCR_MS
 
         public SynthesizerState State { get { return (synth is SpeechSynthesizer ? synth.State : SynthesizerState.Ready); } }
 
-        public Action<StateChangedEventArgs> StateChanged { get; set; } = null;
         public Action<SpeakStartedEventArgs> SpeakStarted { get; set; } = null;
         public Action<SpeakProgressEventArgs> SpeakProgress { get; set; } = null;
+        public Action<StateChangedEventArgs> StateChanged { get; set; } = null;
+        public Action<VoiceChangeEventArgs> VoiceChange { get; set; } = null;
+        public Action<BookmarkReachedEventArgs> BookmarkReached { get; set; } = null;
+        public Action<PhonemeReachedEventArgs> PhonemeReached { get; set; } = null;
+        public Action<VisemeReachedEventArgs> VisemeReached { get; set; } = null;
         public Action<SpeakCompletedEventArgs> SpeakCompleted { get; set; } = null;
+
+        public int PlayNormalRate { get; internal set; } = 0;
+        public int PlaySlowRate { get; internal set; } = -5;
+        public int PlayVolume { get; internal set; } = 100;
 
         private static Dictionary<CultureInfo, List<string>> nametable = new Dictionary<CultureInfo, List<string>>() {
             { CultureInfo.GetCultureInfo("zh-CN"), new List<string>() { "huihui", "yaoyao", "lili", "kangkang" } },
@@ -376,9 +385,29 @@ namespace OCR_MS
             nametable = SetNames(names);
         }
 
-        private async void Synth_StateChanged(object sender, StateChangedEventArgs e)
+        private void Synth_SpeakStarted(object sender, SpeakStartedEventArgs e)
         {
             if (synth == null) return;
+
+            if (CancelRequested) { synth.SpeakAsyncCancel(e.Prompt); synth.SpeakAsyncCancelAll(); PlayQueue.Clear(); return; }
+
+            if (SpeakStarted is Action<SpeakProgressEventArgs>) SpeakStarted.Invoke(e);
+        }
+
+        private void Synth_SpeakProgress(object sender, SpeakProgressEventArgs e)
+        {
+            if (synth == null) return;
+
+            if (e.Cancelled || CancelRequested) { synth.SpeakAsyncCancel(e.Prompt); synth.SpeakAsyncCancelAll(); PlayQueue.Clear(); return; }
+
+            if (SpeakProgress is Action<SpeakProgressEventArgs>) SpeakProgress.Invoke(e);
+        }
+
+        private void Synth_StateChanged(object sender, StateChangedEventArgs e)
+        {
+            if (synth == null) return;
+
+            if (CancelRequested) { synth.SpeakAsyncCancelAll(); PlayQueue.Clear(); return; }
 
             if (synth.State == SynthesizerState.Paused)
             {
@@ -392,53 +421,74 @@ namespace OCR_MS
             {
 
             }
-            if (StateChanged is Action<StateChangedEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
-            {
-                StateChanged(e);
-            }, DispatcherPriority.Background);
+            if (StateChanged is Action<SpeakProgressEventArgs>) StateChanged.Invoke(e);
         }
 
-        private async void Synth_SpeakStarted(object sender, SpeakStartedEventArgs e)
+        private void Synth_VoiceChange(object sender, VoiceChangeEventArgs e)
         {
             if (synth == null) return;
 
-            if (SpeakStarted is Action<SpeakStartedEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
-            {
-                SpeakStarted(e);
-            }, DispatcherPriority.Background);
+            if (e.Cancelled || CancelRequested) { synth.SpeakAsyncCancel(e.Prompt); synth.SpeakAsyncCancelAll(); PlayQueue.Clear(); return; }
+
+            if (VoiceChange is Action<VoiceChangeEventArgs>) VoiceChange.Invoke(e);
         }
 
-        private async void Synth_SpeakProgress(object sender, SpeakProgressEventArgs e)
+        private void Synth_BookmarkReached(object sender, BookmarkReachedEventArgs e)
         {
             if (synth == null) return;
 
-            if (SpeakProgress is Action<SpeakProgressEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
-            {
-                SpeakProgress(e);
-            }, DispatcherPriority.Background);
+            if (e.Cancelled || CancelRequested) { synth.SpeakAsyncCancel(e.Prompt); synth.SpeakAsyncCancelAll(); PlayQueue.Clear(); return; }
+
+            if (BookmarkReached is Action<BookmarkReachedEventArgs>) BookmarkReached.Invoke(e);
         }
 
-        private async void Synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
+        private void Synth_PhonemeReached(object sender, PhonemeReachedEventArgs e)
         {
             if (synth == null) return;
+
+            if (e.Cancelled || CancelRequested) { synth.SpeakAsyncCancel(e.Prompt); synth.SpeakAsyncCancelAll(); PlayQueue.Clear(); return; }
+
+            if (PhonemeReached is Action<PhonemeReachedEventArgs>) PhonemeReached.Invoke(e);
+        }
+
+        private void Synth_VisemeReached(object sender, VisemeReachedEventArgs e)
+        {
+            if (synth == null) return;
+
+            if (e.Cancelled || CancelRequested) { synth.SpeakAsyncCancel(e.Prompt); synth.SpeakAsyncCancelAll(); PlayQueue.Clear(); return; }
+
+            if (VisemeReached is Action<VisemeReachedEventArgs>) VisemeReached.Invoke(e);
+        }
+
+        private void Synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
+        {
+            if (synth == null) return;
+
+            if (CanPlay is SemaphoreSlim && CanPlay.CurrentCount < 1) CanPlay.Release();
+            CancelRequested = false;
 
             if (!e.Cancelled && PlayQueue.Count > 0)
             {
-                var first = PlayQueue.Dequeue();
-                Play(first.Key, first.Value);
+                if (CancelRequested)
+                {
+                    synth.SpeakAsyncCancelAll(); PlayQueue.Clear();
+                }
+                else
+                {
+                    var first = PlayQueue.Dequeue();
+                    Play(first.Key, first.Value);
+                }
             }
             else
             {
-                if (SpeakCompleted is Action<SpeakCompletedEventArgs>) await Dispatcher.CurrentDispatcher.InvokeAsync(() =>
-                {
-                    SpeakCompleted(e);
-                }, DispatcherPriority.Background);
+                if (SpeakCompleted is Action<SpeakProgressEventArgs>) SpeakCompleted.Invoke(e);
+                lastPrompt = null;
             }
         }
         #endregion
 
         #region Play contents routines
-        public void Play(string text, CultureInfo locale = null, bool async = true)
+        public async void Play(string text, CultureInfo locale = null, bool async = true)
         {
             if (string.IsNullOrEmpty(text.Trim())) return;
 
@@ -452,58 +502,66 @@ namespace OCR_MS
                 return;
             }
 
-            try
+            Stop();
+            if (await CanPlay.WaitAsync(1000))
             {
-                Stop();
-
-                if (!(locale is CultureInfo)) locale = DetectCulture(text);
-
-                var voice = GetCustomVoiceName(locale);
-                if (string.IsNullOrEmpty(voice)) synth.SelectVoice(voice_default);
-                else synth.SelectVoice(voice);
-
-                //synth.Volume = 100;  // 0...100
-                //synth.Rate = 0;     // -10...10
-                if (AutoChangeSpeechSpeed && (SimpleCultureDetect || !AltPlayMixedCulture))
+                try
                 {
-                    if (text.Equals(SPEECH_TEXT, StringComparison.CurrentCultureIgnoreCase) &&
-                        SPEECH_CULTURE.IetfLanguageTag.Equals(locale.IetfLanguageTag, StringComparison.CurrentCultureIgnoreCase))
-                        SPEECH_SLOW = !SPEECH_SLOW;
+                    CancelRequested = false;
+
+                    if (!(locale is CultureInfo)) locale = DetectCulture(text);
+
+                    var voice = GetCustomVoiceName(locale);
+                    if (string.IsNullOrEmpty(voice)) synth.SelectVoice(voice_default);
+                    else synth.SelectVoice(voice);
+
+                    synth.Volume = Math.Max(0, Math.Min(PlayVolume, 100));  // 0...100
+                                                                            //synth.Rate = 0;     // -10...10
+                    if (AutoChangeSpeechSpeed && (SimpleCultureDetect || !AltPlayMixedCulture))
+                    {
+                        if (text.Equals(SPEECH_TEXT, StringComparison.CurrentCultureIgnoreCase) &&
+                            SPEECH_CULTURE.IetfLanguageTag.Equals(locale.IetfLanguageTag, StringComparison.CurrentCultureIgnoreCase))
+                            SPEECH_SLOW = !SPEECH_SLOW;
+                        else
+                            SPEECH_SLOW = false;
+
+                        if (SPEECH_SLOW) synth.Rate = Math.Max(-10, Math.Min(PlaySlowRate, 10));
+                        else synth.Rate = Math.Max(-10, Math.Min(PlayNormalRate, 10));
+                    }
+
+                    // Configure the audio output. 
+                    synth.SetOutputToDefaultAudioDevice();
+
+                    if (async)
+                        lastPrompt = synth.SpeakAsync(text);  // Asynchronous
                     else
-                        SPEECH_SLOW = false;
+                        synth.Speak(text);       // Synchronous
 
-                    if (SPEECH_SLOW) synth.Rate = -5;
-                    else synth.Rate = 0;
+                    if (AutoChangeSpeechSpeed && (SimpleCultureDetect || !AltPlayMixedCulture))
+                    {
+                        SPEECH_TEXT = text;
+                        SPEECH_CULTURE = locale;
+                    }
                 }
-
-                if (async)
-                    lastPrompt = synth.SpeakAsync(text);  // Asynchronous
-                else
-                    synth.Speak(text);       // Synchronous
-
-                if (AutoChangeSpeechSpeed && (SimpleCultureDetect || !AltPlayMixedCulture))
-                {
-                    SPEECH_TEXT = text;
-                    SPEECH_CULTURE = locale;
-                }
-            }
 #if DEBUG
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
 #else
-            catch (Exception) { }
-#endif            
+                catch (Exception) { }
+#endif
+            }
         }
 
-        public void Play(string text, string locale, bool async = true)
+        public async void Play(string text, string locale, bool async = true)
         {
+            await Task.Delay(1);
             Play(text, FindCultureByName(locale), async);
         }
 
         private Prompt lastPrompt = null;
-        public void Play(PromptBuilder prompt, CultureInfo locale = null, bool async = true)
+        public async void Play(PromptBuilder prompt, CultureInfo locale = null, bool async = true)
         {
             if (!(synth is SpeechSynthesizer)) return;
 
@@ -516,47 +574,54 @@ namespace OCR_MS
                 return;
             }
 
-            try
+            Stop();
+            if (await CanPlay.WaitAsync(1000))
             {
-                Stop();
-
-                if (!(locale is CultureInfo)) locale = prompt.Culture;
-
-                var voice = GetCustomVoiceName(locale);
-                if (string.IsNullOrEmpty(voice)) synth.SelectVoice(voice_default);
-                else synth.SelectVoice(voice);
-
-                //synth.Volume = 100;  // 0...100
-                //synth.Rate = 0;     // -10...10
-                var prompt_xml = prompt.ToXml();
-                if (AutoChangeSpeechSpeed)
+                try
                 {
-                    if (prompt_xml.Equals(SPEECH_TEXT, StringComparison.CurrentCultureIgnoreCase) &&
-                        SPEECH_CULTURE.IetfLanguageTag.Equals(locale.IetfLanguageTag, StringComparison.CurrentCultureIgnoreCase))
-                        SPEECH_SLOW = !SPEECH_SLOW;
+                    CancelRequested = false;
+
+                    if (!(locale is CultureInfo)) locale = prompt.Culture;
+
+                    var voice = GetCustomVoiceName(locale);
+                    if (string.IsNullOrEmpty(voice)) synth.SelectVoice(voice_default);
+                    else synth.SelectVoice(voice);
+
+                    synth.Volume = Math.Max(0, Math.Min(PlayVolume, 100));  // 0...100
+                                                                            //synth.Rate = 0;     // -10...10
+                    var prompt_xml = prompt.ToXml();
+                    if (AutoChangeSpeechSpeed)
+                    {
+                        if (prompt_xml.Equals(SPEECH_TEXT, StringComparison.CurrentCultureIgnoreCase) &&
+                            SPEECH_CULTURE.IetfLanguageTag.Equals(locale.IetfLanguageTag, StringComparison.CurrentCultureIgnoreCase))
+                            SPEECH_SLOW = !SPEECH_SLOW;
+                        else
+                            SPEECH_SLOW = false;
+
+                        if (SPEECH_SLOW) synth.Rate = Math.Max(-10, Math.Min(PlaySlowRate, 10));
+                        else synth.Rate = Math.Max(-10, Math.Min(PlayNormalRate, 10));
+                    }
+
+                    // Configure the audio output. 
+                    synth.SetOutputToDefaultAudioDevice();
+
+                    if (async)
+                        lastPrompt = synth.SpeakAsync(prompt);  // Asynchronous
                     else
-                        SPEECH_SLOW = false;
+                        synth.Speak(prompt);       // Synchronous
 
-                    if (SPEECH_SLOW) synth.Rate = -5;
-                    else synth.Rate = 0;
+                    SPEECH_TEXT = prompt_xml;
+                    SPEECH_CULTURE = prompt.Culture;
                 }
-
-                if (async)
-                    lastPrompt = synth.SpeakAsync(prompt);  // Asynchronous
-                else
-                    synth.Speak(prompt);       // Synchronous
-
-                SPEECH_TEXT = prompt_xml;
-                SPEECH_CULTURE = prompt.Culture;
-            }
 #if DEBUG
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
 #else
-            catch (Exception) { }
-#endif            
+                catch (Exception) { }
+#endif 
+            }
         }
 
         public void Play(PromptBuilder prompt, string locale, bool async = true)
@@ -566,11 +631,11 @@ namespace OCR_MS
 
         public void Play(IEnumerable<string> contents, CultureInfo locale = null)
         {
+            PlayQueue.Clear();
             if (AltPlayMixedCulture)
             {
                 if (contents is IEnumerable<string>)
                 {
-                    PlayQueue.Clear();
                     if (AutoChangeSpeechSpeed)
                     {
                         var speech_text = string.Join(Environment.NewLine, contents);
@@ -579,8 +644,8 @@ namespace OCR_MS
                         else
                             SPEECH_SLOW = false;
 
-                        if (SPEECH_SLOW) synth.Rate = -5;
-                        else synth.Rate = 0;
+                        if (SPEECH_SLOW) synth.Rate = Math.Max(-10, Math.Min(PlaySlowRate, 10));
+                        else synth.Rate = Math.Max(-10, Math.Min(PlayNormalRate, 10));
 
                         SPEECH_TEXT = speech_text;
                     }
@@ -608,14 +673,13 @@ namespace OCR_MS
                     {
                         SPEECH_TEXT = string.Empty;
                         SPEECH_SLOW = false;
-                        synth.Rate = 0;
+                        synth.Rate = Math.Max(-10, Math.Min(PlayNormalRate, 10));
                     }
                 }
             }
             else
             {
-                PlayQueue.Clear();
-                var prompt = new PromptBuilder();
+                var prompt = new PromptBuilder(CultureInfo.CurrentCulture);
                 prompt.ClearContent();
                 foreach (var text in contents)
                 {
@@ -624,6 +688,7 @@ namespace OCR_MS
                     {
                         var sentences = SliceByCulture(text, locale);
                         var culture = locale == null ? sentences.FirstOrDefault().Value : locale;
+                        prompt.StartStyle(new PromptStyle());
                         prompt.StartParagraph(culture);
                         foreach (var kv in sentences)
                         {
@@ -631,19 +696,26 @@ namespace OCR_MS
                             var new_culture = kv.Value;
                             if (string.IsNullOrEmpty(new_text)) continue;
                             prompt.StartVoice(GetCustomVoiceName(new_culture));
+                            prompt.StartSentence(new_culture);
                             prompt.AppendText(new_text);
+                            prompt.EndSentence();
                             prompt.EndVoice();
                         }
                         prompt.EndParagraph();
+                        prompt.EndStyle();
                     }
                     else
                     {
                         var culture = locale == null ? DetectCulture(text) : locale;
+                        prompt.StartStyle(new PromptStyle());
                         prompt.StartParagraph(culture);
                         prompt.StartVoice(GetCustomVoiceName(culture));
+                        prompt.StartSentence(culture);
                         prompt.AppendText(text);
+                        prompt.EndSentence();
                         prompt.EndVoice();
                         prompt.EndParagraph();
+                        prompt.EndStyle();
                     }
                 }
                 Play(prompt, locale);
@@ -679,7 +751,8 @@ namespace OCR_MS
             catch (Exception) { }
         }
 
-        public void Stop()
+        private bool CancelRequested = false;
+        public async void Stop()
         {
             try
             {
@@ -687,14 +760,10 @@ namespace OCR_MS
                 {
                     if (synth.State != SynthesizerState.Ready)
                     {
-                        if (lastPrompt is Prompt)
-                        {
-                            synth.SpeakAsyncCancel(lastPrompt);
-                            Thread.Sleep(100);
-                        }
+                        CancelRequested = true;
+                        if (lastPrompt is Prompt) synth.SpeakAsyncCancel(lastPrompt);
                         synth.SpeakAsyncCancelAll();
-                        Thread.Sleep(100);
-                        synth.Resume();
+                        await Task.Delay(1);
                     }
                 }
             }
@@ -712,6 +781,10 @@ namespace OCR_MS
                 synth.SpeakStarted += Synth_SpeakStarted;
                 synth.SpeakProgress += Synth_SpeakProgress;
                 synth.StateChanged += Synth_StateChanged;
+                synth.VoiceChange += Synth_VoiceChange;
+                synth.BookmarkReached += Synth_BookmarkReached;
+                synth.PhonemeReached += Synth_PhonemeReached;
+                synth.VisemeReached += Synth_VisemeReached;
                 synth.SpeakCompleted += Synth_SpeakCompleted;
                 #endregion
 
@@ -723,15 +796,33 @@ namespace OCR_MS
 
         ~SpeechTTS()
         {
-            try
+            Dispose(false);
+        }
+
+        public void Close()
+        {
+            Dispose();
+        }
+
+        private bool disposed = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed) return;
+            if (disposing)
             {
-                if (synth is SpeechSynthesizer)
+                try
                 {
-                    Stop();
-                    synth.Dispose();
+                    if (synth is SpeechSynthesizer) synth.Dispose();
                 }
+                catch { }
             }
-            catch (Exception) { }
+            disposed = true;
         }
         #endregion
     }
@@ -739,11 +830,6 @@ namespace OCR_MS
     public static class Speech
     {
         #region Speech Synthesizer events actions
-        public static Action<StateChangedEventArgs> StateChanged
-        {
-            get { return (t2s is SpeechTTS ? t2s.StateChanged : null); }
-            set { if (t2s is SpeechTTS) t2s.StateChanged = value; }
-        }
         public static Action<SpeakStartedEventArgs> SpeakStarted
         {
             get { return (t2s is SpeechTTS ? t2s.SpeakStarted : null); }
@@ -754,6 +840,31 @@ namespace OCR_MS
             get { return (t2s is SpeechTTS ? t2s.SpeakProgress : null); }
             set { if (t2s is SpeechTTS) t2s.SpeakProgress = value; }
         }
+        public static Action<StateChangedEventArgs> StateChanged
+        {
+            get { return (t2s is SpeechTTS ? t2s.StateChanged : null); }
+            set { if (t2s is SpeechTTS) t2s.StateChanged = value; }
+        }
+        public static Action<VoiceChangeEventArgs> VoiceChange
+        {
+            get { return (t2s is SpeechTTS ? t2s.VoiceChange : null); }
+            set { if (t2s is SpeechTTS) t2s.VoiceChange = value; }
+        }
+        public static Action<BookmarkReachedEventArgs> BookmarkReached
+        {
+            get { return (t2s is SpeechTTS ? t2s.BookmarkReached : null); }
+            set { if (t2s is SpeechTTS) t2s.BookmarkReached = value; }
+        }
+        public static Action<PhonemeReachedEventArgs> PhonemeReached
+        {
+            get { return (t2s is SpeechTTS ? t2s.PhonemeReached : null); }
+            set { if (t2s is SpeechTTS) t2s.PhonemeReached = value; }
+        }
+        public static Action<VisemeReachedEventArgs> VisemeReached
+        {
+            get { return (t2s is SpeechTTS ? t2s.VisemeReached : null); }
+            set { if (t2s is SpeechTTS) t2s.VisemeReached = value; }
+        }
         public static Action<SpeakCompletedEventArgs> SpeakCompleted
         {
             get { return (t2s is SpeechTTS ? t2s.SpeakCompleted : null); }
@@ -762,6 +873,7 @@ namespace OCR_MS
         #endregion
 
         #region Speech Synthesizer properties
+        public static Dictionary<string, string> CustomNames { set { SpeechTTS.SetCustomNames(value); } }
         public static bool AutoChangeSpeechSpeed
         {
             get { return (t2s is SpeechTTS ? t2s.AutoChangeSpeechSpeed : true); }
@@ -782,6 +894,21 @@ namespace OCR_MS
             get { return (t2s is SpeechTTS ? t2s.PlayMixedCultureInline : true); }
             set { if (t2s is SpeechTTS) t2s.PlayMixedCultureInline = value; }
         }
+        public static int PlayNormalRate
+        {
+            get { return (t2s is SpeechTTS ? t2s.PlayNormalRate : 0); }
+            set { if (t2s is SpeechTTS) t2s.PlayNormalRate = Math.Max(-10, Math.Min(value, 10)); }
+        }
+        public static int PlaySlowRate
+        {
+            get { return (t2s is SpeechTTS ? t2s.PlaySlowRate : -5); }
+            set { if (t2s is SpeechTTS) t2s.PlaySlowRate = Math.Max(-10, Math.Min(value, 10)); }
+        }
+        public static int PlayVolume
+        {
+            get { return (t2s is SpeechTTS ? t2s.PlayVolume : 100); }
+            set { if (t2s is SpeechTTS) t2s.PlayVolume = Math.Max(0, Math.Min(value, 100)); }
+        }
         public static SynthesizerState State { get { return (t2s is SpeechTTS ? t2s.State : SynthesizerState.Ready); } }
 
         public static bool ChineseSimplifiedPrefer
@@ -796,8 +923,7 @@ namespace OCR_MS
 
         private static SpeechTTS Init()
         {
-            var tts = new SpeechTTS();
-            return (tts);
+            return (new SpeechTTS());
         }
         #endregion
 

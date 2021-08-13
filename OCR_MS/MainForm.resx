@@ -522,6 +522,12 @@
   <data name="tsmiLogOCRHistory.Text" xml:space="preserve">
     <value>Log History</value>
   </data>
+  <data name="tsmiHistoryClear.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 22</value>
+  </data>
+  <data name="tsmiHistoryClear.Text" xml:space="preserve">
+    <value>Clear History</value>
+  </data>
   <data name="tsmiShowOCRResult.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
   </data>
@@ -533,12 +539,6 @@
   </data>
   <data name="tsmiHistory.Text" xml:space="preserve">
     <value>History</value>
-  </data>
-  <data name="tsmiHistoryClear.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
-  </data>
-  <data name="tsmiHistoryClear.Text" xml:space="preserve">
-    <value>Clear History</value>
   </data>
   <data name="tsmiSep1.Size" type="System.Drawing.Size, System.Drawing">
     <value>237, 6</value>
@@ -600,12 +600,6 @@
   <data name="tsmiTranslateEngine.Text" xml:space="preserve">
     <value>Translate Engine</value>
   </data>
-  <data name="tsmiTranslate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
-  </data>
-  <data name="tsmiTranslate.Text" xml:space="preserve">
-    <value>Translating Text</value>
-  </data>
   <data name="tsmiTranslateSrc.Size" type="System.Drawing.Size, System.Drawing">
     <value>240, 22</value>
   </data>
@@ -617,6 +611,12 @@
   </data>
   <data name="tsmiTranslateDst.Text" xml:space="preserve">
     <value>Translating To</value>
+  </data>
+  <data name="tsmiTranslate.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 22</value>
+  </data>
+  <data name="tsmiTranslate.Text" xml:space="preserve">
+    <value>Translating Text</value>
   </data>
   <data name="tsmiSep3.Size" type="System.Drawing.Size, System.Drawing">
     <value>237, 6</value>
@@ -688,7 +688,7 @@
     <value>Exit</value>
   </data>
   <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 612</value>
+    <value>241, 634</value>
   </data>
   <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
     <value>notifyMenu</value>
