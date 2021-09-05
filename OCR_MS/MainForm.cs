@@ -576,11 +576,14 @@ namespace OCR_MS
                     };
 
                     var capture = Screenshot.CaptureRegion(CaptureOption);
-                    var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
-                    png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(capture));
-                    png.Save(ms);
-                    ms.Seek(0, SeekOrigin.Begin);
-                    result = Image.FromStream(ms);
+                    if (capture.PixelWidth >= 16 && capture.PixelHeight >= 16)
+                    {
+                        var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                        png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(capture));
+                        png.Save(ms);
+                        ms.Seek(0, SeekOrigin.Begin);
+                        result = Image.FromStream(ms);
+                    }
                 }
                 catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
             }
@@ -1197,6 +1200,7 @@ namespace OCR_MS
         }
 
         private int cursor_offset = -1;
+        private List<string> words = new List<string>();
         private void MainForm_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
@@ -1204,20 +1208,28 @@ namespace OCR_MS
             #region Speech Synthesis Events Action
             Speech.SpeakStarted = new Action<SpeakStartedEventArgs>((evt) =>
             {
-                edResult.ReadOnly = true;
-                lastSelectionStart = edResult.SelectionStart;
-                lastSelectionLength = edResult.SelectionLength;
-                tsmiTextPlay.Checked = true;
-                tsmiTextPause.Checked = false;
-                tsmiTextStop.Checked = false;
-                if (cursor_offset == -1) cursor_offset = edResult.SelectionLength > 0 ? edResult.SelectionStart : 0;
+                words.Clear();
+                if (!Speech.IsSlicing)
+                {
+                    edResult.ReadOnly = true;
+                    lastSelectionStart = edResult.SelectionStart;
+                    lastSelectionLength = edResult.SelectionLength;
+                    tsmiTextPlay.Checked = true;
+                    tsmiTextPause.Checked = false;
+                    tsmiTextStop.Checked = false;
+                    if (cursor_offset == -1) cursor_offset = edResult.SelectionLength > 0 ? edResult.SelectionStart : 0;
+                }
             });
 
             Speech.SpeakProgress = new Action<SpeakProgressEventArgs>((evt) =>
             {
                 var ei = evt as SpeakProgressEventArgs;
-                edResult.SelectionStart = cursor_offset >= 0 ? ei.CharacterPosition + cursor_offset : ei.CharacterPosition;
-                edResult.SelectionLength = ei.CharacterCount;
+                words.Add(ei.Text);
+                if (!Speech.IsSlicing)
+                {
+                    edResult.SelectionStart = cursor_offset >= 0 ? ei.CharacterPosition + cursor_offset : ei.CharacterPosition;
+                    edResult.SelectionLength = ei.CharacterCount;
+                }
             });
 
             Speech.StateChanged = new Action<StateChangedEventArgs>((evt) =>
@@ -1244,13 +1256,16 @@ namespace OCR_MS
 
             Speech.SpeakCompleted = new Action<SpeakCompletedEventArgs>((evt) =>
             {
-                tsmiTextPlay.Checked = false;
-                tsmiTextPause.Checked = false;
-                tsmiTextStop.Checked = true;
-                cursor_offset = -1;
-                edResult.SelectionStart = lastSelectionStart;
-                edResult.SelectionLength = lastSelectionLength;
-                edResult.ReadOnly = false;
+                if (!Speech.IsSlicing)
+                {
+                    tsmiTextPlay.Checked = false;
+                    tsmiTextPause.Checked = false;
+                    tsmiTextStop.Checked = true;
+                    cursor_offset = -1;
+                    edResult.SelectionStart = lastSelectionStart;
+                    edResult.SelectionLength = lastSelectionLength;
+                    edResult.ReadOnly = false;
+                }
             });
             #endregion
 
@@ -1617,10 +1632,19 @@ namespace OCR_MS
                 string lang = cbLanguage.SelectedValue.ToString();
                 string culture = string.IsNullOrEmpty(lang) ? "unk" : lang;
 
+                var slice_words = new List<string>();
                 if (edResult.SelectionLength > 0)
-                    Speech.Play(edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" }, StringSplitOptions.RemoveEmptyEntries), culture);
+                    slice_words.AddRange(Speech.Slice(edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" }, StringSplitOptions.RemoveEmptyEntries), culture));
                 else
-                    Speech.Play(edResult.Lines, culture);
+                    slice_words.AddRange(Speech.Slice(edResult.Lines, culture));
+
+                if (Speech.State == SynthesizerState.Ready)
+                {
+                    if (edResult.SelectionLength > 0)
+                        Speech.Play(edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" }, StringSplitOptions.RemoveEmptyEntries), culture);
+                    else
+                        Speech.Play(edResult.Lines, culture);
+                }
             }
             catch (Exception ex)
             {
