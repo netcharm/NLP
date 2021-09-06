@@ -1637,6 +1637,14 @@ namespace OCR_MS
                     slice_words.AddRange(Speech.Slice(edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" }, StringSplitOptions.RemoveEmptyEntries), culture));
                 else
                     slice_words.AddRange(Speech.Slice(edResult.Lines, culture));
+                var tip = string.Join(", ", slice_words);
+                tip = Regex.Replace(tip, @"((.+?, ){5})", $"$1{Environment.NewLine}", RegexOptions.IgnoreCase);
+                if (slice_words.Count > 0)
+                {
+                    hint.SetToolTip(edResult, null);
+                    hint.Show(tip, edResult, edResult.Left, edResult.Bottom, 5000);
+                    hint.SetToolTip(edResult, tip);
+                }
 
                 if (Speech.State == SynthesizerState.Ready)
                 {

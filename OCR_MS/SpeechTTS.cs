@@ -18,7 +18,7 @@ namespace OCR_MS
         #region Culture routines
         public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
 
-        public bool ChineseSimplifiedPrefer { get; set; } = true;
+        public static bool ChineseSimplifiedPrefer { get; set; } = true;
 
         #region Regex Patterns for culture detect/slice
         //
@@ -29,37 +29,31 @@ namespace OCR_MS
         // 韩文：[\uac00-\ud7ff]
         //
         //private string pattern_zh = @"[\u3000-\u303f\ufe00-\ufe4f\u3400-\u4db5\u4e00-\u9fcc\uf900-\ufad9\u20000-\u2cea1]+?";
-        private string pattern_zhs = @"([\u3000-\u303f\ufe00-\ufe4f\uff01-\uffee\u3400-\u4db5\u4e00-\u9fcc\uf900-\ufad9\uff61-\uff64]|([\ud840-\ud873][\udc00-\udfff]))+";
-        private string pattern_zht = @"[\u3000-\u3003\u3008-\u300F\u3010-\u3011\u3014-\u3015\u301C-\u301E\u3105-\u31ba\ua140-\ua3bf\ua440-\uc67e\uc940-\uf9d5\ue000-\uf848]+";
-        //private string pattern_ja = @"[\u0021-\u024f\u0250-\u02af\u0391-\u03d9\u1f00-\u1ffe\u1e00-\u1eff\u2010-\u205e\u2e00-\u2e3b\u2c60-\u2c7f\ua720-\ua7ff]+";
-        private string pattern_ja = @"([\u3041-\u309f\u30a0-\u31ff\u3220-\u325f\u3280-\u32ff\u3300-\u4077\uff65-\uff9f]|(\ud83c[\ude01-\ude51]))+";
-        private string pattern_ko = @"[\u1100-\u11ff\u3131-\u318e\u3200-\u321f\u3260-\u327f\ua960-\ua97c\uac00-\ud7a3\uffa0-\uffdf]+";
-        private string pattern_en = @"[\u0020-\u007e\u0080-\u02af\u0391-\u03d9\u1f00-\u1ffe\u1e00-\u1eff\u2010-\u205e\u2e00-\u2e3b\u2c60-\u2c7f\ua720-\ua7ff]+";
-        private string pattern_dt = @"^[\d: tTzZ+\-\/\\]{4,}$";
-        private string pattern_digit = @"^\d+$";
-        //private string pattern_emoji = @"[\u2190-\u27bf\u3400-\u4dbf\u4dc0-\u4dff\uf900-\ufad9\u1d300-\u1d356\u1f000-\u1f02b\u1f030-\u1f093\u1f0a0-\u1f0f5\u1f300-\u1f5ff]+";
-        private string pattern_emoji = @"([\u2190-\u27bf]|(\ud834[\udf00-\udf56])|(\ud83c[\udc00-\udfff]))+?";
-        private string pattern_symbol = @"[\u0021-\u0040\u005b-\u0060\u007b-\u00ff\u2010-\u2e3b\uff61-\uff64\uffeb-\uffef]+";
+        private static string pattern_zhs = @"([\u3000-\u303f\ufe00-\ufe4f\uff01-\uffee\u3400-\u4db5\u4e00-\u9fcc\uf900-\ufad9\uff61-\uff64]|([\ud840-\ud873][\udc00-\udfff]))+";
+        private static string pattern_zht = @"[\u3000-\u3003\u3008-\u300F\u3010-\u3011\u3014-\u3015\u301C-\u301E\u3105-\u31ba\ua140-\ua3bf\ua440-\uc67e\uc940-\uf9d5\ue000-\uf848]+";
+        //private static string pattern_ja = @"[\u0021-\u024f\u0250-\u02af\u0391-\u03d9\u1f00-\u1ffe\u1e00-\u1eff\u2010-\u205e\u2e00-\u2e3b\u2c60-\u2c7f\ua720-\ua7ff]+";
+        private static string pattern_ja = @"([\u3041-\u309f\u30a0-\u31ff\u3220-\u325f\u3280-\u32ff\u3300-\u4077\uff65-\uff9f]|(\ud83c[\ude01-\ude51]))+";
+        private static string pattern_ko = @"[\u1100-\u11ff\u3131-\u318e\u3200-\u321f\u3260-\u327f\ua960-\ua97c\uac00-\ud7a3\uffa0-\uffdf]+";
+        private static string pattern_en = @"[\u0020-\u007e\u0080-\u02af\u0391-\u03d9\u1f00-\u1ffe\u1e00-\u1eff\u2010-\u205e\u2e00-\u2e3b\u2c60-\u2c7f\ua720-\ua7ff]+";
+        private static string pattern_dt = @"^[\d: tTzZ+\-\/\\]{4,}$";
+        private static string pattern_digit = @"^\d+$";
+        //private static string pattern_emoji = @"[\u2190-\u27bf\u3400-\u4dbf\u4dc0-\u4dff\uf900-\ufad9\u1d300-\u1d356\u1f000-\u1f02b\u1f030-\u1f093\u1f0a0-\u1f0f5\u1f300-\u1f5ff]+";
+        private static string pattern_emoji = @"([\u2190-\u27bf]|(\ud834[\udf00-\udf56])|(\ud83c[\udc00-\udfff]))+?";
+        private static string pattern_symbol = @"[\u0021-\u0040\u005b-\u0060\u007b-\u00ff\u2010-\u2e3b\uff61-\uff64\uffeb-\uffef]+";
         #endregion
 
         #region Required Encoding types
         //var m_jp = Regex.Matches(text, @"([\u0800-\u4e00])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
         //var m_zh = Regex.Matches(text, @"([\u4e00-\u9fbb])", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-        private Encoding GBK = Encoding.GetEncoding("GBK");
-        private Encoding BIG5 = Encoding.GetEncoding("BIG5");
-        private Encoding JAP = Encoding.GetEncoding("Shift-JIS");
-        private Encoding UTF8 = Encoding.UTF8;
+        private static Encoding GBK = Encoding.GetEncoding("GBK");
+        private static Encoding BIG5 = Encoding.GetEncoding("BIG5");
+        private static Encoding JAP = Encoding.GetEncoding("Shift-JIS");
+        private static Encoding UTF8 = Encoding.UTF8;
         #endregion
 
-        private CultureInfo FindCultureByName(string lang)
+        internal protected static CultureInfo FindCultureByName(string lang)
         {
             CultureInfo culture = null;
-            if (string.IsNullOrEmpty(lang)) lang = "unk";
-            else lang = lang.ToLower();
-
-            CultureInfo[] cultures = CultureInfo.GetCultures(CultureTypes.AllCultures & ~CultureTypes.NeutralCultures);
-            CultureInfo[] specific = CultureInfo.GetCultures(CultureTypes.SpecificCultures &~ CultureTypes.UserCustomCulture);
-
             #region Microsoft Language define lite
             //{ "unk","AutoDetect"},
             //{ "zh-Hans","ChineseSimplified"},
@@ -91,6 +85,12 @@ namespace OCR_MS
             #endregion
             try
             {
+                if (string.IsNullOrEmpty(lang)) lang = "unk";
+                else lang = lang.ToLower();
+
+                CultureInfo[] cultures = CultureInfo.GetCultures(CultureTypes.AllCultures & ~CultureTypes.NeutralCultures);
+                CultureInfo[] specific = CultureInfo.GetCultures(CultureTypes.SpecificCultures &~ CultureTypes.UserCustomCulture);
+
                 if (!lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var ret = cultures.Where(c => (
@@ -112,16 +112,15 @@ namespace OCR_MS
                         culture = CultureInfo.GetCultureInfo("en-US");
                 }
 
-                if (culture.EnglishName.StartsWith("unk", StringComparison.CurrentCultureIgnoreCase))
+                if (culture is CultureInfo && culture.EnglishName.StartsWith("unk", StringComparison.CurrentCultureIgnoreCase))
                     culture = null;
             }
             catch (Exception) { culture = null; }
-            finally { }
 
             return (culture);
         }
 
-        private CultureInfo DetectCulture(string text)
+        internal protected static CultureInfo DetectCulture(string text)
         {
             CultureInfo result = CultureInfo.CurrentCulture;
 
@@ -185,7 +184,7 @@ namespace OCR_MS
             return (result);
         }
 
-        private IList<KeyValuePair<string, CultureInfo>> SliceByCulture(string text, CultureInfo defautlCulture)
+        private IList<KeyValuePair<string, CultureInfo>> SlicingByCulture(string text, CultureInfo defautlCulture)
         {
             var result = new List<KeyValuePair<string, CultureInfo>>();
 
@@ -671,7 +670,7 @@ namespace OCR_MS
                         if (string.IsNullOrEmpty(text)) continue;
                         if (PlayMixedCultureInline)
                         {
-                            var sentences = SliceByCulture(text, locale);
+                            var sentences = SlicingByCulture(text, locale);
                             foreach (var s in sentences)
                                 PlayQueue.Enqueue(s);
                         }
@@ -703,7 +702,7 @@ namespace OCR_MS
                     if (string.IsNullOrEmpty(text)) continue;
                     if (PlayMixedCultureInline)
                     {
-                        var sentences = SliceByCulture(text, locale);
+                        var sentences = SlicingByCulture(text, locale);
                         var culture = locale == null ? sentences.FirstOrDefault().Value : locale;
                         prompt.StartStyle(new PromptStyle());
                         prompt.StartParagraph(culture);
@@ -787,7 +786,7 @@ namespace OCR_MS
             catch (Exception) { }
         }
 
-        public IEnumerable<string> Slice(string text, CultureInfo locale = null, bool async = true)
+        public IList<string> Slice(string text, CultureInfo locale = null, bool async = true)
         {
             var result = new List<string>();
 
@@ -797,10 +796,10 @@ namespace OCR_MS
 
             if (slice_synth.GetInstalledVoices().Count <= 0) return (result);
 
-            if (slice_synth.State != SynthesizerState.Ready) return (result);
+            //if (slice_synth.State != SynthesizerState.Ready) return (result);
 
             IsSlicing = true;
-            slice_synth.SpeakAsyncCancelAll();
+            if (slice_synth.State != SynthesizerState.Ready) slice_synth.SpeakAsyncCancelAll();
 
             try
             {
@@ -828,7 +827,7 @@ namespace OCR_MS
             return (result);
         }
 
-        public IEnumerable<string> Slice(string text, string locale, bool async = true)
+        public IList<string> Slice(string text, string locale, bool async = true)
         {
             return (Slice(text, FindCultureByName(locale), async));
         }
@@ -988,14 +987,13 @@ namespace OCR_MS
 
         public static bool ChineseSimplifiedPrefer
         {
-            get { return (t2s is SpeechTTS ? t2s.ChineseSimplifiedPrefer : true); }
-            set { if (t2s is SpeechTTS) t2s.ChineseSimplifiedPrefer = value; }
+            get { return (t2s is SpeechTTS ? SpeechTTS.ChineseSimplifiedPrefer : true); }
+            set { if (t2s is SpeechTTS) SpeechTTS.ChineseSimplifiedPrefer = value; }
         }
         #endregion
 
         #region Init speech synthesizer instance
         private static SpeechTTS t2s = Init();
-
         private static SpeechTTS Init()
         {
             return (new SpeechTTS());
@@ -1005,97 +1003,41 @@ namespace OCR_MS
         #region Synthesizer helper routines
         public static CultureInfo FindCultureByName(this string lang)
         {
-            CultureInfo culture = null;
-            #region Microsoft Language define lite
-            //{ "unk","AutoDetect"},
-            //{ "zh-Hans","ChineseSimplified"},
-            //{ "zh-Hant","ChineseTraditional"},
-            //{ "cs","Czech"},
-            //{ "da","Danish"},
-            //{ "nl","Dutch"},
-            //{ "en","English"},
-            //{ "fi","Finnish"},
-            //{ "fr","French"},
-            //{ "de","German"},
-            //{ "el","Greek"},
-            //{ "hu","Hungarian"},
-            //{ "it","Italian"},
-            //{ "ja","Japanese"},
-            //{ "ko","Korean"},
-            //{ "nb","Norwegian"},
-            //{ "pl","Polish"},
-            //{ "pt","Portuguese"},
-            //{ "ru","Russian"},
-            //{ "es","Spanish"},
-            //{ "sv","Swedish"},
-            //{ "tr","Turkish"},
-            //{ "ar","Arabic"},
-            //{ "ro","Romanian"},
-            //{ "sr-Cyrl","SerbianCyrillic"},
-            //{ "sr-Latn","SerbianLatin"},
-            //{ "sk","Slovak"}
-            #endregion
-            try
-            {
-                if (string.IsNullOrEmpty(lang)) lang = "unk";
-                else lang = lang.ToLower();
+            return (SpeechTTS.FindCultureByName(lang));
+        }
 
-                CultureInfo[] cultures = CultureInfo.GetCultures(CultureTypes.AllCultures & ~CultureTypes.NeutralCultures);
-                CultureInfo[] specific = CultureInfo.GetCultures(CultureTypes.SpecificCultures &~ CultureTypes.UserCustomCulture);
-
-                if (!lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    var ret = cultures.Where(c => (
-                        c.IetfLanguageTag.Contains("-") && (
-                        (c.IetfLanguageTag.ToLower().Equals(lang) ||
-                        c.IetfLanguageTag.ToLower().StartsWith(lang)||
-                        c.IetfLanguageTag.ToLower().EndsWith(lang)))
-                    ));
-                    if (ret.Count() > 0) culture = ret.FirstOrDefault();
-                    if (culture.Name.Equals("zh-Hant") || lang.Equals("zh-Hant"))
-                        culture = CultureInfo.GetCultureInfo("zh-TW");
-                    else if (culture.Name.Equals("zh-Hans") || lang.Equals("zh-Hans"))
-                        culture = CultureInfo.GetCultureInfo("zh-CN");
-                    else if (culture.Name.Equals("ja") || lang.Equals("ja"))
-                        culture = CultureInfo.GetCultureInfo("ja-JP");
-                    else if (culture.Name.Equals("ko") || lang.Equals("ko"))
-                        culture = CultureInfo.GetCultureInfo("ko-KR");
-                    else if (culture.Name.Equals("en") || lang.Equals("en"))
-                        culture = CultureInfo.GetCultureInfo("en-US");
-                }
-
-                if (culture is CultureInfo && culture.EnglishName.StartsWith("unk", StringComparison.CurrentCultureIgnoreCase))
-                    culture = null;
-            }
-            catch (Exception) { culture = null; }
-            finally { }
-
-            return (culture);
+        public static CultureInfo DetectCulture(this string text)
+        {
+            return (SpeechTTS.DetectCulture(text));
         }
 
         public static char[] TagBreak = new char[] { '#', '@' };
         public static string[] LineBreak = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
         public static void Play(this string text, CultureInfo culture, bool async = true)
         {
-            if (!(t2s is SpeechTTS))
+            try
             {
-                t2s = Init();
-            }
-            if (t2s is SpeechTTS)
-            {
-                if (culture == null)
+                if (!(t2s is SpeechTTS))
                 {
-                    if (SimpleCultureDetect)
-                        t2s.Play(text, "unk", async);
-                    else
-                    {
-                        var tlist = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                        t2s.Play(tlist, culture);
-                    }
+                    t2s = Init();
                 }
-                else
-                    t2s.Play(text, culture, async);
+                if (t2s is SpeechTTS)
+                {
+                    if (culture == null)
+                    {
+                        if (SimpleCultureDetect)
+                            t2s.Play(text, "unk", async);
+                        else
+                        {
+                            var tlist = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                            t2s.Play(tlist, culture);
+                        }
+                    }
+                    else
+                        t2s.Play(text, culture, async);
+                }
             }
+            catch { }
         }
 
         public static void Play(this string text, string lang, bool async = true)
@@ -1111,22 +1053,26 @@ namespace OCR_MS
 
         public static void Play(this IEnumerable<string> texts, CultureInfo culture, bool async = true)
         {
-            if (!(t2s is SpeechTTS))
+            try
             {
-                t2s = Init();
-            }
-            if (t2s is SpeechTTS)
-            {
-                if (culture == null)
+                if (!(t2s is SpeechTTS))
                 {
-                    if (SimpleCultureDetect)
-                        t2s.Play(string.Join(Environment.NewLine, texts), "unk", async);
-                    else
-                        t2s.Play(texts.ToList(), culture);
+                    t2s = Init();
                 }
-                else
-                    t2s.Play(string.Join(Environment.NewLine, texts), culture, async);
+                if (t2s is SpeechTTS)
+                {
+                    if (culture == null)
+                    {
+                        if (SimpleCultureDetect)
+                            t2s.Play(string.Join(Environment.NewLine, texts), "unk", async);
+                        else
+                            t2s.Play(texts.ToList(), culture);
+                    }
+                    else
+                        t2s.Play(string.Join(Environment.NewLine, texts), culture, async);
+                }
             }
+            catch { }
         }
 
         public static void Play(this IEnumerable<string> texts, string lang, bool async = true)
@@ -1142,20 +1088,32 @@ namespace OCR_MS
 
         public static void Pause()
         {
-            if (t2s is SpeechTTS) t2s.Pause();
+            try
+            {
+                if (t2s is SpeechTTS) t2s.Pause();
+            }
+            catch { }
         }
 
         public static void Resume()
         {
-            if (t2s is SpeechTTS) t2s.Resume();
+            try
+            {
+                if (t2s is SpeechTTS) t2s.Resume();
+            }
+            catch { }
         }
 
         public static void Stop()
         {
-            if (t2s is SpeechTTS) t2s.Stop();
+            try
+            {
+                if (t2s is SpeechTTS) t2s.Stop();
+            }
+            catch { }
         }
 
-        public static IEnumerable<string> Slice(this string text, CultureInfo culture, bool async = true)
+        public static IList<string> Slice(this string text, CultureInfo culture, bool async = true)
         {
             var result = new List<string>();
 
@@ -1174,28 +1132,28 @@ namespace OCR_MS
             return (result);
         }
 
-        public static IEnumerable<string> Slice(this string text, string lang, bool async = true)
+        public static IList<string> Slice(this string text, string lang, bool async = true)
         {
             return (Slice(text, FindCultureByName(lang), async));
         }
 
-        public static IEnumerable<string> Slice(this string text)
+        public static IList<string> Slice(this string text)
         {
             CultureInfo culture = null;
             return (Slice(text, culture, true));
         }
 
-        public static IEnumerable<string> Slice(this IEnumerable<string> texts, CultureInfo culture, bool async = true)
+        public static IList<string> Slice(this IEnumerable<string> texts, CultureInfo culture, bool async = true)
         {
             return (Slice(string.Join(Environment.NewLine, texts), culture, async));
         }
 
-        public static IEnumerable<string> Slice(this IEnumerable<string> texts, string lang, bool async = true)
+        public static IList<string> Slice(this IEnumerable<string> texts, string lang, bool async = true)
         {
             return (Slice(texts, FindCultureByName(lang), async));
         }
 
-        public static IEnumerable<string> Slice(this IEnumerable<string> texts)
+        public static IList<string> Slice(this IEnumerable<string> texts)
         {
             CultureInfo culture = null;
             return (Slice(texts, culture, true));
