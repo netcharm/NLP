@@ -639,14 +639,17 @@ namespace OCR_MS
             try
             {
                 int w = lines.Max(l => l.Length), h = lines.Count();
-                var laa = lines.Select(l => l.ToArray()).ToArray();
+                var laa = lines.Select(l => l.Replace(" ", "　").ToArray()).ToArray();
                 List<List<char>> matrix = new List<List<char>>();
 
                 for (int i = 0; i < w; i++)
                 {
                     var l = new List<char>();
                     for (int j = 0; j < h; j++)
-                        l.Add(laa[j][w - i - 1]);
+                    {
+                        try { l.Add(laa[j][w - i - 1]); }
+                        catch { l.Add('　'); }
+                    }
                     matrix.Add(l);
                 }
                 result = matrix.Select(r => string.Join("", r)).ToList();
@@ -661,14 +664,17 @@ namespace OCR_MS
             try
             {
                 int w = lines.Max(l => l.Length), h = lines.Count();
-                var laa = lines.Select(l => l.ToArray()).ToArray();
+                var laa = lines.Select(l => l.Replace(" ", "　").ToArray()).ToArray();
                 List<List<char>> matrix = new List<List<char>>();
 
                 for (int i = 0; i < w; i++)
                 {
                     var l = new List<char>();
                     for (int j = 0; j < h; j++)
-                        l.Add(laa[h - j - 1][i]);
+                    {
+                        try { l.Add(laa[h - j - 1][i]); }
+                        catch { l.Add('　'); }
+                    }
                     matrix.Add(l);
                 }
                 result = matrix.Select(r => string.Join("", r)).ToList();
