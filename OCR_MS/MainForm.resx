@@ -430,13 +430,13 @@
     <value>264, 17</value>
   </metadata>
   <data name="tsmiShowWindow.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiShowWindow.Text" xml:space="preserve">
     <value>Show Window</value>
   </data>
   <data name="tsmiTopMost.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTopMost.Text" xml:space="preserve">
     <value>Always On Top</value>
@@ -502,82 +502,109 @@
     <value>10%</value>
   </data>
   <data name="tsmiOpacity.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiOpacity.Text" xml:space="preserve">
     <value>Window Opacity</value>
   </data>
   <data name="tsmiCloseToTray.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiCloseToTray.Text" xml:space="preserve">
     <value>Close To Tray</value>
   </data>
   <data name="tsmiSep0.Size" type="System.Drawing.Size, System.Drawing">
-    <value>237, 6</value>
+    <value>241, 6</value>
   </data>
   <data name="tsmiLogOCRHistory.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiLogOCRHistory.Text" xml:space="preserve">
     <value>Log History</value>
   </data>
   <data name="tsmiHistoryClear.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiHistoryClear.Text" xml:space="preserve">
     <value>Clear History</value>
   </data>
   <data name="tsmiShowOCRResult.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiShowOCRResult.Text" xml:space="preserve">
     <value>Show Last OCR Result JSON</value>
   </data>
   <data name="tsmiHistory.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiHistory.Text" xml:space="preserve">
     <value>History</value>
   </data>
   <data name="tsmiSep1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>237, 6</value>
+    <value>241, 6</value>
   </data>
   <data name="tsmiTextAutoSpeechingRate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTextAutoSpeechingRate.Text" xml:space="preserve">
     <value>Auto Change Speech Speed</value>
   </data>
   <data name="tsmiTextAutoSpeech.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTextAutoSpeech.Text" xml:space="preserve">
     <value>Auto Speaking OCR Result</value>
   </data>
   <data name="tsmiTextPlay.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTextPlay.Text" xml:space="preserve">
     <value>Text Play</value>
   </data>
   <data name="tsmiTextPause.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTextPause.Text" xml:space="preserve">
     <value>Text Pause</value>
   </data>
   <data name="tsmiTextStop.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTextStop.Text" xml:space="preserve">
     <value>Text Stop</value>
   </data>
   <data name="tsmiSep2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>237, 6</value>
+    <value>241, 6</value>
+  </data>
+  <data name="tsmiSpaceToFull.Size" type="System.Drawing.Size, System.Drawing">
+    <value>244, 22</value>
+  </data>
+  <data name="tsmiSpaceToFull.Text" xml:space="preserve">
+    <value>Convert Space To Full Width</value>
+  </data>
+  <data name="tsmiSpaceToHalf.Size" type="System.Drawing.Size, System.Drawing">
+    <value>244, 22</value>
+  </data>
+  <data name="tsmiSpaceToHalf.Text" xml:space="preserve">
+    <value>Convert Space To Half Width</value>
+  </data>
+  <data name="tsmiTextV2H.Size" type="System.Drawing.Size, System.Drawing">
+    <value>244, 22</value>
+  </data>
+  <data name="tsmiTextV2H.Text" xml:space="preserve">
+    <value>Convert Text To Horizontal</value>
+  </data>
+  <data name="tsmiTextH2V.Size" type="System.Drawing.Size, System.Drawing">
+    <value>244, 22</value>
+  </data>
+  <data name="tsmiTextH2V.Text" xml:space="preserve">
+    <value>Convert Text To Vertical</value>
+  </data>
+  <data name="tsmiSep3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>241, 6</value>
   </data>
   <data name="tsmiTranslateAuto.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTranslateAuto.Text" xml:space="preserve">
     <value>Auto Translating OCR Result</value>
@@ -595,31 +622,31 @@
     <value>Baidu</value>
   </data>
   <data name="tsmiTranslateEngine.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTranslateEngine.Text" xml:space="preserve">
     <value>Translate Engine</value>
   </data>
   <data name="tsmiTranslateSrc.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTranslateSrc.Text" xml:space="preserve">
     <value>Translating From</value>
   </data>
   <data name="tsmiTranslateDst.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTranslateDst.Text" xml:space="preserve">
     <value>Translating To</value>
   </data>
   <data name="tsmiTranslate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiTranslate.Text" xml:space="preserve">
     <value>Translating Text</value>
   </data>
-  <data name="tsmiSep3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>237, 6</value>
+  <data name="tsmiSep4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>241, 6</value>
   </data>
   <data name="tsmiOcrEngineAzure.Size" type="System.Drawing.Size, System.Drawing">
     <value>109, 22</value>
@@ -634,61 +661,61 @@
     <value>Baidu</value>
   </data>
   <data name="tsmiOcrEngine.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiOcrEngine.Text" xml:space="preserve">
     <value>OCR Engine</value>
   </data>
   <data name="tsmiWatchClipboard.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiWatchClipboard.Text" xml:space="preserve">
     <value>Monitor Clipboard</value>
   </data>
   <data name="tsmiClearClipboard.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiClearClipboard.Text" xml:space="preserve">
     <value>Auto Clear Clipboard</value>
   </data>
   <data name="tsmiUseLastIme.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiUseLastIme.Text" xml:space="preserve">
     <value>Restore Last IME</value>
   </data>
   <data name="tsmiUseLastOCRLanguage.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiUseLastOCRLanguage.Text" xml:space="preserve">
     <value>Restore Last OCR Language</value>
   </data>
-  <data name="tsmiSep4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>237, 6</value>
+  <data name="tsmiSep5.Size" type="System.Drawing.Size, System.Drawing">
+    <value>241, 6</value>
   </data>
   <data name="tsmiOptions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiOptions.Text" xml:space="preserve">
     <value>Options</value>
   </data>
   <data name="tsmiSaveState.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiSaveState.Text" xml:space="preserve">
     <value>Save Current State/APIKEY</value>
   </data>
   <data name="tsmiSep9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>237, 6</value>
+    <value>241, 6</value>
   </data>
   <data name="tsmiExit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 22</value>
+    <value>244, 22</value>
   </data>
   <data name="tsmiExit.Text" xml:space="preserve">
     <value>Exit</value>
   </data>
   <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 634</value>
+    <value>245, 728</value>
   </data>
   <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
     <value>notifyMenu</value>
@@ -834,6 +861,12 @@
   <data name="&gt;&gt;tsmiLogOCRHistory.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;tsmiHistoryClear.Name" xml:space="preserve">
+    <value>tsmiHistoryClear</value>
+  </data>
+  <data name="&gt;&gt;tsmiHistoryClear.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;tsmiShowOCRResult.Name" xml:space="preserve">
     <value>tsmiShowOCRResult</value>
   </data>
@@ -844,12 +877,6 @@
     <value>tsmiHistory</value>
   </data>
   <data name="&gt;&gt;tsmiHistory.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tsmiHistoryClear.Name" xml:space="preserve">
-    <value>tsmiHistoryClear</value>
-  </data>
-  <data name="&gt;&gt;tsmiHistoryClear.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tsmiSep1.Name" xml:space="preserve">
@@ -894,6 +921,24 @@
   <data name="&gt;&gt;tsmiSep2.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;tsmiTextV2H.Name" xml:space="preserve">
+    <value>tsmiTextV2H</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextV2H.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextH2V.Name" xml:space="preserve">
+    <value>tsmiTextH2V</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextH2V.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep3.Name" xml:space="preserve">
+    <value>tsmiSep3</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;tsmiTranslateAuto.Name" xml:space="preserve">
     <value>tsmiTranslateAuto</value>
   </data>
@@ -918,12 +963,6 @@
   <data name="&gt;&gt;tsmiTranslateEngineBaidu.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tsmiTranslate.Name" xml:space="preserve">
-    <value>tsmiTranslate</value>
-  </data>
-  <data name="&gt;&gt;tsmiTranslate.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;tsmiTranslateSrc.Name" xml:space="preserve">
     <value>tsmiTranslateSrc</value>
   </data>
@@ -936,10 +975,16 @@
   <data name="&gt;&gt;tsmiTranslateDst.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tsmiSep3.Name" xml:space="preserve">
-    <value>tsmiSep3</value>
+  <data name="&gt;&gt;tsmiTranslate.Name" xml:space="preserve">
+    <value>tsmiTranslate</value>
   </data>
-  <data name="&gt;&gt;tsmiSep3.Type" xml:space="preserve">
+  <data name="&gt;&gt;tsmiTranslate.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep4.Name" xml:space="preserve">
+    <value>tsmiSep4</value>
+  </data>
+  <data name="&gt;&gt;tsmiSep4.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tsmiOcrEngine.Name" xml:space="preserve">
@@ -984,10 +1029,10 @@
   <data name="&gt;&gt;tsmiUseLastOCRLanguage.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tsmiSep4.Name" xml:space="preserve">
-    <value>tsmiSep4</value>
+  <data name="&gt;&gt;tsmiSep5.Name" xml:space="preserve">
+    <value>tsmiSep5</value>
   </data>
-  <data name="&gt;&gt;tsmiSep4.Type" xml:space="preserve">
+  <data name="&gt;&gt;tsmiSep5.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tsmiOptions.Name" xml:space="preserve">
@@ -1012,6 +1057,18 @@
     <value>tsmiExit</value>
   </data>
   <data name="&gt;&gt;tsmiExit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSpaceToFull.Name" xml:space="preserve">
+    <value>tsmiSpaceToFull</value>
+  </data>
+  <data name="&gt;&gt;tsmiSpaceToFull.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSpaceToHalf.Name" xml:space="preserve">
+    <value>tsmiSpaceToHalf</value>
+  </data>
+  <data name="&gt;&gt;tsmiSpaceToHalf.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

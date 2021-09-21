@@ -59,9 +59,9 @@
             this.tsmiCloseToTray = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiLogOCRHistory = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiHistoryClear = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiShowOCRResult = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiHistory = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiHistoryClear = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTextAutoSpeechingRate = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextAutoSpeech = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,14 +69,17 @@
             this.tsmiTextPause = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextStop = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiTextV2H = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextH2V = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTranslateAuto = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateEngine = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateEngineAzure = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateEngineBaidu = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiTranslate = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateSrc = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateDst = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiTranslate = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep4 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiOcrEngine = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOcrEngineAzure = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOcrEngineBaidu = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,11 +87,13 @@
             this.tsmiClearClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiUseLastIme = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiUseLastOCRLanguage = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep4 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiSep5 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSpaceToFull = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSpaceToHalf = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -209,18 +214,23 @@
             this.tsmiTextPause,
             this.tsmiTextStop,
             this.tsmiSep2,
+            this.tsmiSpaceToFull,
+            this.tsmiSpaceToHalf,
+            this.tsmiTextV2H,
+            this.tsmiTextH2V,
+            this.tsmiSep3,
             this.tsmiTranslateAuto,
             this.tsmiTranslateEngine,
             this.tsmiTranslateSrc,
             this.tsmiTranslateDst,
             this.tsmiTranslate,
-            this.tsmiSep3,
+            this.tsmiSep4,
             this.tsmiOcrEngine,
             this.tsmiWatchClipboard,
             this.tsmiClearClipboard,
             this.tsmiUseLastIme,
             this.tsmiUseLastOCRLanguage,
-            this.tsmiSep4,
+            this.tsmiSep5,
             this.tsmiOptions,
             this.tsmiSaveState,
             this.tsmiSep9,
@@ -340,6 +350,12 @@
             resources.ApplyResources(this.tsmiLogOCRHistory, "tsmiLogOCRHistory");
             this.tsmiLogOCRHistory.CheckedChanged += new System.EventHandler(this.tsmiLogOCRHistory_CheckedChanged);
             // 
+            // tsmiHistoryClear
+            // 
+            this.tsmiHistoryClear.Name = "tsmiHistoryClear";
+            resources.ApplyResources(this.tsmiHistoryClear, "tsmiHistoryClear");
+            this.tsmiHistoryClear.Click += new System.EventHandler(this.tsmiHistoryClear_Click);
+            // 
             // tsmiShowOCRResult
             // 
             this.tsmiShowOCRResult.Name = "tsmiShowOCRResult";
@@ -351,12 +367,6 @@
             this.tsmiHistory.Name = "tsmiHistory";
             resources.ApplyResources(this.tsmiHistory, "tsmiHistory");
             this.tsmiHistory.DropDownOpening += new System.EventHandler(this.tsmiHistory_DropDownOpening);
-            // 
-            // tsmiHistoryClear
-            // 
-            this.tsmiHistoryClear.Name = "tsmiHistoryClear";
-            resources.ApplyResources(this.tsmiHistoryClear, "tsmiHistoryClear");
-            this.tsmiHistoryClear.Click += new System.EventHandler(this.tsmiHistoryClear_Click);
             // 
             // tsmiSep1
             // 
@@ -401,6 +411,23 @@
             this.tsmiSep2.Name = "tsmiSep2";
             resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
             // 
+            // tsmiTextV2H
+            // 
+            this.tsmiTextV2H.Name = "tsmiTextV2H";
+            resources.ApplyResources(this.tsmiTextV2H, "tsmiTextV2H");
+            this.tsmiTextV2H.Click += new System.EventHandler(this.tsmiConvertText_Click);
+            // 
+            // tsmiTextH2V
+            // 
+            this.tsmiTextH2V.Name = "tsmiTextH2V";
+            resources.ApplyResources(this.tsmiTextH2V, "tsmiTextH2V");
+            this.tsmiTextH2V.Click += new System.EventHandler(this.tsmiConvertText_Click);
+            // 
+            // tsmiSep3
+            // 
+            this.tsmiSep3.Name = "tsmiSep3";
+            resources.ApplyResources(this.tsmiSep3, "tsmiSep3");
+            // 
             // tsmiTranslateAuto
             // 
             this.tsmiTranslateAuto.CheckOnClick = true;
@@ -430,12 +457,6 @@
             resources.ApplyResources(this.tsmiTranslateEngineBaidu, "tsmiTranslateEngineBaidu");
             this.tsmiTranslateEngineBaidu.Click += new System.EventHandler(this.tsmiTranslateEngine_Click);
             // 
-            // tsmiTranslate
-            // 
-            this.tsmiTranslate.Name = "tsmiTranslate";
-            resources.ApplyResources(this.tsmiTranslate, "tsmiTranslate");
-            this.tsmiTranslate.Click += new System.EventHandler(this.tsmiTranslate_Click);
-            // 
             // tsmiTranslateSrc
             // 
             this.tsmiTranslateSrc.Name = "tsmiTranslateSrc";
@@ -446,10 +467,16 @@
             this.tsmiTranslateDst.Name = "tsmiTranslateDst";
             resources.ApplyResources(this.tsmiTranslateDst, "tsmiTranslateDst");
             // 
-            // tsmiSep3
+            // tsmiTranslate
             // 
-            this.tsmiSep3.Name = "tsmiSep3";
-            resources.ApplyResources(this.tsmiSep3, "tsmiSep3");
+            this.tsmiTranslate.Name = "tsmiTranslate";
+            resources.ApplyResources(this.tsmiTranslate, "tsmiTranslate");
+            this.tsmiTranslate.Click += new System.EventHandler(this.tsmiTranslate_Click);
+            // 
+            // tsmiSep4
+            // 
+            this.tsmiSep4.Name = "tsmiSep4";
+            resources.ApplyResources(this.tsmiSep4, "tsmiSep4");
             // 
             // tsmiOcrEngine
             // 
@@ -501,10 +528,10 @@
             this.tsmiUseLastOCRLanguage.Name = "tsmiUseLastOCRLanguage";
             resources.ApplyResources(this.tsmiUseLastOCRLanguage, "tsmiUseLastOCRLanguage");
             // 
-            // tsmiSep4
+            // tsmiSep5
             // 
-            this.tsmiSep4.Name = "tsmiSep4";
-            resources.ApplyResources(this.tsmiSep4, "tsmiSep4");
+            this.tsmiSep5.Name = "tsmiSep5";
+            resources.ApplyResources(this.tsmiSep5, "tsmiSep5");
             // 
             // tsmiOptions
             // 
@@ -528,6 +555,18 @@
             this.tsmiExit.Name = "tsmiExit";
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
+            // tsmiSpaceToFull
+            // 
+            this.tsmiSpaceToFull.Name = "tsmiSpaceToFull";
+            resources.ApplyResources(this.tsmiSpaceToFull, "tsmiSpaceToFull");
+            this.tsmiSpaceToFull.Click += new System.EventHandler(this.tsmiConvertText_Click);
+            // 
+            // tsmiSpaceToHalf
+            // 
+            this.tsmiSpaceToHalf.Name = "tsmiSpaceToHalf";
+            resources.ApplyResources(this.tsmiSpaceToHalf, "tsmiSpaceToHalf");
+            this.tsmiSpaceToHalf.Click += new System.EventHandler(this.tsmiConvertText_Click);
             // 
             // MainForm
             // 
@@ -622,6 +661,11 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiTextAutoSpeechingRate;
         private System.Windows.Forms.ToolStripMenuItem tsmiUseLastIme;
         private System.Windows.Forms.ToolStripMenuItem tsmiUseLastOCRLanguage;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextV2H;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextH2V;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep5;
+        private System.Windows.Forms.ToolStripMenuItem tsmiSpaceToFull;
+        private System.Windows.Forms.ToolStripMenuItem tsmiSpaceToHalf;
     }
 }
 

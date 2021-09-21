@@ -632,6 +632,60 @@ namespace OCR_MS
             }
             return (result);
         }
+        
+        internal IList<string> ConvertTextV2H(IEnumerable<string> lines)
+        {
+            var result = new List<string>();
+            try
+            {
+                int w = lines.Max(l => l.Length), h = lines.Count();
+                var laa = lines.Select(l => l.ToArray()).ToArray();
+                List<List<char>> matrix = new List<List<char>>();
+
+                for (int i = 0; i < w; i++)
+                {
+                    var l = new List<char>();
+                    for (int j = 0; j < h; j++)
+                        l.Add(laa[j][w - i - 1]);
+                    matrix.Add(l);
+                }
+                result = matrix.Select(r => string.Join("", r)).ToList();
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
+            return (result);
+        }
+
+        internal IList<string> ConvertTextH2V(IEnumerable<string> lines)
+        {
+            var result = new List<string>();
+            try
+            {
+                int w = lines.Max(l => l.Length), h = lines.Count();
+                var laa = lines.Select(l => l.ToArray()).ToArray();
+                List<List<char>> matrix = new List<List<char>>();
+
+                for (int i = 0; i < w; i++)
+                {
+                    var l = new List<char>();
+                    for (int j = 0; j < h; j++)
+                        l.Add(laa[h - j - 1][i]);
+                    matrix.Add(l);
+                }
+                result = matrix.Select(r => string.Join("", r)).ToList();
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
+            return (result);
+        }
+        
+        internal IList<string> ConvertSpaceToFull(IEnumerable<string> lines)
+        {
+            return (lines.Select(l => l.Replace(" ", "　")).ToList());
+        }
+
+        internal IList<string> ConvertSpaceToHalf(IEnumerable<string> lines)
+        {
+            return (lines.Select(l => l.Replace("　", " ")).ToList());
+        }
         #endregion
 
         private int lastSelectionStart = 0;
@@ -1975,6 +2029,31 @@ namespace OCR_MS
                 tsmiTranslateEngineAzure.Checked = false;
                 tsmiTranslateEngineBaidu.Checked = true;
             }
+        }
+
+        private void tsmiConvertText_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (sender == tsmiTextV2H)
+                {
+                    edResult.Lines = ConvertTextV2H(edResult.Lines).ToArray();
+                }
+                else if (sender == tsmiTextH2V)
+                {
+                    edResult.Lines = ConvertTextH2V(edResult.Lines).ToArray();
+                }
+                else if (sender == tsmiSpaceToFull)
+                {
+                    edResult.Lines = ConvertSpaceToFull(edResult.Lines).ToArray();
+                }
+                else if (sender == tsmiSpaceToHalf)
+                {
+                    edResult.Lines = ConvertSpaceToHalf(edResult.Lines).ToArray();
+                }
+
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
     }
 
