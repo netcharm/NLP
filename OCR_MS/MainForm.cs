@@ -45,10 +45,10 @@ namespace OCR_MS
         private const string API_TITLE_CV = "Computer Vision API";
         private const string API_TITLE_TT = "Translator Text API";
 
-        private string GetLangiageFrom(string lang = "")
+        private string GetLangiageFrom(string lang = "", bool auto_detect = true)
         {
             string lang_src = string.IsNullOrEmpty(lang) ? "unk" : lang;
-            lang_src = Result_Lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ? string.Empty : Result_Lang;
+            lang_src = Result_Lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ? string.Empty : (auto_detect ? Result_Lang : lang_src);
             if (string.IsNullOrEmpty(lang_src)) lang_src = (string)tsmiTranslateSrc.Tag;
             if (string.IsNullOrEmpty(lang_src) || lang_src.Equals("unk", StringComparison.CurrentCultureIgnoreCase)) lang_src = cbLanguage.SelectedValue.ToString();
             return (lang_src.ToLower());
@@ -82,7 +82,6 @@ namespace OCR_MS
             {"sr-Cyrl","SerbianCyrillic"}, {"sr-Latn","SerbianLatin"}, {"sk","Slovak"},
             {"th", "Tailand" }, {"yue", "粤语" }, {"wyw", "文言文" },
         };
-        internal Dictionary<string, string> azure_lang = new Dictionary<string, string>();
 
         internal string Result_JSON = string.Empty;
         internal string Result_Lang = string.Empty;
@@ -312,7 +311,7 @@ namespace OCR_MS
         }
         private bool TRANSLATING_AUTO = false;
 
-        internal async Task<string> Run_Azure_Translate(string src)
+        internal async Task<string> Run_Azure_Translate(string src, bool auto_detect_lang = true, string from = "")
         {
             string result = string.Empty;
             if (AzureApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey) && !string.IsNullOrEmpty(edResult.Text))
@@ -321,8 +320,9 @@ namespace OCR_MS
                 {
                     pbar.Style = ProgressBarStyle.Marquee;
 
-                    var langSrc = GetLangiageFrom();
+                    var langSrc = auto_detect_lang || string.IsNullOrEmpty(from) ? GetLangiageFrom() : GetLangiageFrom(from, auto_detect: auto_detect_lang);
                     var langDst = GetLangiageTo();
+                    //langSrc = azure_languages.ContainsKey(langSrc) ? azure_languages[langSrc] : "unk";
 
                     result = await MakeRequest_Azure_Translate(src, langDst, langSrc);
                 }
@@ -468,7 +468,7 @@ namespace OCR_MS
             return (result);
         }
 
-        internal async Task<string> Run_Baidu_Translate(string src)
+        internal async Task<string> Run_Baidu_Translate(string src, bool auto_detect_lang = true, string from = "")
         {
             string result = string.Empty;
 
@@ -483,7 +483,7 @@ namespace OCR_MS
             var signs = md5hash.ComputeHash(Encoding.UTF8.GetBytes($"{appID}{src}{salt}{appKEY}"));
             var sign = string.Join("", signs.Select(v => v.ToString("x2")));
 
-            var lang_src = GetLangiageFrom();
+            var lang_src = auto_detect_lang || string.IsNullOrEmpty(from) ? GetLangiageFrom() : GetLangiageFrom(from, auto_detect: auto_detect_lang);
             lang_src = baidu_languages.ContainsKey(lang_src) ? baidu_languages[lang_src] : "auto";
 
             var lang_dst = GetLangiageTo();
@@ -1726,12 +1726,14 @@ namespace OCR_MS
             try
             {
                 pbar.Style = ProgressBarStyle.Marquee;
+                bool auto_lang_from = !(ModifierKeys == Keys.Control) || (ModifierKeys == Keys.None);
+                string lang_from = cbLanguage.SelectedValue as string;
                 string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
                 var result = string.Empty;
                 if (tsmiTranslateEngineAzure.Checked)
-                    result = await Run_Azure_Translate(text);
+                    result = await Run_Azure_Translate(text, auto_detect_lang: auto_lang_from, from: lang_from);
                 else if (tsmiTranslateEngineBaidu.Checked)
-                    result = await Run_Baidu_Translate(text);
+                    result = await Run_Baidu_Translate(text, auto_detect_lang: auto_lang_from, from: lang_from);
                 if (!string.IsNullOrEmpty(result))
                 {
                     StringBuilder sb = new StringBuilder();
