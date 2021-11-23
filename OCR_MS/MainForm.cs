@@ -570,7 +570,7 @@ namespace OCR_MS
                 try
                 {
                     if (CaptureOption == null) CaptureOption = new ScreenshotOptions()
-                    {
+                    {                        
                         BackgroundOpacity = CaptureBackgroundOpacity,
                         SelectionRectangleBorderBrush = new System.Windows.Media.SolidColorBrush(CaptureBorderColor)
                     };
@@ -1616,7 +1616,8 @@ namespace OCR_MS
                 System.Diagnostics.Debug.WriteLine("OCR Starting...");
                 Task.Delay(20).GetAwaiter().GetResult();
 
-                var src = GetClipboardImage();
+                var force = ModifierKeys == Keys.Control;
+                var src = force ? null : GetClipboardImage();
                 if (!(src is Image)) src = GetCaptureScreen();
                 if (src is Image)
                 {
