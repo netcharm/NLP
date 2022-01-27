@@ -2,7 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
@@ -68,6 +70,69 @@ namespace OCR_MS
             }
 
             return (lang_dst.ToLower());
+        }
+
+        private string CorrectionDictFile = "ocr_correction.json";
+        private CorrectionDicts AutoCorrections { get; set; } = new CorrectionDicts();
+        private void LoadCorrectionDictionary()
+        {
+            var file = Path.Combine(AppPath, CorrectionDictFile);
+            if (File.Exists(file))
+            {
+                if (AutoCorrections == null) AutoCorrections = new CorrectionDicts();
+                else AutoCorrections.Clear();
+                try
+                {
+                    var json = File.ReadAllText(file);
+                    AutoCorrections = JsonConvert.DeserializeObject<CorrectionDicts>(json);
+                }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"LoadCorrectionDictionary => {ex.Message}"); }
+            }
+            else SaveCorrectionDictionary();
+        }
+
+        private void SaveCorrectionDictionary()
+        {
+            var file = Path.Combine(AppPath, CorrectionDictFile);
+            if (AutoCorrections is CorrectionDicts)
+            {
+                try
+                {
+                    foreach (var lang in azure_languages)
+                        if (!AutoCorrections.Dictionaries.ContainsKey(lang.Key)) AutoCorrections.Dictionaries.Add(lang.Key, new CorrectionDict() { Language = lang.Key });
+                    foreach (var lang in baidu_languages)
+                        if (!AutoCorrections.Dictionaries.ContainsKey(lang.Key)) AutoCorrections.Dictionaries.Add(lang.Key, new CorrectionDict() { Language = lang.Key });
+
+                    var json = JsonConvert.SerializeObject(AutoCorrections, Formatting.Indented);
+                    File.WriteAllText(file, json);
+                }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"SaveCorrectionDictionary => {ex.Message}"); }
+            }
+        }
+
+        private string AutoCorrecting(string text, string lang)
+        {
+            string result = text;
+
+            try
+            {
+                if (AutoCorrections is CorrectionDicts && !string.IsNullOrEmpty(lang) && AutoCorrections.Dictionaries.ContainsKey(lang))
+                {
+                    var dict = AutoCorrections.Dictionaries[lang].Items;
+                    if (dict is OrderedDictionary)
+                    {
+                        foreach (DictionaryEntry entry in dict)
+                        {
+                            var k = entry.Key is string ? (entry.Key as string).Trim() : string.Empty;
+                            var v = entry.Value is string ? (entry.Value as string).Trim() : string.Empty;
+                            result = Regex.Replace(result, k, v, RegexOptions.IgnoreCase);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"AutoCorrecting => {ex.Message}"); }
+
+            return (result);
         }
 
         #region OCR with microsoft cognitive api
@@ -570,7 +635,7 @@ namespace OCR_MS
                 try
                 {
                     if (CaptureOption == null) CaptureOption = new ScreenshotOptions()
-                    {                        
+                    {
                         BackgroundOpacity = CaptureBackgroundOpacity,
                         SelectionRectangleBorderBrush = new System.Windows.Media.SolidColorBrush(CaptureBorderColor)
                     };
@@ -632,7 +697,7 @@ namespace OCR_MS
             }
             return (result);
         }
-        
+
         internal IList<string> ConvertTextV2H(IEnumerable<string> lines)
         {
             var result = new List<string>();
@@ -682,7 +747,7 @@ namespace OCR_MS
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
             return (result);
         }
-        
+
         internal IList<string> ConvertSpaceToFull(IEnumerable<string> lines)
         {
             return (lines.Select(l => l.Replace(" ", "　")).ToList());
@@ -1148,9 +1213,12 @@ namespace OCR_MS
                         }
                     }
                     #endregion
-                }                
+                }
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"LoadConfig => {ex.Message}"); }
+
+            LoadCorrectionDictionary();
+
             CFGLOADED = true;
         }
 
@@ -1626,10 +1694,12 @@ namespace OCR_MS
                     if (qr_result == null || string.IsNullOrEmpty(qr_result.Text))
                     {
                         string lang = cbLanguage.SelectedValue.ToString();
+                        string result = string.Empty;
                         if (tsmiOcrEngineAzure.Checked)
-                            edResult.Text = await Run_Azure_OCR(src, lang);
+                            result = await Run_Azure_OCR(src, lang);
                         else if (tsmiOcrEngineBaidu.Checked)
-                            edResult.Text = await Run_Baidu_OCR(src, lang);
+                            result = await Run_Baidu_OCR(src, lang);
+                        edResult.Text = AutoCorrecting(result, lang);
                         if (tsmiTextAutoSpeech.Checked) btnSpeech.PerformClick();
                         if (tsmiTranslateAuto.Checked) btnTranslate.PerformClick();
                     }
@@ -2064,6 +2134,12 @@ namespace OCR_MS
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
+
+        private void tsmiReloadCorrectionTable_Click(object sender, EventArgs e)
+        {
+            LoadCorrectionDictionary();
+            edResult.Text = AutoCorrecting(edResult.Text, GetLangiageFrom());
+        }
     }
 
     public class AzureAPI
@@ -2102,5 +2178,32 @@ namespace OCR_MS
         public int BorderThickness { get; set; } = 2;
         [JsonProperty("backgroundopacity")]
         public double BackgroundOpacity { get; set; } = 0.75;
+    }
+
+    public class CorrectionDict
+    {
+        public string Language { get; set; } = string.Empty;
+        public OrderedDictionary Items { get; set; } = new OrderedDictionary();
+
+        public void Clear()
+        {
+            if (Items is OrderedDictionary) Items.Clear();
+            else Items = new OrderedDictionary();
+        }
+    }
+
+    public class CorrectionDicts
+    {
+        public Dictionary<string, CorrectionDict> Dictionaries { get; set; } = new Dictionary<string, CorrectionDict>(StringComparer.OrdinalIgnoreCase);
+
+        public void Clear()
+        {
+            if (Dictionaries is IList<CorrectionDict>)
+            {
+                foreach (var dict in Dictionaries) { dict.Value.Clear(); }
+                Dictionaries.Clear();
+            }
+            else Dictionaries = new Dictionary<string, CorrectionDict>(StringComparer.OrdinalIgnoreCase);
+        }
     }
 }

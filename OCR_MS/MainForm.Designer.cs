@@ -69,6 +69,8 @@
             this.tsmiTextPause = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextStop = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiSpaceToFull = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSpaceToHalf = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextV2H = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextH2V = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
@@ -92,8 +94,7 @@
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSpaceToFull = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSpaceToHalf = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiReloadCorrectionTable = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -228,6 +229,7 @@
             this.tsmiOcrEngine,
             this.tsmiWatchClipboard,
             this.tsmiClearClipboard,
+            this.tsmiReloadCorrectionTable,
             this.tsmiUseLastIme,
             this.tsmiUseLastOCRLanguage,
             this.tsmiSep5,
@@ -411,6 +413,18 @@
             this.tsmiSep2.Name = "tsmiSep2";
             resources.ApplyResources(this.tsmiSep2, "tsmiSep2");
             // 
+            // tsmiSpaceToFull
+            // 
+            this.tsmiSpaceToFull.Name = "tsmiSpaceToFull";
+            resources.ApplyResources(this.tsmiSpaceToFull, "tsmiSpaceToFull");
+            this.tsmiSpaceToFull.Click += new System.EventHandler(this.tsmiConvertText_Click);
+            // 
+            // tsmiSpaceToHalf
+            // 
+            this.tsmiSpaceToHalf.Name = "tsmiSpaceToHalf";
+            resources.ApplyResources(this.tsmiSpaceToHalf, "tsmiSpaceToHalf");
+            this.tsmiSpaceToHalf.Click += new System.EventHandler(this.tsmiConvertText_Click);
+            // 
             // tsmiTextV2H
             // 
             this.tsmiTextV2H.Name = "tsmiTextV2H";
@@ -556,17 +570,11 @@
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
-            // tsmiSpaceToFull
+            // tsmiReloadCorrectionTable
             // 
-            this.tsmiSpaceToFull.Name = "tsmiSpaceToFull";
-            resources.ApplyResources(this.tsmiSpaceToFull, "tsmiSpaceToFull");
-            this.tsmiSpaceToFull.Click += new System.EventHandler(this.tsmiConvertText_Click);
-            // 
-            // tsmiSpaceToHalf
-            // 
-            this.tsmiSpaceToHalf.Name = "tsmiSpaceToHalf";
-            resources.ApplyResources(this.tsmiSpaceToHalf, "tsmiSpaceToHalf");
-            this.tsmiSpaceToHalf.Click += new System.EventHandler(this.tsmiConvertText_Click);
+            this.tsmiReloadCorrectionTable.Name = "tsmiReloadCorrectionTable";
+            resources.ApplyResources(this.tsmiReloadCorrectionTable, "tsmiReloadCorrectionTable");
+            this.tsmiReloadCorrectionTable.Click += new System.EventHandler(this.tsmiReloadCorrectionTable_Click);
             // 
             // MainForm
             // 
@@ -666,6 +674,7 @@
         private System.Windows.Forms.ToolStripSeparator tsmiSep5;
         private System.Windows.Forms.ToolStripMenuItem tsmiSpaceToFull;
         private System.Windows.Forms.ToolStripMenuItem tsmiSpaceToHalf;
+        private System.Windows.Forms.ToolStripMenuItem tsmiReloadCorrectionTable;
     }
 }
 

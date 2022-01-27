@@ -442,61 +442,61 @@
     <value>Always On Top</value>
   </data>
   <data name="tsmiOpacity100.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity100.Text" xml:space="preserve">
     <value>100%</value>
   </data>
   <data name="tsmiOpacity90.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity90.Text" xml:space="preserve">
     <value>90%</value>
   </data>
   <data name="tsmiOpacity80.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity80.Text" xml:space="preserve">
     <value>80%</value>
   </data>
   <data name="tsmiOpacity70.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity70.Text" xml:space="preserve">
     <value>70%</value>
   </data>
   <data name="tsmiOpacity60.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity60.Text" xml:space="preserve">
     <value>60%</value>
   </data>
   <data name="tsmiOpacity50.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity50.Text" xml:space="preserve">
     <value>50%</value>
   </data>
   <data name="tsmiOpacity40.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity40.Text" xml:space="preserve">
     <value>40%</value>
   </data>
   <data name="tsmiOpacity30.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity30.Text" xml:space="preserve">
     <value>30%</value>
   </data>
   <data name="tsmiOpacity20.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity20.Text" xml:space="preserve">
     <value>20%</value>
   </data>
   <data name="tsmiOpacity10.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="tsmiOpacity10.Text" xml:space="preserve">
     <value>10%</value>
@@ -678,6 +678,12 @@
   <data name="tsmiClearClipboard.Text" xml:space="preserve">
     <value>Auto Clear Clipboard</value>
   </data>
+  <data name="tsmiReloadCorrectionTable.Size" type="System.Drawing.Size, System.Drawing">
+    <value>244, 22</value>
+  </data>
+  <data name="tsmiReloadCorrectionTable.Text" xml:space="preserve">
+    <value>Reload Correction Table</value>
+  </data>
   <data name="tsmiUseLastIme.Size" type="System.Drawing.Size, System.Drawing">
     <value>244, 22</value>
   </data>
@@ -715,7 +721,7 @@
     <value>Exit</value>
   </data>
   <data name="notifyMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>245, 728</value>
+    <value>245, 750</value>
   </data>
   <data name="&gt;&gt;notifyMenu.Name" xml:space="preserve">
     <value>notifyMenu</value>
@@ -921,6 +927,18 @@
   <data name="&gt;&gt;tsmiSep2.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;tsmiSpaceToFull.Name" xml:space="preserve">
+    <value>tsmiSpaceToFull</value>
+  </data>
+  <data name="&gt;&gt;tsmiSpaceToFull.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiSpaceToHalf.Name" xml:space="preserve">
+    <value>tsmiSpaceToHalf</value>
+  </data>
+  <data name="&gt;&gt;tsmiSpaceToHalf.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;tsmiTextV2H.Name" xml:space="preserve">
     <value>tsmiTextV2H</value>
   </data>
@@ -1059,16 +1077,10 @@
   <data name="&gt;&gt;tsmiExit.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tsmiSpaceToFull.Name" xml:space="preserve">
-    <value>tsmiSpaceToFull</value>
+  <data name="&gt;&gt;tsmiReloadCorrectionTable.Name" xml:space="preserve">
+    <value>tsmiReloadCorrectionTable</value>
   </data>
-  <data name="&gt;&gt;tsmiSpaceToFull.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tsmiSpaceToHalf.Name" xml:space="preserve">
-    <value>tsmiSpaceToHalf</value>
-  </data>
-  <data name="&gt;&gt;tsmiSpaceToHalf.Type" xml:space="preserve">
+  <data name="&gt;&gt;tsmiReloadCorrectionTable.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
