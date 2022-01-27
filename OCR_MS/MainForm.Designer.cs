@@ -87,6 +87,8 @@
             this.tsmiOcrEngineBaidu = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiClearClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiReloadCorrectionTable = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiEditCorrectionTable = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiUseLastIme = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiUseLastOCRLanguage = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep5 = new System.Windows.Forms.ToolStripSeparator();
@@ -94,7 +96,7 @@
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiReloadCorrectionTable = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiRestart = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -230,12 +232,14 @@
             this.tsmiWatchClipboard,
             this.tsmiClearClipboard,
             this.tsmiReloadCorrectionTable,
+            this.tsmiEditCorrectionTable,
             this.tsmiUseLastIme,
             this.tsmiUseLastOCRLanguage,
             this.tsmiSep5,
             this.tsmiOptions,
             this.tsmiSaveState,
             this.tsmiSep9,
+            this.tsmiRestart,
             this.tsmiExit});
             this.notifyMenu.Name = "notifyMenu";
             resources.ApplyResources(this.notifyMenu, "notifyMenu");
@@ -530,6 +534,18 @@
             resources.ApplyResources(this.tsmiClearClipboard, "tsmiClearClipboard");
             this.tsmiClearClipboard.CheckedChanged += new System.EventHandler(this.chkAutoClipboard_CheckedChanged);
             // 
+            // tsmiReloadCorrectionTable
+            // 
+            this.tsmiReloadCorrectionTable.Name = "tsmiReloadCorrectionTable";
+            resources.ApplyResources(this.tsmiReloadCorrectionTable, "tsmiReloadCorrectionTable");
+            this.tsmiReloadCorrectionTable.Click += new System.EventHandler(this.tsmiCorrectionTable_Click);
+            // 
+            // tsmiEditCorrectionTable
+            // 
+            this.tsmiEditCorrectionTable.Name = "tsmiEditCorrectionTable";
+            resources.ApplyResources(this.tsmiEditCorrectionTable, "tsmiEditCorrectionTable");
+            this.tsmiEditCorrectionTable.Click += new System.EventHandler(this.tsmiCorrectionTable_Click);
+            // 
             // tsmiUseLastIme
             // 
             this.tsmiUseLastIme.CheckOnClick = true;
@@ -570,11 +586,11 @@
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
-            // tsmiReloadCorrectionTable
+            // tsmiRestart
             // 
-            this.tsmiReloadCorrectionTable.Name = "tsmiReloadCorrectionTable";
-            resources.ApplyResources(this.tsmiReloadCorrectionTable, "tsmiReloadCorrectionTable");
-            this.tsmiReloadCorrectionTable.Click += new System.EventHandler(this.tsmiReloadCorrectionTable_Click);
+            this.tsmiRestart.Name = "tsmiRestart";
+            resources.ApplyResources(this.tsmiRestart, "tsmiRestart");
+            this.tsmiRestart.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
             // MainForm
             // 
@@ -675,6 +691,8 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiSpaceToFull;
         private System.Windows.Forms.ToolStripMenuItem tsmiSpaceToHalf;
         private System.Windows.Forms.ToolStripMenuItem tsmiReloadCorrectionTable;
+        private System.Windows.Forms.ToolStripMenuItem tsmiEditCorrectionTable;
+        private System.Windows.Forms.ToolStripMenuItem tsmiRestart;
     }
 }
 

@@ -72,7 +72,9 @@ namespace OCR_MS
             return (lang_dst.ToLower());
         }
 
-        private string CorrectionDictFile = "ocr_correction.json";
+        #region OCR Auto Correction Table
+        private string CorrectionDictFile { get; set; } = "ocr_correction.json";
+        private string CorrectionDictEditor { get; set; } = string.Empty;
         private CorrectionDicts AutoCorrections { get; set; } = new CorrectionDicts();
         private void LoadCorrectionDictionary()
         {
@@ -99,9 +101,15 @@ namespace OCR_MS
                 try
                 {
                     foreach (var lang in azure_languages)
-                        if (!AutoCorrections.Dictionaries.ContainsKey(lang.Key)) AutoCorrections.Dictionaries.Add(lang.Key, new CorrectionDict() { Language = lang.Key });
+                    {
+                        if (!AutoCorrections.Dictionaries.ContainsKey(lang.Key))
+                            AutoCorrections.Dictionaries.Add(lang.Key, new CorrectionDict() { Language = lang.Key, Description = lang.Value });
+                    }
                     foreach (var lang in baidu_languages)
-                        if (!AutoCorrections.Dictionaries.ContainsKey(lang.Key)) AutoCorrections.Dictionaries.Add(lang.Key, new CorrectionDict() { Language = lang.Key });
+                    {
+                        if (!AutoCorrections.Dictionaries.ContainsKey(lang.Key))
+                            AutoCorrections.Dictionaries.Add(lang.Key, new CorrectionDict() { Language = lang.Key, Description = lang.Value });
+                    }
 
                     var json = JsonConvert.SerializeObject(AutoCorrections, Formatting.Indented);
                     File.WriteAllText(file, json);
@@ -118,7 +126,7 @@ namespace OCR_MS
             {
                 if (AutoCorrections is CorrectionDicts && !string.IsNullOrEmpty(lang) && AutoCorrections.Dictionaries.ContainsKey(lang))
                 {
-                    var dict = AutoCorrections.Dictionaries[lang].Items;
+                    var dict = AutoCorrections.Dictionaries[lang].Words;
                     if (dict is OrderedDictionary)
                     {
                         foreach (DictionaryEntry entry in dict)
@@ -134,6 +142,7 @@ namespace OCR_MS
 
             return (result);
         }
+        #endregion
 
         #region OCR with microsoft cognitive api
         private static Dictionary<string, AzureAPI> AzureApi = new Dictionary<string, AzureAPI>();
@@ -999,6 +1008,27 @@ namespace OCR_MS
                     tsmiHistoryClear.Enabled = OCR_HISTORY;
                     #endregion
 
+                    #region OCR Correction Table
+                    JToken ocr_corr_file = token.SelectToken("$..ocr.correction_file", false);
+                    if (ocr_corr_file != null)
+                    {
+                        try
+                        {
+                            CorrectionDictFile = Convert.ToString(ocr_corr_file);
+                        }
+                        catch (Exception) { }
+                    }
+                    JToken ocr_corr_editor = token.SelectToken("$..ocr.correction_editor", false);
+                    if (ocr_corr_editor != null)
+                    {
+                        try
+                        {
+                            CorrectionDictEditor = Convert.ToString(ocr_corr_editor);
+                        }
+                        catch (Exception) { }
+                    }
+                    #endregion
+
                     #region Translate Options
                     JToken autotrans = token.SelectToken("$..translate.auto_translate", false);
                     if (autotrans != null)
@@ -1262,6 +1292,8 @@ namespace OCR_MS
                 { "ocr", new Dictionary<string, object>()
                     {
                         { "log_history", OCR_HISTORY },
+                        { "correction_file", CorrectionDictFile },
+                        { "correction_editor", CorrectionDictEditor },
                     }
                 },
                 { "translate", new Dictionary<string, object>()
@@ -1848,6 +1880,10 @@ namespace OCR_MS
 
         private void tsmiExit_Click(object sender, EventArgs e)
         {
+            if (sender == tsmiRestart)
+            {
+                System.Diagnostics.Process.Start(Application.ExecutablePath);
+            }
             Application.Exit();
         }
 
@@ -2135,10 +2171,25 @@ namespace OCR_MS
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
 
-        private void tsmiReloadCorrectionTable_Click(object sender, EventArgs e)
+        private void tsmiCorrectionTable_Click(object sender, EventArgs e)
         {
-            LoadCorrectionDictionary();
-            edResult.Text = AutoCorrecting(edResult.Text, GetLangiageFrom());
+            if (sender == tsmiReloadCorrectionTable)
+            {
+                LoadCorrectionDictionary();
+                edResult.Text = AutoCorrecting(edResult.Text, GetLangiageFrom());
+            }
+            else if (sender == tsmiEditCorrectionTable)
+            {
+                if (!string.IsNullOrEmpty(CorrectionDictFile))
+                {
+                    var file = Path.Combine(AppPath, CorrectionDictFile);
+                    if (File.Exists(file))
+                    {
+                        if (string.IsNullOrEmpty(CorrectionDictEditor)) System.Diagnostics.Process.Start(file);
+                        else System.Diagnostics.Process.Start(CorrectionDictEditor, file);
+                    }
+                }
+            }
         }
     }
 
@@ -2183,12 +2234,13 @@ namespace OCR_MS
     public class CorrectionDict
     {
         public string Language { get; set; } = string.Empty;
-        public OrderedDictionary Items { get; set; } = new OrderedDictionary();
+        public string Description { get; set; } = string.Empty;
+        public OrderedDictionary Words { get; set; } = new OrderedDictionary();
 
         public void Clear()
         {
-            if (Items is OrderedDictionary) Items.Clear();
-            else Items = new OrderedDictionary();
+            if (Words is OrderedDictionary) Words.Clear();
+            else Words = new OrderedDictionary();
         }
     }
 
