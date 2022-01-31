@@ -2150,22 +2150,28 @@ namespace OCR_MS
         {
             try
             {
+                var HasSelection = edResult.SelectionLength > 0;
+                var lines = HasSelection ? edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n", "\r" }, StringSplitOptions.None) : edResult.Lines;
+
                 if (sender == tsmiTextV2H)
                 {
-                    edResult.Lines = ConvertTextV2H(edResult.Lines).ToArray();
+                    lines = ConvertTextV2H(lines).ToArray();
                 }
                 else if (sender == tsmiTextH2V)
                 {
-                    edResult.Lines = ConvertTextH2V(edResult.Lines).ToArray();
+                    lines = ConvertTextH2V(lines).ToArray();
                 }
                 else if (sender == tsmiSpaceToFull)
                 {
-                    edResult.Lines = ConvertSpaceToFull(edResult.Lines).ToArray();
+                    lines = ConvertSpaceToFull(lines).ToArray();
                 }
                 else if (sender == tsmiSpaceToHalf)
                 {
-                    edResult.Lines = ConvertSpaceToHalf(edResult.Lines).ToArray();
+                    lines = ConvertSpaceToHalf(lines).ToArray();
                 }
+
+                if (HasSelection) edResult.SelectedText = string.Join(Environment.NewLine, lines);
+                else edResult.Lines = lines;
 
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
