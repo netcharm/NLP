@@ -47,12 +47,12 @@ namespace OCR_MS
         private const string API_TITLE_CV = "Computer Vision API";
         private const string API_TITLE_TT = "Translator Text API";
 
-        private string GetLangiageFrom(string lang = "", bool auto_detect = true)
+        private string GetLanguageFrom(string lang = "", bool auto_detect = true)
         {
             string lang_src = string.IsNullOrEmpty(lang) ? "unk" : lang;
             lang_src = Result_Lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ? string.Empty : (auto_detect ? Result_Lang : lang_src);
             if (string.IsNullOrEmpty(lang_src)) lang_src = (string)tsmiTranslateSrc.Tag;
-            if (string.IsNullOrEmpty(lang_src) || lang_src.Equals("unk", StringComparison.CurrentCultureIgnoreCase)) lang_src = cbLanguage.SelectedValue.ToString();
+            if (lang_src.Equals("unk", StringComparison.CurrentCultureIgnoreCase) && !auto_detect) lang_src = cbLanguage.SelectedValue.ToString();
             return (lang_src.ToLower());
         }
 
@@ -335,8 +335,8 @@ namespace OCR_MS
             var queryString = HttpUtility.ParseQueryString( string.Empty );
             // Request parameters
             queryString["api-version"] = "3.0";
-            queryString["textType"] = "html";
-            if (!string.IsNullOrEmpty(langSrc)) queryString["from"] = langSrc;
+            queryString["textType"] = "plain"; //"html"
+            if (!(string.IsNullOrEmpty(langSrc) || langSrc.Equals("unk", StringComparison.CurrentCultureIgnoreCase))) queryString["from"] = langSrc;
             if (!string.IsNullOrEmpty(langDst)) queryString["to"] = langDst;
             queryString["toScript"] = "Latn";
             //queryString["allowFallback"] = "true";
@@ -349,36 +349,38 @@ namespace OCR_MS
             var uri = $"{ApiEndpoint_TT}/translate?" + queryString;
             uri = uri.Replace("//translate", "/translate");
 
-            //var lines = src.Split(new string[] { "\n\r", "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries );
-            //var srclines = lines.Select(l => $"{{'Text':'{l.Replace("'", "\\'").Replace("\"", "\\\"")}'}}");            
-            //var content = new StringContent($"[{string.Join(",", srclines)}]");
-            var content = new StringContent($"[{{'Text':'{src.Replace("'", "\\'").Replace("\"", "\\\"")}'}}]");
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-            var client = new HttpClient();
-            // Request headers
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiKey_TT);
-
-            HttpResponseMessage response = await client.PostAsync(uri, content);
-            if (response.StatusCode == HttpStatusCode.OK)
+            using (var client = new HttpClient())
             {
-                string translate_result = await response.Content.ReadAsStringAsync();
-
-                JToken token = JToken.Parse(translate_result);
-                Result_JSON = JsonConvert.SerializeObject(token, Formatting.Indented);
-                Result_JSON = Result_JSON.Replace("\\\"", "\"");
-
-                StringBuilder sb = new StringBuilder();
-                IEnumerable<JToken> translations = token.SelectTokens( "$..translations", false );
-                foreach (var translation in translations)
+                using (var request = new HttpRequestMessage())
                 {
-                    IEnumerable<JToken> translate_text = translation.SelectTokens( "$..text", false ).First();
-                    IEnumerable<JToken> translate_latn = translation.SelectTokens( "$..transliteration.text", false ).First();
-                    IEnumerable<JToken> translate_to = translation.SelectTokens( "$..to", false ).First();
+                    request.Method = HttpMethod.Post;
+                    request.RequestUri = new Uri(uri);
+                    request.Content = new StringContent($"[{{'Text':'{src.Replace("'", "\\'").Replace("\"", "\\\"")}'}}]", Encoding.UTF8, "application/json");
+                    request.Headers.Add("Ocp-Apim-Subscription-Key", ApiKey_TT);
+                    request.Headers.Add("Ocp-Apim-Subscription-Region", "global");
 
-                    sb.AppendLine(translate_text.Value<string>());
+                    HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(false);
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        string translate_result = await response.Content.ReadAsStringAsync();
+
+                        JToken token = JToken.Parse(translate_result);
+                        Result_JSON = JsonConvert.SerializeObject(token, Formatting.Indented);
+                        Result_JSON = Result_JSON.Replace("\\\"", "\"");
+
+                        StringBuilder sb = new StringBuilder();
+                        IEnumerable<JToken> translations = token.SelectTokens( "$..translations", false );
+                        foreach (var translation in translations)
+                        {
+                            IEnumerable<JToken> translate_text = translation.SelectTokens( "$..text", false ).First();
+                            IEnumerable<JToken> translate_latn = translation.SelectTokens( "$..transliteration.text", false ).First();
+                            IEnumerable<JToken> translate_to = translation.SelectTokens( "$..to", false ).First();
+
+                            sb.AppendLine(translate_text.Value<string>());
+                        }
+                        result = sb.ToString().Trim();
+                    }
                 }
-                result = sb.ToString().Trim();
             }
 
             return (result);
@@ -394,7 +396,7 @@ namespace OCR_MS
                 {
                     pbar.Style = ProgressBarStyle.Marquee;
 
-                    var langSrc = auto_detect_lang || string.IsNullOrEmpty(from) ? GetLangiageFrom() : GetLangiageFrom(from, auto_detect: auto_detect_lang);
+                    var langSrc = auto_detect_lang || string.IsNullOrEmpty(from) ? GetLanguageFrom() : GetLanguageFrom(from, auto_detect: auto_detect_lang);
                     var langDst = GetLangiageTo();
                     //langSrc = azure_languages.ContainsKey(langSrc) ? azure_languages[langSrc] : "unk";
 
@@ -447,7 +449,7 @@ namespace OCR_MS
             var signs = md5hash.ComputeHash(Encoding.UTF8.GetBytes($"{appID}{src}{salt}{appKEY}"));
             var sign = string.Join("", signs.Select(v => v.ToString("x2")));
 
-            var lang_src = GetLangiageFrom(lang);
+            var lang_src = GetLanguageFrom(lang);
             lang_src = baidu_languages_tt.ContainsKey(lang_src) ? baidu_languages_tt[lang_src] : "CHN_ENG";
 
             var param_token = new Dictionary<string, string>()
@@ -557,7 +559,7 @@ namespace OCR_MS
             var signs = md5hash.ComputeHash(Encoding.UTF8.GetBytes($"{appID}{src}{salt}{appKEY}"));
             var sign = string.Join("", signs.Select(v => v.ToString("x2")));
 
-            var lang_src = auto_detect_lang || string.IsNullOrEmpty(from) ? GetLangiageFrom() : GetLangiageFrom(from, auto_detect: auto_detect_lang);
+            var lang_src = auto_detect_lang || string.IsNullOrEmpty(from) ? GetLanguageFrom() : GetLanguageFrom(from, auto_detect: auto_detect_lang);
             lang_src = baidu_languages.ContainsKey(lang_src) ? baidu_languages[lang_src] : "auto";
 
             var lang_dst = GetLangiageTo();
@@ -1829,8 +1831,8 @@ namespace OCR_MS
             try
             {
                 pbar.Style = ProgressBarStyle.Marquee;
-                bool auto_lang_from = !(ModifierKeys == Keys.Control) || (ModifierKeys == Keys.None);
-                string lang_from = cbLanguage.SelectedValue as string;
+                bool auto_lang_from = !(ModifierKeys == Keys.Control || ModifierKeys == Keys.None);
+                string lang_from = ModifierKeys == Keys.Alt ? "unk" : cbLanguage.SelectedValue as string;
                 string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
                 var result = string.Empty;
                 if (tsmiTranslateEngineAzure.Checked)
@@ -2182,7 +2184,7 @@ namespace OCR_MS
             if (sender == tsmiReloadCorrectionTable)
             {
                 LoadCorrectionDictionary();
-                edResult.Text = AutoCorrecting(edResult.Text, GetLangiageFrom());
+                edResult.Text = AutoCorrecting(edResult.Text, GetLanguageFrom());
             }
             else if (sender == tsmiEditCorrectionTable)
             {
