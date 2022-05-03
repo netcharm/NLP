@@ -1787,7 +1787,7 @@ namespace OCR_MS
                     Speech.SimpleCultureDetect = false;
                 else
                     Speech.SimpleCultureDetect = true;
-                if (ModifierKeys.HasFlag(Keys.Alt))
+                if (ModifierKeys.HasFlag(Keys.Shift))
                     Speech.AltPlayMixedCulture = true;
                 else
                     Speech.AltPlayMixedCulture = false;
@@ -1795,7 +1795,7 @@ namespace OCR_MS
                 Speech.AutoChangeSpeechSpeed = tsmiTextAutoSpeechingRate.Checked;
 
                 string lang = cbLanguage.SelectedValue.ToString();
-                string culture = string.IsNullOrEmpty(lang) ? "unk" : lang;
+                string culture = string.IsNullOrEmpty(lang) || ModifierKeys == Keys.Alt ? "unk" : lang;
 
                 var slice_words = new List<string>();
                 if (edResult.SelectionLength > 0)
