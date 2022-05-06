@@ -1101,6 +1101,19 @@ namespace OCR_MS
                         }
                         catch (Exception) { }
                     }
+                    JToken culturevoice = token.SelectToken("$..speech.voice", false);
+                    if (culturevoice != null)
+                    {
+                        try
+                        {
+                            var voice_list = culturevoice.ToObject<Dictionary<string, List<string>>>();
+                            foreach (var kv in voice_list)
+                            {
+                                Speech.SetVoice(kv.Key, kv.Value);
+                            }
+                        }
+                        catch (Exception) { }
+                    }
                     #endregion
 
                     #region Result Editor Option
@@ -1248,7 +1261,7 @@ namespace OCR_MS
                     #endregion
                 }
             }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"LoadConfig => {ex.Message}"); }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"LoadConfig => {ex.Message}"); MessageBox.Show(ex.Message); }
 
             LoadCorrectionDictionary();
 
