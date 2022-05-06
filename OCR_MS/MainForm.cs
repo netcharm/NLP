@@ -30,6 +30,7 @@ namespace OCR_MS
     {
         private string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
         private string AppName = Path.GetFileNameWithoutExtension(Application.ExecutablePath);
+        private string AppConfigFile { get; set; } = $"{Path.GetFileNameWithoutExtension(Application.ExecutablePath)}.json";
 
         private static string[] exts_img = new string[] { ".bmp", ".jpg", ".png", ".jpeg", ".tif", ".tiff", ".gif" };
         private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
@@ -824,7 +825,7 @@ namespace OCR_MS
         /// </summary>
         private void LoadConfig()
         {
-            var cfg = Path.Combine( AppPath, AppName + ".json" );
+            var cfg = Path.Combine(AppPath, AppConfigFile);
             try
             {
                 if (File.Exists(cfg))
@@ -2191,6 +2192,26 @@ namespace OCR_MS
                 if (!string.IsNullOrEmpty(CorrectionDictFile))
                 {
                     var file = Path.Combine(AppPath, CorrectionDictFile);
+                    if (File.Exists(file))
+                    {
+                        if (string.IsNullOrEmpty(CorrectionDictEditor)) System.Diagnostics.Process.Start(file);
+                        else System.Diagnostics.Process.Start(CorrectionDictEditor, file);
+                    }
+                }
+            }
+        }
+
+        private void tsmiEditConfig_Click(object sender, EventArgs e)
+        {
+            if (sender == tsmiReloadConfig)
+            {
+                LoadConfig();
+            }
+            else if (sender == tsmiEditConfig)
+            {
+                if (!string.IsNullOrEmpty(AppConfigFile))
+                {
+                    var file = Path.Combine(AppPath, AppConfigFile);
                     if (File.Exists(file))
                     {
                         if (string.IsNullOrEmpty(CorrectionDictEditor)) System.Diagnostics.Process.Start(file);

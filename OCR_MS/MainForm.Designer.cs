@@ -93,10 +93,12 @@
             this.tsmiUseLastOCRLanguage = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep5 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiEditConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiRestart = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiReloadConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -237,12 +239,15 @@
             this.tsmiUseLastOCRLanguage,
             this.tsmiSep5,
             this.tsmiOptions,
+            this.tsmiReloadConfig,
+            this.tsmiEditConfig,
             this.tsmiSaveState,
             this.tsmiSep9,
             this.tsmiRestart,
             this.tsmiExit});
             this.notifyMenu.Name = "notifyMenu";
             resources.ApplyResources(this.notifyMenu, "notifyMenu");
+            this.notifyMenu.Click += new System.EventHandler(this.tsmiEditConfig_Click);
             // 
             // tsmiShowWindow
             // 
@@ -565,9 +570,15 @@
             // 
             // tsmiOptions
             // 
-            this.tsmiOptions.Name = "tsmiOptions";
             resources.ApplyResources(this.tsmiOptions, "tsmiOptions");
+            this.tsmiOptions.Name = "tsmiOptions";
             this.tsmiOptions.Click += new System.EventHandler(this.tsmiOptions_Click);
+            // 
+            // tsmiEditConfig
+            // 
+            this.tsmiEditConfig.Name = "tsmiEditConfig";
+            resources.ApplyResources(this.tsmiEditConfig, "tsmiEditConfig");
+            this.tsmiEditConfig.Click += new System.EventHandler(this.tsmiEditConfig_Click);
             // 
             // tsmiSaveState
             // 
@@ -580,17 +591,22 @@
             this.tsmiSep9.Name = "tsmiSep9";
             resources.ApplyResources(this.tsmiSep9, "tsmiSep9");
             // 
+            // tsmiRestart
+            // 
+            this.tsmiRestart.Name = "tsmiRestart";
+            resources.ApplyResources(this.tsmiRestart, "tsmiRestart");
+            this.tsmiRestart.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
             // tsmiExit
             // 
             this.tsmiExit.Name = "tsmiExit";
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
-            // tsmiRestart
+            // tsmiReloadConfig
             // 
-            this.tsmiRestart.Name = "tsmiRestart";
-            resources.ApplyResources(this.tsmiRestart, "tsmiRestart");
-            this.tsmiRestart.Click += new System.EventHandler(this.tsmiExit_Click);
+            this.tsmiReloadConfig.Name = "tsmiReloadConfig";
+            resources.ApplyResources(this.tsmiReloadConfig, "tsmiReloadConfig");
             // 
             // MainForm
             // 
@@ -693,6 +709,8 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiReloadCorrectionTable;
         private System.Windows.Forms.ToolStripMenuItem tsmiEditCorrectionTable;
         private System.Windows.Forms.ToolStripMenuItem tsmiRestart;
+        private System.Windows.Forms.ToolStripMenuItem tsmiEditConfig;
+        private System.Windows.Forms.ToolStripMenuItem tsmiReloadConfig;
     }
 }
 
