@@ -363,6 +363,14 @@ namespace OCR_MS
                 catch{ }
             }
         });
+        public Func<Dictionary<string, List<string>>> GetVoices { get; } = new Func<Dictionary<string, List<string>>>(() => {
+            var result = new Dictionary<string, List<string>>();
+            if (nametable is Dictionary<CultureInfo, List<string>>)
+            {
+                foreach (var kv in nametable) result[kv.Key.IetfLanguageTag] = kv.Value;
+            }
+            return (result);
+        });
         private static Dictionary<CultureInfo, List<string>> nametable = new Dictionary<CultureInfo, List<string>>() {
             { CultureInfo.GetCultureInfo("zh-CN"), new List<string>() { "huihui", "yaoyao", "lili", "kangkang" } },
             { CultureInfo.GetCultureInfo("zh-TW"), new List<string>() { "hanhan", "yating", "zhiwei" } },
@@ -959,6 +967,7 @@ namespace OCR_MS
         #region Speech Synthesizer properties
         public static Dictionary<string, string> CustomNames { set { SpeechTTS.SetCustomNames(value); } }
         public static Action<string, List<string>> SetVoice { get { return (t2s is SpeechTTS ? t2s.SetVoice : null); } }
+        public static Func<Dictionary<string, List<string>>> GetVoices { get { return (t2s is SpeechTTS ? t2s.GetVoices : null); } }
         public static bool AutoChangeSpeechSpeed
         {
             get { return (t2s is SpeechTTS ? t2s.AutoChangeSpeechSpeed : true); }

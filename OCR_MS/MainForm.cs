@@ -48,11 +48,10 @@ namespace OCR_MS
         private const string API_TITLE_CV = "Computer Vision API";
         private const string API_TITLE_TT = "Translator Text API";
 
-        private string GetLanguageFrom(string lang = "", bool auto_detect = true)
+        private string GetLanguageFrom(string lang = "", bool auto_detect = true, bool ignore_last = false)
         {
-            string lang_src = string.IsNullOrEmpty(lang) ? "unk" : lang;
-            lang_src = Result_Lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ? string.Empty : (auto_detect ? Result_Lang : lang_src);
-            if (string.IsNullOrEmpty(lang_src)) lang_src = (string)tsmiTranslateSrc.Tag;
+            string lang_src = string.IsNullOrEmpty(lang) ? (string)tsmiTranslateSrc.Tag : lang;
+            lang_src = auto_detect || Result_Lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ? lang_src : Result_Lang;
             if (lang_src.Equals("unk", StringComparison.CurrentCultureIgnoreCase) && !auto_detect) lang_src = cbLanguage.SelectedValue.ToString();
             return (lang_src.ToLower());
         }
@@ -1323,7 +1322,8 @@ namespace OCR_MS
                         { "auto_rate", tsmiTextAutoSpeechingRate.Checked },
                         { "auto_speech", tsmiTextAutoSpeech.Checked },
                         { "alt_play_mixed_culture", Speech.AltPlayMixedCulture },
-                        { "simple_detect_culture", Speech.SimpleCultureDetect }
+                        { "simple_detect_culture", Speech.SimpleCultureDetect },
+                        { "voice",Speech.GetVoices() }
                     }
                 },
                 { "result", new Dictionary<string, object>()
@@ -1845,7 +1845,7 @@ namespace OCR_MS
             try
             {
                 pbar.Style = ProgressBarStyle.Marquee;
-                bool auto_lang_from = !(ModifierKeys == Keys.Control || ModifierKeys == Keys.None);
+                bool auto_lang_from = !(ModifierKeys == Keys.Control ||ModifierKeys == Keys.None);
                 string lang_from = ModifierKeys == Keys.Alt ? "unk" : cbLanguage.SelectedValue as string;
                 string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
                 var result = string.Empty;
