@@ -34,8 +34,9 @@ namespace OCR_MS
 
         private static string[] exts_img = new string[] { ".bmp", ".jpg", ".png", ".jpeg", ".tif", ".tiff", ".gif" };
         private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
+        private static string[] split_symbol = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
 
-        private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
+    private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
 
         private bool CFGLOADED = false;
         private bool ALWAYS_ON_TOP = false;
@@ -48,11 +49,21 @@ namespace OCR_MS
         private const string API_TITLE_CV = "Computer Vision API";
         private const string API_TITLE_TT = "Translator Text API";
 
-        private string GetLanguageFrom(string lang = "", bool auto_detect = true, bool ignore_last = false)
+        private string GetLanguageFrom(string lang = "")
         {
-            string lang_src = string.IsNullOrEmpty(lang) ? (string)tsmiTranslateSrc.Tag : lang;
-            lang_src = auto_detect || Result_Lang.Equals("unk", StringComparison.CurrentCultureIgnoreCase) ? lang_src : Result_Lang;
-            if (lang_src.Equals("unk", StringComparison.CurrentCultureIgnoreCase) && !auto_detect) lang_src = cbLanguage.SelectedValue.ToString();
+            var lang_src = string.IsNullOrEmpty(lang) ? "unk" : lang;
+            try
+            {
+                if (ModifierKeys == Keys.Control && !string.IsNullOrEmpty((string)tsmiTranslateSrc.Tag))
+                    lang_src = (string)tsmiTranslateSrc.Tag;
+                else if (ModifierKeys == Keys.Shift)
+                    lang_src = cbLanguage.SelectedValue.ToString();
+                else if (ModifierKeys == Keys.Alt)
+                    lang_src = "unk";
+                else if (ModifierKeys == Keys.None)
+                    lang_src = string.IsNullOrEmpty(Result_Lang) ? "unk" : Result_Lang;
+            }
+            catch { }
             return (lang_src.ToLower());
         }
 
@@ -387,7 +398,7 @@ namespace OCR_MS
         }
         private bool TRANSLATING_AUTO = false;
 
-        internal async Task<string> Run_Azure_Translate(string src, bool auto_detect_lang = true, string from = "")
+        internal async Task<string> Run_Azure_Translate(string src, string from = "")
         {
             string result = string.Empty;
             if (AzureApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey) && !string.IsNullOrEmpty(edResult.Text))
@@ -396,9 +407,8 @@ namespace OCR_MS
                 {
                     pbar.Style = ProgressBarStyle.Marquee;
 
-                    var langSrc = auto_detect_lang || string.IsNullOrEmpty(from) ? GetLanguageFrom() : GetLanguageFrom(from, auto_detect: auto_detect_lang);
+                    var langSrc = GetLanguageFrom(from);
                     var langDst = GetLangiageTo();
-                    //langSrc = azure_languages.ContainsKey(langSrc) ? azure_languages[langSrc] : "unk";
 
                     result = await MakeRequest_Azure_Translate(src, langDst, langSrc);
                 }
@@ -544,7 +554,7 @@ namespace OCR_MS
             return (result);
         }
 
-        internal async Task<string> Run_Baidu_Translate(string src, bool auto_detect_lang = true, string from = "")
+        internal async Task<string> Run_Baidu_Translate(string src, string from = "")
         {
             string result = string.Empty;
 
@@ -559,7 +569,7 @@ namespace OCR_MS
             var signs = md5hash.ComputeHash(Encoding.UTF8.GetBytes($"{appID}{src}{salt}{appKEY}"));
             var sign = string.Join("", signs.Select(v => v.ToString("x2")));
 
-            var lang_src = auto_detect_lang || string.IsNullOrEmpty(from) ? GetLanguageFrom() : GetLanguageFrom(from, auto_detect: auto_detect_lang);
+            var lang_src = GetLanguageFrom(from);
             lang_src = baidu_languages.ContainsKey(lang_src) ? baidu_languages[lang_src] : "auto";
 
             var lang_dst = GetLangiageTo();
@@ -1733,6 +1743,7 @@ namespace OCR_MS
                 Task.Delay(20).GetAwaiter().GetResult();
 
                 var force = ModifierKeys == Keys.Control;
+                var lang = ModifierKeys == Keys.Alt ? "unk" : cbLanguage.SelectedValue.ToString();
                 var src = force ? null : GetClipboardImage();
                 if (!(src is Image)) src = GetCaptureScreen();
                 if (src is Image)
@@ -1741,7 +1752,6 @@ namespace OCR_MS
                     var qr_result = qr.Decode(new Bitmap(src));
                     if (qr_result == null || string.IsNullOrEmpty(qr_result.Text))
                     {
-                        string lang = cbLanguage.SelectedValue.ToString();
                         string result = string.Empty;
                         if (tsmiOcrEngineAzure.Checked)
                             result = await Run_Azure_OCR(src, lang);
@@ -1813,7 +1823,7 @@ namespace OCR_MS
 
                 var slice_words = new List<string>();
                 if (edResult.SelectionLength > 0)
-                    slice_words.AddRange(Speech.Slice(edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" }, StringSplitOptions.RemoveEmptyEntries), culture));
+                    slice_words.AddRange(Speech.Slice(edResult.SelectedText.Split(split_symbol, StringSplitOptions.RemoveEmptyEntries), culture));
                 else
                     slice_words.AddRange(Speech.Slice(edResult.Lines, culture));
                 var tip = string.Join(", ", slice_words);
@@ -1828,7 +1838,7 @@ namespace OCR_MS
                 if (Speech.State == SynthesizerState.Ready)
                 {
                     if (edResult.SelectionLength > 0)
-                        Speech.Play(edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" }, StringSplitOptions.RemoveEmptyEntries), culture);
+                        Speech.Play(edResult.SelectedText.Split(split_symbol, StringSplitOptions.RemoveEmptyEntries), culture);
                     else
                         Speech.Play(edResult.Lines, culture);
                 }
@@ -1845,14 +1855,14 @@ namespace OCR_MS
             try
             {
                 pbar.Style = ProgressBarStyle.Marquee;
-                bool auto_lang_from = !(ModifierKeys == Keys.Control ||ModifierKeys == Keys.None);
-                string lang_from = ModifierKeys == Keys.Alt ? "unk" : cbLanguage.SelectedValue as string;
+                int select_s = edResult.SelectionStart;
+                int select_l = edResult.SelectionLength;
                 string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
                 var result = string.Empty;
                 if (tsmiTranslateEngineAzure.Checked)
-                    result = await Run_Azure_Translate(text, auto_detect_lang: auto_lang_from, from: lang_from);
+                    result = await Run_Azure_Translate(text);
                 else if (tsmiTranslateEngineBaidu.Checked)
-                    result = await Run_Baidu_Translate(text, auto_detect_lang: auto_lang_from, from: lang_from);
+                    result = await Run_Baidu_Translate(text);
                 if (!string.IsNullOrEmpty(result))
                 {
                     StringBuilder sb = new StringBuilder();
@@ -1860,6 +1870,8 @@ namespace OCR_MS
                     sb.AppendLine();
                     sb.AppendLine(result);
                     edResult.Text = sb.ToString();
+                    edResult.SelectionStart = select_s;
+                    edResult.SelectionLength = select_l;
                 }
             }
             catch (Exception) { }
