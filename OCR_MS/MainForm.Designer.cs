@@ -93,12 +93,13 @@
             this.tsmiUseLastOCRLanguage = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep5 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiReloadConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiEditConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSaveState = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiRestart = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiReloadConfig = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiText2QR = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -223,6 +224,7 @@
             this.tsmiSpaceToHalf,
             this.tsmiTextV2H,
             this.tsmiTextH2V,
+            this.tsmiText2QR,
             this.tsmiSep3,
             this.tsmiTranslateAuto,
             this.tsmiTranslateEngine,
@@ -574,6 +576,11 @@
             this.tsmiOptions.Name = "tsmiOptions";
             this.tsmiOptions.Click += new System.EventHandler(this.tsmiOptions_Click);
             // 
+            // tsmiReloadConfig
+            // 
+            this.tsmiReloadConfig.Name = "tsmiReloadConfig";
+            resources.ApplyResources(this.tsmiReloadConfig, "tsmiReloadConfig");
+            // 
             // tsmiEditConfig
             // 
             this.tsmiEditConfig.Name = "tsmiEditConfig";
@@ -603,10 +610,11 @@
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
-            // tsmiReloadConfig
+            // tsmiText2QR
             // 
-            this.tsmiReloadConfig.Name = "tsmiReloadConfig";
-            resources.ApplyResources(this.tsmiReloadConfig, "tsmiReloadConfig");
+            this.tsmiText2QR.Name = "tsmiText2QR";
+            resources.ApplyResources(this.tsmiText2QR, "tsmiText2QR");
+            this.tsmiText2QR.Click += new System.EventHandler(this.tsmiText2QR_Click);
             // 
             // MainForm
             // 
@@ -711,6 +719,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiRestart;
         private System.Windows.Forms.ToolStripMenuItem tsmiEditConfig;
         private System.Windows.Forms.ToolStripMenuItem tsmiReloadConfig;
+        private System.Windows.Forms.ToolStripMenuItem tsmiText2QR;
     }
 }
 

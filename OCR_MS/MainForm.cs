@@ -2205,6 +2205,64 @@ namespace OCR_MS
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
 
+        private void tsmiText2QR_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var size = 1024;
+                int select_s = edResult.SelectionStart;
+                int select_l = edResult.SelectionLength;
+                string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
+
+                var render = new ZXing.Rendering.BitmapRenderer();
+                var hint = new Dictionary<ZXing.EncodeHintType, object>() { { ZXing.EncodeHintType.MIN_SIZE, new Size(128, 128) } };
+                var qr = new ZXing.BarcodeWriter()
+                {
+                    Format = ZXing.BarcodeFormat.QR_CODE,
+                    Options = new ZXing.QrCode.QrCodeEncodingOptions() { Height = size, Width = size, CharacterSet = "UTF-8" },
+                    Renderer = render
+                };
+                var qr_matrix = qr.Encode(text);
+                var qr_result = render.Render(qr_matrix, ZXing.BarcodeFormat.QR_CODE, text);
+                if (qr_result is Bitmap)
+                {
+                    var picbox = new PictureBox()
+                    {
+                        Image = qr_result,
+                        Width = qr_result.Width,
+                        Height = qr_result.Height,
+                        BorderStyle = BorderStyle.None,                         
+                        Dock = DockStyle.Fill,
+                        SizeMode = PictureBoxSizeMode.Zoom
+                    };
+                    var win = new Form() {
+                        Icon = this.Icon,
+                        AutoSize = true,
+                        AutoSizeMode = AutoSizeMode.GrowOnly,
+                        BackColor = render.Background,
+                        MinimumSize = new Size(512, 512),
+                        //MaximumSize = new Size(size, size),
+                        StartPosition = FormStartPosition.CenterScreen,
+                        FormBorderStyle = FormBorderStyle.FixedDialog,
+                        //MaximizeBox = false,
+                        MinimizeBox = false,
+                        SizeGripStyle = SizeGripStyle.Hide,
+                        DialogResult = DialogResult.OK,
+                        CancelButton = null,
+                    };
+                    win.Controls.Add(picbox);
+                    if (DialogResult.Cancel == win.ShowDialog())
+                    {
+                        if (picbox.Image is Image) picbox.Image.Dispose();
+                        picbox.Dispose();
+                        win.Dispose();
+                    }
+                    //win = new System.Windows.
+                }
+            }
+            catch (Exception) { }
+        }
+
         private void tsmiCorrectionTable_Click(object sender, EventArgs e)
         {
             if (sender == tsmiReloadCorrectionTable)
@@ -2245,6 +2303,7 @@ namespace OCR_MS
                 }
             }
         }
+
     }
 
     public class AzureAPI
