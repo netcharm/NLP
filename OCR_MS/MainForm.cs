@@ -1552,6 +1552,10 @@ namespace OCR_MS
                     default: break;
                 }
             }
+            else if (e.KeyCode == Keys.F4)
+            {
+                tsmiText2QR.PerformClick();
+            }
             else e.Handled = true;
         }
 
@@ -2241,17 +2245,18 @@ namespace OCR_MS
         {
             try
             {
-                var size = 1024;
+                var size_m = 512;
+                var size_l = 1024;
                 int select_s = edResult.SelectionStart;
                 int select_l = edResult.SelectionLength;
                 string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
 
                 var render = new ZXing.Rendering.BitmapRenderer();
-                var hint = new Dictionary<ZXing.EncodeHintType, object>() { { ZXing.EncodeHintType.MIN_SIZE, new Size(128, 128) } };
+                var hint = new Dictionary<ZXing.EncodeHintType, object>() { { ZXing.EncodeHintType.MIN_SIZE, new Size(size_m, size_m) } };
                 var qr = new ZXing.BarcodeWriter()
                 {
                     Format = ZXing.BarcodeFormat.QR_CODE,
-                    Options = new ZXing.QrCode.QrCodeEncodingOptions() { Height = size, Width = size, CharacterSet = "UTF-8" },
+                    Options = new ZXing.QrCode.QrCodeEncodingOptions() { Height = size_l, Width = size_l, CharacterSet = "UTF-8" },
                     Renderer = render
                 };
                 var qr_matrix = qr.Encode(text);
@@ -2273,8 +2278,7 @@ namespace OCR_MS
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowOnly,
                         BackColor = render.Background,
-                        MinimumSize = new Size(512, 512),
-                        //MaximumSize = new Size(size, size),
+                        ClientSize = new Size(size_m, size_m),
                         StartPosition = FormStartPosition.CenterScreen,
                         FormBorderStyle = FormBorderStyle.FixedDialog,
                         //MaximizeBox = false,
