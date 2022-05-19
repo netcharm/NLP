@@ -73,6 +73,7 @@
             this.tsmiSpaceToHalf = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextV2H = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextH2V = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiText2QR = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTranslateAuto = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateEngine = new System.Windows.Forms.ToolStripMenuItem();
@@ -99,7 +100,6 @@
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiRestart = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiText2QR = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -448,6 +448,12 @@
             resources.ApplyResources(this.tsmiTextH2V, "tsmiTextH2V");
             this.tsmiTextH2V.Click += new System.EventHandler(this.tsmiConvertText_Click);
             // 
+            // tsmiText2QR
+            // 
+            this.tsmiText2QR.Name = "tsmiText2QR";
+            resources.ApplyResources(this.tsmiText2QR, "tsmiText2QR");
+            this.tsmiText2QR.Click += new System.EventHandler(this.tsmiText2QR_Click);
+            // 
             // tsmiSep3
             // 
             this.tsmiSep3.Name = "tsmiSep3";
@@ -610,12 +616,6 @@
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
-            // tsmiText2QR
-            // 
-            this.tsmiText2QR.Name = "tsmiText2QR";
-            resources.ApplyResources(this.tsmiText2QR, "tsmiText2QR");
-            this.tsmiText2QR.Click += new System.EventHandler(this.tsmiText2QR_Click);
-            // 
             // MainForm
             // 
             this.AcceptButton = this.btnOCR;
@@ -636,6 +636,7 @@
             this.KeyPreview = true;
             this.Name = "MainForm";
             this.Opacity = 0.99900000000000011D;
+            this.Activated += new System.EventHandler(this.MainForm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.InputLanguageChanged += new System.Windows.Forms.InputLanguageChangedEventHandler(this.MainForm_InputLanguageChanged);

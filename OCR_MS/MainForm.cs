@@ -36,7 +36,7 @@ namespace OCR_MS
         private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
         private static string[] split_symbol = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
 
-    private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
+        private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
 
         private bool CFGLOADED = false;
         private bool ALWAYS_ON_TOP = false;
@@ -1494,6 +1494,12 @@ namespace OCR_MS
             LoadConfig();
         }
 
+        private void MainForm_Activated(object sender, EventArgs e)
+        {
+            Console.WriteLine("Result Focus");
+            edResult.Focus();
+        }
+
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing && CLOSE_TO_TRAY)
@@ -1523,6 +1529,28 @@ namespace OCR_MS
             {
                 this.WindowState = FormWindowState.Minimized;
             }
+            else if (e.KeyCode == Keys.F1)
+            {
+                btnTranslate.PerformClick();
+            }
+            else if (e.KeyCode == Keys.F2)
+            {
+                btnSpeech.PerformClick();
+            }
+            else if (e.KeyCode == Keys.F3)
+            {
+                switch (cbLanguage.SelectedIndex)
+                {
+                    case 0: cbLanguage.SelectedIndex = 1; break;   //Auto
+                    case 1: cbLanguage.SelectedIndex = 2; break;   //ChineseS
+                    case 2: cbLanguage.SelectedIndex = 13; break;   //ChineseT
+                    case 6: cbLanguage.SelectedIndex = 0; break;   //English
+                    case 13: cbLanguage.SelectedIndex = 14; break;  //Japanese
+                    case 14: cbLanguage.SelectedIndex = 6; break;  //Korean
+                    default: break;
+                }
+            }
+            else e.Handled = true;
         }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
@@ -1698,6 +1726,7 @@ namespace OCR_MS
             {
                 FontSizeChange(0);
             }
+            else e.Handled = true;
         }
 
         private void edResult_KeyUp(object sender, KeyEventArgs e)
@@ -1715,6 +1744,7 @@ namespace OCR_MS
                 //    edResult.Tag = 
                 //}
             }
+            else e.Handled = true;
         }
 
         private void edResult_MouseMove(object sender, MouseEventArgs e)
@@ -2231,11 +2261,12 @@ namespace OCR_MS
                         Image = qr_result,
                         Width = qr_result.Width,
                         Height = qr_result.Height,
-                        BorderStyle = BorderStyle.None,                         
+                        BorderStyle = BorderStyle.None,
                         Dock = DockStyle.Fill,
                         SizeMode = PictureBoxSizeMode.Zoom
                     };
-                    var win = new Form() {
+                    var win = new Form()
+                    {
                         Icon = this.Icon,
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowOnly,
