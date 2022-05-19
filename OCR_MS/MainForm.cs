@@ -1556,6 +1556,10 @@ namespace OCR_MS
             {
                 tsmiText2QR.PerformClick();
             }
+            else if (e.KeyCode == Keys.F5)
+            {
+                btnOCR.PerformClick();
+            }
             else e.Handled = true;
         }
 
