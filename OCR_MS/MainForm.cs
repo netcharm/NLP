@@ -1496,7 +1496,9 @@ namespace OCR_MS
 
         private void MainForm_Activated(object sender, EventArgs e)
         {
+#if DEBUG
             Console.WriteLine("Result Focus");
+#endif
             edResult.Focus();
         }
 
