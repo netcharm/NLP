@@ -1523,6 +1523,7 @@ namespace OCR_MS
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
+            e.Handled = true;
             if (e.Control && e.KeyCode == Keys.S)
             {
                 tsmiSaveState.PerformClick();
@@ -1560,7 +1561,7 @@ namespace OCR_MS
             {
                 btnOCR.PerformClick();
             }
-            else e.Handled = true;
+            else e.Handled = false;
         }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
@@ -1724,6 +1725,7 @@ namespace OCR_MS
 
         private void edResult_KeyDown(object sender, KeyEventArgs e)
         {
+            e.Handled = true;
             if (e.Control && (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Subtract))
             {
                 FontSizeChange(-1);
@@ -1736,11 +1738,12 @@ namespace OCR_MS
             {
                 FontSizeChange(0);
             }
-            else e.Handled = true;
+            else e.Handled = false;
         }
 
         private void edResult_KeyUp(object sender, KeyEventArgs e)
         {
+            e.Handled = true;
             if (e.Control && e.KeyCode == Keys.A)
             {
                 edResult.SelectAll();
@@ -1754,7 +1757,7 @@ namespace OCR_MS
                 //    edResult.Tag = 
                 //}
             }
-            else e.Handled = true;
+            else e.Handled = false;
         }
 
         private void edResult_MouseMove(object sender, MouseEventArgs e)

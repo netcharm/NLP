@@ -169,7 +169,7 @@
     <value>2</value>
   </data>
   <data name="cbLanguage.ToolTip" xml:space="preserve">
-    <value>Select OCR Target Language</value>
+    <value>Select OCR Target Language [F3]</value>
   </data>
   <data name="&gt;&gt;cbLanguage.Name" xml:space="preserve">
     <value>cbLanguage</value>
@@ -274,7 +274,7 @@
     <value>TextBeforeImage</value>
   </data>
   <data name="btnOCR.ToolTip" xml:space="preserve">
-    <value>OCR the Clipboard Image</value>
+    <value>OCR the Clipboard Image [F5]</value>
   </data>
   <data name="&gt;&gt;btnOCR.Name" xml:space="preserve">
     <value>btnOCR</value>
@@ -307,7 +307,7 @@
     <value>7</value>
   </data>
   <data name="btnTranslate.ToolTip" xml:space="preserve">
-    <value>Translating Result</value>
+    <value>Translating Result [F1]</value>
   </data>
   <data name="&gt;&gt;btnTranslate.Name" xml:space="preserve">
     <value>btnTranslate</value>
@@ -340,7 +340,7 @@
     <value>6</value>
   </data>
   <data name="btnSpeech.ToolTip" xml:space="preserve">
-    <value>OCR Result To Speech.</value>
+    <value>OCR Result To Speech. [F2]</value>
   </data>
   <data name="&gt;&gt;btnSpeech.Name" xml:space="preserve">
     <value>btnSpeech</value>
@@ -614,6 +614,9 @@
   </data>
   <data name="tsmiTextH2V.Text" xml:space="preserve">
     <value>Convert Text To Vertical</value>
+  </data>
+  <data name="tsmiText2QR.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>F4</value>
   </data>
   <data name="tsmiText2QR.Size" type="System.Drawing.Size, System.Drawing">
     <value>244, 22</value>
