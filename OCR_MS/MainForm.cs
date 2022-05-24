@@ -44,6 +44,8 @@ namespace OCR_MS
         private bool CLIPBOARD_CLEAR = false;
         private bool CLIPBOARD_WATCH = true;
 
+        private bool HideWinOnCapture = true;
+
         private bool OCR_HISTORY = false;
 
         private const string API_TITLE_CV = "Computer Vision API";
@@ -660,8 +662,9 @@ namespace OCR_MS
                         BackgroundOpacity = CaptureBackgroundOpacity,
                         SelectionRectangleBorderBrush = new System.Windows.Media.SolidColorBrush(CaptureBorderColor)
                     };
-
+                    if (HideWinOnCapture) Hide();
                     var capture = Screenshot.CaptureRegion(CaptureOption);
+                    if (HideWinOnCapture) Show();
                     if (capture.PixelWidth >= 16 && capture.PixelHeight >= 16)
                     {
                         var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
@@ -672,6 +675,7 @@ namespace OCR_MS
                     }
                 }
                 catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
+                finally { Show(); }
             }
             return (result);
         }
@@ -843,11 +847,11 @@ namespace OCR_MS
                     JToken token = JToken.Parse(json);
                     #region Close Form to Notify Tray Area
                     JToken tray = token.SelectToken("$..close_to_tray", false);
-                    if (tray != null)
+                    if (tray is JToken)
                     {
                         try
                         {
-                            CLOSE_TO_TRAY = Convert.ToBoolean(tray);
+                            CLOSE_TO_TRAY = tray.Value<bool>();
                             tsmiCloseToTray.Checked = CLOSE_TO_TRAY;
                         }
                         catch (Exception) { }
@@ -856,16 +860,16 @@ namespace OCR_MS
 
                     #region Form Position
                     JToken pos = token.SelectToken("$..pos", false);
-                    if (pos != null)
+                    if (pos is JToken)
                     {
-                        var x = pos.SelectToken("$..x", false).ToString();
-                        var y = pos.SelectToken("$..y", false).ToString();
-                        if (x != null && y != null)
+                        var x = pos.SelectToken("$..x", false);
+                        var y = pos.SelectToken("$..y", false);
+                        if (x is JToken && y is JToken)
                         {
                             try
                             {
-                                this.Left = Convert.ToInt32(x);
-                                this.Top = Convert.ToInt32(y);
+                                this.Left = x.Value<int>();
+                                this.Top = y.Value<int>();
                             }
                             catch (Exception)
                             {
@@ -874,9 +878,9 @@ namespace OCR_MS
                         }
                     }
                     JToken ontop = token.SelectToken("$..topmost", false);
-                    if (ontop != null)
+                    if (ontop is JToken)
                     {
-                        bool.TryParse(ontop.ToString(), out ALWAYS_ON_TOP);
+                        bool.TryParse(ontop.Value<string>(), out ALWAYS_ON_TOP);
                         tsmiTopMost.Checked = ALWAYS_ON_TOP;
                         this.TopMost = ALWAYS_ON_TOP;
                     }
@@ -884,32 +888,36 @@ namespace OCR_MS
 
                     #region Form Opacity
                     JToken form_opacity = token.SelectToken("$..opacity", false);
-                    if (form_opacity != null)
+                    if (form_opacity is JToken)
                     {
-                        Opacity = Convert.ToDouble(form_opacity.ToString());
-                        string os = $"{Math.Round(Opacity * 100, 0)}%";
-                        foreach (ToolStripMenuItem mi in tsmiOpacity.DropDownItems)
+                        try
                         {
-                            if (mi.Text == os)
-                                mi.Checked = true;
-                            else
-                                mi.Checked = false;
+                            Opacity = form_opacity.Value<double>();
+                            string os = $"{Math.Round(Opacity * 100, 0)}%";
+                            foreach (ToolStripMenuItem mi in tsmiOpacity.DropDownItems)
+                            {
+                                if (mi.Text == os)
+                                    mi.Checked = true;
+                                else
+                                    mi.Checked = false;
+                            }
                         }
+                        catch { }
                     }
                     #endregion
 
                     #region Form Size
                     JToken size = token.SelectToken("$..size", false);
-                    if (size != null)
+                    if (size is JToken)
                     {
-                        var w = size.SelectToken("$..w", false).ToString();
-                        var h = size.SelectToken("$..h", false).ToString();
-                        if (w != null && h != null)
+                        var w = size.SelectToken("$..w", false);
+                        var h = size.SelectToken("$..h", false);
+                        if (w is JToken && h is JToken)
                         {
                             try
                             {
-                                this.Width = Math.Max(this.MinimumSize.Width, Convert.ToInt32(w));
-                                this.Height = Math.Max(this.MinimumSize.Height, Convert.ToInt32(h));
+                                this.Width = Math.Max(this.MinimumSize.Width, w.Value<int>());
+                                this.Height = Math.Max(this.MinimumSize.Height, h.Value<int>());
                             }
                             catch (Exception)
                             {
@@ -921,24 +929,24 @@ namespace OCR_MS
 
                     #region Clipboard Options
                     JToken clipboard = token.SelectToken("$..clipboard", false);
-                    if (clipboard != null)
+                    if (clipboard is JToken)
                     {
-                        var clear = clipboard.SelectToken("$..clear", false).ToString();
-                        if (clear != null)
+                        var clear = clipboard.SelectToken("$..clear", false);
+                        if (clear is JToken)
                         {
                             try
                             {
-                                CLIPBOARD_CLEAR = Convert.ToBoolean(clear);
+                                CLIPBOARD_CLEAR = clear.Value<bool>();
                                 tsmiClearClipboard.Checked = CLIPBOARD_CLEAR;
                             }
                             catch (Exception) { }
                         }
-                        var watch = clipboard.SelectToken("$..watch", false).ToString();
-                        if (watch != null)
+                        var watch = clipboard.SelectToken("$..watch", false);
+                        if (watch is JToken)
                         {
                             try
                             {
-                                CLIPBOARD_WATCH = Convert.ToBoolean(watch);
+                                CLIPBOARD_WATCH = watch.Value<bool>();
                                 tsmiWatchClipboard.Checked = CLIPBOARD_WATCH;
                                 chkAutoClipboard.Checked = CLIPBOARD_WATCH;
                             }
@@ -950,43 +958,51 @@ namespace OCR_MS
                     #region Capture Options
                     var patten_htmlcolor = @"^#?([0-9a-f]{2}){3,4}$";
                     JToken capture_opts = token.SelectToken("$..capture", false);
-                    if (capture_opts != null)
+                    if (capture_opts is JToken)
                     {
-                        var capture_opacity = capture_opts.SelectToken("$..BackgroundOpacity", false).ToString();
-                        if (!string.IsNullOrEmpty(capture_opacity))
+                        var capture_hideform = capture_opts.SelectToken("$..HideWindowOnCapture", false);
+                        if (capture_hideform is JToken)
+                        {
+                            bool capture_hideform_value = HideWinOnCapture;
+                            if (bool.TryParse(capture_hideform.Value<string>(), out capture_hideform_value)) HideWinOnCapture = capture_hideform_value;
+                        }
+                        tsmiHideWinOnCapture.Checked = HideWinOnCapture;
+                        var capture_opacity = capture_opts.SelectToken("$..BackgroundOpacity", false);
+                        if (capture_opacity is JToken)
                         {
                             double capture_opacity_value = CaptureBackgroundOpacity;
-                            if (double.TryParse(capture_opacity, out capture_opacity_value)) CaptureBackgroundOpacity = capture_opacity_value;
+                            if (double.TryParse(capture_opacity.Value<string>(), out capture_opacity_value)) CaptureBackgroundOpacity = capture_opacity_value;
                         }
-                        var capture_borderthickness = capture_opts.SelectToken("$..BorderThickness", false).ToString();
-                        if (!string.IsNullOrEmpty(capture_borderthickness))
+                        var capture_borderthickness = capture_opts.SelectToken("$..BorderThickness", false);
+                        if (capture_borderthickness is JToken)
                         {
                             int capture_borderthickness_value = CaptureBorderThickness;
-                            if (int.TryParse(capture_borderthickness, out capture_borderthickness_value)) CaptureBorderThickness = capture_borderthickness_value;
+                            if (int.TryParse(capture_borderthickness.Value<string>(), out capture_borderthickness_value)) CaptureBorderThickness = capture_borderthickness_value;
                         }
-                        var capture_bordercolor = capture_opts.SelectToken("$..BorderColor", false).ToString();
-                        if (!string.IsNullOrEmpty(capture_bordercolor))
+                        var capture_bordercolor = capture_opts.SelectToken("$..BorderColor", false);
+                        if (capture_bordercolor is JToken)
                         {
+                            var capture_bordercolor_str = capture_bordercolor.Value<string>();
                             try
                             {
-                                if (Regex.IsMatch(capture_bordercolor, patten_htmlcolor, RegexOptions.IgnoreCase))
+                                if (Regex.IsMatch(capture_bordercolor.ToString(), patten_htmlcolor, RegexOptions.IgnoreCase))
                                 {
-                                    var capture_bordercolor_value = System.Windows.Media.ColorConverter.ConvertFromString(capture_bordercolor);
+                                    var capture_bordercolor_value = System.Windows.Media.ColorConverter.ConvertFromString(capture_bordercolor_str);
                                     if (capture_bordercolor_value is System.Windows.Media.Color)
                                         CaptureBorderColor = (System.Windows.Media.Color)capture_bordercolor_value;
                                 }
                                 else
                                 {
-                                    var color = Color.FromName(capture_bordercolor);
+                                    var color = Color.FromName(capture_bordercolor_str);
                                     if (color.ToArgb() != 0)
                                         CaptureBorderColor = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
                                 }
                             }
                             catch (Exception)
                             {
-                                if (Regex.IsMatch(capture_bordercolor, patten_htmlcolor, RegexOptions.IgnoreCase))
+                                if (Regex.IsMatch(capture_bordercolor_str, patten_htmlcolor, RegexOptions.IgnoreCase))
                                 {
-                                    var colors = Regex.Replace(capture_bordercolor.Trim('#'), @"..(?!$)", "$0,", RegexOptions.IgnoreCase).Split(',');
+                                    var colors = Regex.Replace(capture_bordercolor_str.Trim('#'), @"..(?!$)", "$0,", RegexOptions.IgnoreCase).Split(',');
                                     if (colors.Length == 4) CaptureBorderColor = System.Windows.Media.Color.FromArgb(
                                         byte.Parse(colors[0], NumberStyles.HexNumber),
                                         byte.Parse(colors[1], NumberStyles.HexNumber),
@@ -1004,12 +1020,11 @@ namespace OCR_MS
 
                     #region OCR History
                     JToken ocrhist = token.SelectToken("$..ocr.log_history", false);
-                    if (ocrhist != null)
+                    if (ocrhist is JToken)
                     {
                         try
                         {
-                            OCR_HISTORY = Convert.ToBoolean(ocrhist);
-
+                            OCR_HISTORY = ocrhist.Value<bool>();
                         }
                         catch (Exception) { }
                     }
@@ -1022,20 +1037,20 @@ namespace OCR_MS
 
                     #region OCR Correction Table
                     JToken ocr_corr_file = token.SelectToken("$..ocr.correction_file", false);
-                    if (ocr_corr_file != null)
+                    if (ocr_corr_file is JToken)
                     {
                         try
                         {
-                            CorrectionDictFile = Convert.ToString(ocr_corr_file);
+                            CorrectionDictFile = ocr_corr_file.Value<string>();
                         }
                         catch (Exception) { }
                     }
                     JToken ocr_corr_editor = token.SelectToken("$..ocr.correction_editor", false);
-                    if (ocr_corr_editor != null)
+                    if (ocr_corr_editor is JToken)
                     {
                         try
                         {
-                            CorrectionDictEditor = Convert.ToString(ocr_corr_editor);
+                            CorrectionDictEditor = ocr_corr_editor.Value<string>();
                         }
                         catch (Exception) { }
                     }
@@ -1043,21 +1058,21 @@ namespace OCR_MS
 
                     #region Translate Options
                     JToken autotrans = token.SelectToken("$..translate.auto_translate", false);
-                    if (autotrans != null)
+                    if (autotrans is JToken)
                     {
                         try
                         {
-                            TRANSLATING_AUTO = Convert.ToBoolean(autotrans);
+                            TRANSLATING_AUTO = autotrans.Value<bool>();
                             tsmiTranslateAuto.Checked = TRANSLATING_AUTO;
                         }
                         catch (Exception) { }
                     }
                     JToken trans_to = token.SelectToken("$..translate.translate_to", false);
-                    if (trans_to != null)
+                    if (trans_to is JToken)
                     {
                         try
                         {
-                            tsmiTranslateDst.Tag = Convert.ToString(trans_to);
+                            tsmiTranslateDst.Tag = trans_to.Value<string>();
                             foreach (var item in tsmiTranslateDst.DropDownItems)
                             {
                                 if (item is ToolStripMenuItem)
@@ -1075,7 +1090,7 @@ namespace OCR_MS
 
                     #region Speech Options
                     JToken autospeechrate = token.SelectToken("$..speech.auto_rate", false);
-                    if (autospeechrate != null)
+                    if (autospeechrate is JToken)
                     {
                         try
                         {
@@ -1084,7 +1099,7 @@ namespace OCR_MS
                         catch (Exception) { }
                     }
                     JToken autospeech = token.SelectToken("$..speech.auto_speech", false);
-                    if (autospeech != null)
+                    if (autospeech is JToken)
                     {
                         try
                         {
@@ -1093,7 +1108,7 @@ namespace OCR_MS
                         catch (Exception) { }
                     }
                     JToken altmixedculture = token.SelectToken("$..speech.alt_play_mixed_culture", false);
-                    if (altmixedculture != null)
+                    if (altmixedculture is JToken)
                     {
                         try
                         {
@@ -1102,7 +1117,7 @@ namespace OCR_MS
                         catch (Exception) { }
                     }
                     JToken simpledetectculture = token.SelectToken("$..speech.simple_detect_culture", false);
-                    if (simpledetectculture != null)
+                    if (simpledetectculture is JToken)
                     {
                         try
                         {
@@ -1111,7 +1126,7 @@ namespace OCR_MS
                         catch (Exception) { }
                     }
                     JToken culturevoice = token.SelectToken("$..speech.voice", false);
-                    if (culturevoice != null)
+                    if (culturevoice is JToken)
                     {
                         try
                         {
@@ -1127,7 +1142,7 @@ namespace OCR_MS
 
                     #region Result Editor Option
                     JToken editor_use_ime = token.SelectToken("$..result.use_last_ime", false);
-                    if (editor_use_ime != null)
+                    if (editor_use_ime is JToken)
                     {
                         try
                         {
@@ -1138,7 +1153,7 @@ namespace OCR_MS
                     if (tsmiUseLastIme.Checked)
                     {
                         JToken editor_ime = token.SelectToken("$..result.ime", false);
-                        if (editor_ime != null)
+                        if (editor_ime is JToken)
                         {
                             try
                             {
@@ -1157,7 +1172,7 @@ namespace OCR_MS
                         }
                     }
                     JToken editor_use_lang = token.SelectToken("$..result.use_last_language", false);
-                    if (editor_use_lang != null)
+                    if (editor_use_lang is JToken)
                     {
                         try
                         {
@@ -1168,7 +1183,7 @@ namespace OCR_MS
                     if (tsmiUseLastOCRLanguage.Checked)
                     {
                         JToken editor_lang = token.SelectToken("$..result.language", false);
-                        if (editor_lang != null)
+                        if (editor_lang is JToken)
                         {
                             try
                             {
@@ -1196,7 +1211,7 @@ namespace OCR_MS
                         }
                     }
                     JToken editor_font = token.SelectToken("$..result.font", false);
-                    if (editor_font != null)
+                    if (editor_font is JToken)
                     {
                         try
                         {
@@ -1309,6 +1324,7 @@ namespace OCR_MS
                 },
                 { "capture", new Dictionary<string, string>()
                     {
+                        { "HideWindowOnCapture", $"{HideWinOnCapture.ToString()}" },
                         { "BackgroundOpacity", $"{CaptureBackgroundOpacity}" },
                         { "BorderThickness", $"{CaptureBorderThickness}" },
                         { "BorderColor", CaptureBorderColor.ToString() }
@@ -1782,7 +1798,9 @@ namespace OCR_MS
             {
                 btnOCR.Enabled = false;
                 pbar.Style = ProgressBarStyle.Marquee;
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine("OCR Starting...");
+#endif
                 Task.Delay(20).GetAwaiter().GetResult();
 
                 var force = ModifierKeys == Keys.Control;
@@ -1833,6 +1851,7 @@ namespace OCR_MS
                 pbar.Style = ProgressBarStyle.Blocks;
                 btnOCR.Enabled = true;
                 edResult.Focus();
+                Activate();
             }
         }
 
@@ -1984,6 +2003,11 @@ namespace OCR_MS
         private void tsmiClearClipboard_Click(object sender, EventArgs e)
         {
             CLIPBOARD_CLEAR = tsmiClearClipboard.Checked;
+        }
+
+        private void tsmiHideWinOnCapture_Click(object sender, EventArgs e)
+        {
+            HideWinOnCapture = tsmiHideWinOnCapture.Checked;
         }
 
         private void tsmiSaveState_Click(object sender, EventArgs e)

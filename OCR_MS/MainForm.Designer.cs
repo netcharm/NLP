@@ -88,6 +88,7 @@
             this.tsmiOcrEngineBaidu = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiWatchClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiClearClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiHideWinOnCapture = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiReloadCorrectionTable = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiEditCorrectionTable = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiUseLastIme = new System.Windows.Forms.ToolStripMenuItem();
@@ -235,6 +236,7 @@
             this.tsmiOcrEngine,
             this.tsmiWatchClipboard,
             this.tsmiClearClipboard,
+            this.tsmiHideWinOnCapture,
             this.tsmiReloadCorrectionTable,
             this.tsmiEditCorrectionTable,
             this.tsmiUseLastIme,
@@ -547,6 +549,13 @@
             resources.ApplyResources(this.tsmiClearClipboard, "tsmiClearClipboard");
             this.tsmiClearClipboard.CheckedChanged += new System.EventHandler(this.chkAutoClipboard_CheckedChanged);
             // 
+            // tsmiHideWinOnCapture
+            // 
+            this.tsmiHideWinOnCapture.CheckOnClick = true;
+            this.tsmiHideWinOnCapture.Name = "tsmiHideWinOnCapture";
+            resources.ApplyResources(this.tsmiHideWinOnCapture, "tsmiHideWinOnCapture");
+            this.tsmiHideWinOnCapture.Click += new System.EventHandler(this.tsmiHideWinOnCapture_Click);
+            // 
             // tsmiReloadCorrectionTable
             // 
             this.tsmiReloadCorrectionTable.Name = "tsmiReloadCorrectionTable";
@@ -721,6 +730,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiEditConfig;
         private System.Windows.Forms.ToolStripMenuItem tsmiReloadConfig;
         private System.Windows.Forms.ToolStripMenuItem tsmiText2QR;
+        private System.Windows.Forms.ToolStripMenuItem tsmiHideWinOnCapture;
     }
 }
 
