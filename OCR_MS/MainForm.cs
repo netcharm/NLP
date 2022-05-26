@@ -1475,7 +1475,11 @@ namespace OCR_MS
             notify.BalloonTipTitle = this.Text;
             notify.BalloonTipText = $"Using \"{API_TITLE_CV}\" OCR feature.";
             notify.Text = this.Text;
-
+#if DEBUG
+            notify.Visible = true;
+#else
+            notify.Visible = false;
+#endif
             hint.ToolTipTitle = this.Text;
 
             // Adds our form to the chain of clipboard viewers.
