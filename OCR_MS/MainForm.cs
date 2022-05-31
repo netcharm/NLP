@@ -56,11 +56,11 @@ namespace OCR_MS
             var lang_src = string.IsNullOrEmpty(lang) ? "unk" : lang;
             try
             {
-                if (ModifierKeys == Keys.Control && !string.IsNullOrEmpty((string)tsmiTranslateSrc.Tag))
+                if (ModifierKeys == Keys.Alt && !string.IsNullOrEmpty((string)tsmiTranslateSrc.Tag))
                     lang_src = (string)tsmiTranslateSrc.Tag;
                 else if (ModifierKeys == Keys.Shift)
                     lang_src = cbLanguage.SelectedValue.ToString();
-                else if (ModifierKeys == Keys.Alt)
+                else if (ModifierKeys == Keys.Control)
                     lang_src = "unk";
                 else if (ModifierKeys == Keys.None)
                     lang_src = string.IsNullOrEmpty(Result_Lang) ? "unk" : Result_Lang;
@@ -1529,10 +1529,19 @@ namespace OCR_MS
                 e.Cancel = true;
                 Hide();
             }
+            else if (e.CloseReason == CloseReason.ApplicationExitCall)
+            {
+                e.Cancel = false;
+            }
             else
             {
+#if DEBUG
                 if (_clipboardViewerNext != IntPtr.Zero)
                     ChangeClipboardChain(this.Handle, _clipboardViewerNext);
+#else
+                e.Cancel = true;
+                WindowState = FormWindowState.Minimized;
+#endif
             }
         }
 
@@ -1807,9 +1816,8 @@ namespace OCR_MS
 #endif
                 Task.Delay(20).GetAwaiter().GetResult();
 
-                var force = ModifierKeys == Keys.Control;
-                var lang = ModifierKeys == Keys.Alt ? "unk" : cbLanguage.SelectedValue.ToString();
-                var src = force ? null : GetClipboardImage();
+                var lang = ModifierKeys.HasFlag(Keys.Control) ? "unk" : cbLanguage.SelectedValue.ToString();
+                var src = ModifierKeys.HasFlag(Keys.Shift) ? null : GetClipboardImage();
                 if (!(src is Image)) src = GetCaptureScreen();
                 if (src is Image)
                 {
@@ -1885,7 +1893,7 @@ namespace OCR_MS
                 Speech.AutoChangeSpeechSpeed = tsmiTextAutoSpeechingRate.Checked;
 
                 string lang = cbLanguage.SelectedValue.ToString();
-                string culture = string.IsNullOrEmpty(lang) || ModifierKeys == Keys.Alt ? "unk" : lang;
+                string culture = string.IsNullOrEmpty(lang) || ModifierKeys == Keys.Control ? "unk" : lang;
 
                 var slice_words = new List<string>();
                 if (edResult.SelectionLength > 0)
