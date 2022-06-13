@@ -74,6 +74,7 @@
             this.tsmiTextV2H = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextH2V = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiText2QR = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextLineReverse = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTranslateAuto = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateEngine = new System.Windows.Forms.ToolStripMenuItem();
@@ -226,6 +227,7 @@
             this.tsmiTextV2H,
             this.tsmiTextH2V,
             this.tsmiText2QR,
+            this.tsmiTextLineReverse,
             this.tsmiSep3,
             this.tsmiTranslateAuto,
             this.tsmiTranslateEngine,
@@ -455,6 +457,12 @@
             this.tsmiText2QR.Name = "tsmiText2QR";
             resources.ApplyResources(this.tsmiText2QR, "tsmiText2QR");
             this.tsmiText2QR.Click += new System.EventHandler(this.tsmiText2QR_Click);
+            // 
+            // tsmiTextLineReverse
+            // 
+            this.tsmiTextLineReverse.Name = "tsmiTextLineReverse";
+            resources.ApplyResources(this.tsmiTextLineReverse, "tsmiTextLineReverse");
+            this.tsmiTextLineReverse.Click += new System.EventHandler(this.tsmiTextLineReverse_Click);
             // 
             // tsmiSep3
             // 
@@ -731,6 +739,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiReloadConfig;
         private System.Windows.Forms.ToolStripMenuItem tsmiText2QR;
         private System.Windows.Forms.ToolStripMenuItem tsmiHideWinOnCapture;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextLineReverse;
     }
 }
 

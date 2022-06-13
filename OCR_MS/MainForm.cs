@@ -34,7 +34,7 @@ namespace OCR_MS
 
         private static string[] exts_img = new string[] { ".bmp", ".jpg", ".png", ".jpeg", ".tif", ".tiff", ".gif" };
         private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
-        private static string[] split_symbol = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
+        private static string[] line_break = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
 
         private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
 
@@ -1396,6 +1396,59 @@ namespace OCR_MS
             }
         }
 
+        private void TextToQR(string text, int size_qr = 1024, int size_win = 512)
+        {
+            try
+            {
+                var render = new ZXing.Rendering.BitmapRenderer();
+                var hint = new Dictionary<ZXing.EncodeHintType, object>() { { ZXing.EncodeHintType.MIN_SIZE, new Size(size_qr, size_qr) } };
+                var qr = new ZXing.BarcodeWriter()
+                {
+                    Format = ZXing.BarcodeFormat.QR_CODE,
+                    Options = new ZXing.QrCode.QrCodeEncodingOptions() { Height = size_qr, Width = size_qr, CharacterSet = "UTF-8" },
+                    Renderer = render
+                };
+                var qr_matrix = qr.Encode(text);
+                var qr_result = render.Render(qr_matrix, ZXing.BarcodeFormat.QR_CODE, text);
+                if (qr_result is Bitmap)
+                {
+                    var picbox = new PictureBox()
+                    {
+                        Image = qr_result,
+                        Width = qr_result.Width,
+                        Height = qr_result.Height,
+                        BorderStyle = BorderStyle.None,
+                        Dock = DockStyle.Fill,
+                        SizeMode = PictureBoxSizeMode.Zoom
+                    };
+                    var win = new Form()
+                    {
+                        Icon = this.Icon,
+                        AutoSize = true,
+                        AutoSizeMode = AutoSizeMode.GrowOnly,
+                        BackColor = render.Background,
+                        ClientSize = new Size(size_win, size_win),
+                        StartPosition = FormStartPosition.CenterScreen,
+                        FormBorderStyle = FormBorderStyle.FixedDialog,
+                        //MaximizeBox = false,
+                        MinimizeBox = false,
+                        SizeGripStyle = SizeGripStyle.Hide,
+                        DialogResult = DialogResult.OK,
+                        CancelButton = null,
+                    };
+                    win.Controls.Add(picbox);
+                    if (DialogResult.Cancel == win.ShowDialog())
+                    {
+                        if (picbox.Image is Image) picbox.Image.Dispose();
+                        picbox.Dispose();
+                        win.Dispose();
+                    }
+                    //win = new System.Windows.
+                }
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "QR Generating ERROR!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
         public MainForm()
         {
             InitializeComponent();
@@ -1897,7 +1950,7 @@ namespace OCR_MS
 
                 var slice_words = new List<string>();
                 if (edResult.SelectionLength > 0)
-                    slice_words.AddRange(Speech.Slice(edResult.SelectedText.Split(split_symbol, StringSplitOptions.RemoveEmptyEntries), culture));
+                    slice_words.AddRange(Speech.Slice(edResult.SelectedText.Split(line_break, StringSplitOptions.RemoveEmptyEntries), culture));
                 else
                     slice_words.AddRange(Speech.Slice(edResult.Lines, culture));
                 var tip = string.Join(", ", slice_words);
@@ -1912,7 +1965,7 @@ namespace OCR_MS
                 if (Speech.State == SynthesizerState.Ready)
                 {
                     if (edResult.SelectionLength > 0)
-                        Speech.Play(edResult.SelectedText.Split(split_symbol, StringSplitOptions.RemoveEmptyEntries), culture);
+                        Speech.Play(edResult.SelectedText.Split(line_break, StringSplitOptions.RemoveEmptyEntries), culture);
                     else
                         Speech.Play(edResult.Lines, culture);
                 }
@@ -2258,7 +2311,7 @@ namespace OCR_MS
             try
             {
                 var HasSelection = edResult.SelectionLength > 0;
-                var lines = HasSelection ? edResult.SelectedText.Split(new string[] { Environment.NewLine, "\n", "\r" }, StringSplitOptions.None) : edResult.Lines;
+                var lines = HasSelection ? edResult.SelectedText.Split(line_break, StringSplitOptions.None) : edResult.Lines;
 
                 if (sender == tsmiTextV2H)
                 {
@@ -2293,52 +2346,24 @@ namespace OCR_MS
                 int select_s = edResult.SelectionStart;
                 int select_l = edResult.SelectionLength;
                 string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
+                TextToQR(text, size_l, size_m);
+            }
+            catch (Exception) { }
+        }
 
-                var render = new ZXing.Rendering.BitmapRenderer();
-                var hint = new Dictionary<ZXing.EncodeHintType, object>() { { ZXing.EncodeHintType.MIN_SIZE, new Size(size_m, size_m) } };
-                var qr = new ZXing.BarcodeWriter()
-                {
-                    Format = ZXing.BarcodeFormat.QR_CODE,
-                    Options = new ZXing.QrCode.QrCodeEncodingOptions() { Height = size_l, Width = size_l, CharacterSet = "UTF-8" },
-                    Renderer = render
-                };
-                var qr_matrix = qr.Encode(text);
-                var qr_result = render.Render(qr_matrix, ZXing.BarcodeFormat.QR_CODE, text);
-                if (qr_result is Bitmap)
-                {
-                    var picbox = new PictureBox()
-                    {
-                        Image = qr_result,
-                        Width = qr_result.Width,
-                        Height = qr_result.Height,
-                        BorderStyle = BorderStyle.None,
-                        Dock = DockStyle.Fill,
-                        SizeMode = PictureBoxSizeMode.Zoom
-                    };
-                    var win = new Form()
-                    {
-                        Icon = this.Icon,
-                        AutoSize = true,
-                        AutoSizeMode = AutoSizeMode.GrowOnly,
-                        BackColor = render.Background,
-                        ClientSize = new Size(size_m, size_m),
-                        StartPosition = FormStartPosition.CenterScreen,
-                        FormBorderStyle = FormBorderStyle.FixedDialog,
-                        //MaximizeBox = false,
-                        MinimizeBox = false,
-                        SizeGripStyle = SizeGripStyle.Hide,
-                        DialogResult = DialogResult.OK,
-                        CancelButton = null,
-                    };
-                    win.Controls.Add(picbox);
-                    if (DialogResult.Cancel == win.ShowDialog())
-                    {
-                        if (picbox.Image is Image) picbox.Image.Dispose();
-                        picbox.Dispose();
-                        win.Dispose();
-                    }
-                    //win = new System.Windows.
-                }
+        private void tsmiTextLineReverse_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int select_s = edResult.SelectionStart;
+                int select_l = edResult.SelectionLength;
+                var HasSelection = edResult.SelectionLength > 0;
+                string text = HasSelection ? edResult.SelectedText : edResult.Text;
+
+                var lines = text.Split(line_break, StringSplitOptions.None);
+                lines = lines.Reverse().ToArray();
+                if (HasSelection) edResult.SelectedText = string.Join(Environment.NewLine, lines);
+                else edResult.Lines = lines;
             }
             catch (Exception) { }
         }
