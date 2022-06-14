@@ -1435,15 +1435,32 @@ namespace OCR_MS
                         SizeGripStyle = SizeGripStyle.Hide,
                         DialogResult = DialogResult.OK,
                         CancelButton = null,
+                        KeyPreview = true,
+                    };
+                    win.FormClosing += (sender, e) =>
+                    {
+                        if (picbox is PictureBox)
+                        {
+                            if (picbox.Image is Image) picbox.Image.Dispose();
+                            picbox.Dispose();
+                        }
+                    };
+                    win.KeyUp += (sender, e) =>
+                    {
+                        if (e.KeyCode == Keys.Escape || e.KeyCode == Keys.Return)
+                        {
+                            e.Handled = true;
+                            e.SuppressKeyPress = false;
+                            win.Close();
+                        }
                     };
                     win.Controls.Add(picbox);
+
                     if (DialogResult.Cancel == win.ShowDialog())
                     {
-                        if (picbox.Image is Image) picbox.Image.Dispose();
-                        picbox.Dispose();
-                        win.Dispose();
+                        win.Close();
                     }
-                    //win = new System.Windows.
+                    win.Dispose();
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "QR Generating ERROR!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
@@ -1459,6 +1476,7 @@ namespace OCR_MS
         private void MainForm_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            KeyPreview = true;
 
             #region Speech Synthesis Events Action
             Speech.SpeakStarted = new Action<SpeakStartedEventArgs>((evt) =>
@@ -1582,7 +1600,7 @@ namespace OCR_MS
                 e.Cancel = true;
                 Hide();
             }
-            else if (e.CloseReason == CloseReason.ApplicationExitCall)
+            else if (e.CloseReason == CloseReason.ApplicationExitCall || ModifierKeys == Keys.Shift)
             {
                 e.Cancel = false;
             }
