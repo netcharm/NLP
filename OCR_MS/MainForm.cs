@@ -35,6 +35,7 @@ namespace OCR_MS
         private static string[] exts_img = new string[] { ".bmp", ".jpg", ".png", ".jpeg", ".tif", ".tiff", ".gif" };
         private static string[] exts_txt = new string[] { ".txt", ".text", ".md", ".htm", ".html", ".rst", ".ini", ".csv", ".mo", ".ssa", ".ass", ".srt" };
         private static string[] line_break = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
+        private static char[] trim_ends = new char[] { ' ', '　' };
 
         private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
 
@@ -742,7 +743,7 @@ namespace OCR_MS
                     }
                     matrix.Add(l);
                 }
-                result = matrix.Select(r => string.Join("", r)).ToList();
+                result = matrix.Select(r => string.Join("", r).TrimEnd(trim_ends)).ToList();
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
             return (result);
@@ -767,7 +768,7 @@ namespace OCR_MS
                     }
                     matrix.Add(l);
                 }
-                result = matrix.Select(r => string.Join("", r)).ToList();
+                result = matrix.Select(r => string.Join("", r).TrimEnd(trim_ends)).ToList();
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
             return (result);
@@ -1163,6 +1164,7 @@ namespace OCR_MS
                                     if (input.LayoutName.Equals(lang, StringComparison.CurrentCultureIgnoreCase))
                                     {
                                         CurrentInputLanguage = input;
+                                        ImeMode = ImeMode.On;
                                         InputLanguage.CurrentInputLanguage = input;
                                         break;
                                     }
@@ -1696,14 +1698,16 @@ namespace OCR_MS
             try
             {
                 var fmts = e.Data.GetFormats();
+                var idx = edResult.SelectionStart;
+                var len = edResult.SelectionLength;
                 if (fmts.Contains("System.String"))
                 {
                     //if (edResult.AllowDrop)
                     {
                         var text = (string)e.Data.GetData("System.String");
-                        var idx = edResult.SelectionStart;
-                        edResult.Text = edResult.Text.Insert(idx, text);
+                        edResult.Text = edResult.Text.Insert(len > 0 ? idx + len : idx, text);
                         edResult.SelectionStart = idx;
+                        edResult.SelectionLength = len;
                     }
                 }
                 else if (fmts.Contains("UnicodeText"))
@@ -1711,9 +1715,9 @@ namespace OCR_MS
                     //if (edResult.AllowDrop)
                     {
                         var text = (string)e.Data.GetData("UnicodeText");
-                        var idx = edResult.SelectionStart;
-                        edResult.Text = edResult.Text.Insert(idx, text);
+                        edResult.Text = edResult.Text.Insert(len > 0 ? idx + len : idx, text);
                         edResult.SelectionStart = idx;
+                        edResult.SelectionLength = len;
                     }
                 }
                 else if (fmts.Contains("Text"))
@@ -1721,9 +1725,9 @@ namespace OCR_MS
                     //if (edResult.AllowDrop)
                     {
                         var text = Encoding.UTF8.GetString(Encoding.Default.GetBytes(e.Data.GetData("Text") as string));
-                        var idx = edResult.SelectionStart;
-                        edResult.Text = edResult.Text.Insert(idx, text);
+                        edResult.Text = edResult.Text.Insert(len > 0 ? idx + len : idx, text);
                         edResult.SelectionStart = idx;
+                        edResult.SelectionLength = len;
                     }
                 }
                 else if (fmts.Contains("PNG"))
@@ -1760,7 +1764,7 @@ namespace OCR_MS
                                         string[] lines = File.ReadAllLines(fn);
                                         foreach (var l in lines)
                                         {
-                                            sb.AppendLine(l);
+                                            sb.AppendLine(l.TrimEnd(trim_ends));
                                         }
                                     }
                                     catch (Exception) { }
@@ -1772,16 +1776,16 @@ namespace OCR_MS
                                         using (Bitmap src = (Bitmap)Image.FromFile(fn))
                                         {
                                             string lang = cbLanguage.SelectedValue.ToString();
-                                            sb.AppendLine(await Run_Azure_OCR(src, lang));
+                                            sb.AppendLine((await Run_Azure_OCR(src, lang)).TrimEnd(trim_ends));
                                             src.Dispose();
                                         }
                                     }
                                     catch (Exception) { }
                                 }
 
-                                var idx = edResult.SelectionStart;
-                                edResult.Text = edResult.Text.Insert(idx, sb.ToString());
+                                edResult.Text = edResult.Text.Insert(len > 0 ? idx + len : idx, sb.ToString());
                                 edResult.SelectionStart = idx;
+                                edResult.SelectionLength = len;
                             }
                         }
                     }
@@ -1856,6 +1860,14 @@ namespace OCR_MS
                 //    Result_Lang = ResultHistory.Last().Value;
                 //    edResult.Tag = 
                 //}
+            }
+            else if (e.Control && e.KeyCode == Keys.W)
+            {
+                var idx = edResult.SelectionStart;
+                var len = edResult.SelectionLength;
+                edResult.Lines = edResult.Lines.Select(l => l.TrimEnd(trim_ends)).ToArray();
+                //edResult.SelectionStart = idx;
+                //edResult.SelectionLength = len;
             }
             else e.Handled = false;
         }
@@ -2135,6 +2147,26 @@ namespace OCR_MS
             }
         }
 
+        private void tsmiOptions_Click(object sender, EventArgs e)
+        {
+            OptionsForm opt = new OptionsForm()
+            {
+                Icon = Icon,
+                APIKEYTITLE_CV = API_TITLE_CV,
+                APIKEYTITLE_TT = API_TITLE_TT,
+                APIKEY_CV = AzureApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(AzureApi[API_TITLE_CV].ApiKey) ? AzureApi[API_TITLE_CV].ApiKey : string.Empty,
+                APIKEY_TT = AzureApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey) ? AzureApi[API_TITLE_TT].ApiKey : string.Empty
+            };
+
+            if (opt.ShowDialog() == DialogResult.OK)
+            {
+                AzureApi[API_TITLE_CV] = new AzureAPI() { Name = API_TITLE_CV, ApiKey = opt.APIKEY_CV };
+                AzureApi[API_TITLE_TT] = new AzureAPI() { Name = API_TITLE_TT, ApiKey = opt.APIKEY_TT };
+                SaveConfig();
+            }
+            opt.Dispose();
+        }
+
         private void tsmiHistory_Click(object sender, EventArgs e)
         {
             foreach (ToolStripMenuItem mi in tsmiHistory.DropDownItems)
@@ -2202,26 +2234,6 @@ namespace OCR_MS
         private void tsmiTranslate_Click(object sender, EventArgs e)
         {
             btnTranslate.PerformClick();
-        }
-
-        private void tsmiOptions_Click(object sender, EventArgs e)
-        {
-            OptionsForm opt = new OptionsForm()
-            {
-                Icon = Icon,
-                APIKEYTITLE_CV = API_TITLE_CV,
-                APIKEYTITLE_TT = API_TITLE_TT,
-                APIKEY_CV = AzureApi.ContainsKey(API_TITLE_CV) && !string.IsNullOrEmpty(AzureApi[API_TITLE_CV].ApiKey) ? AzureApi[API_TITLE_CV].ApiKey : string.Empty,
-                APIKEY_TT = AzureApi.ContainsKey(API_TITLE_TT) && !string.IsNullOrEmpty(AzureApi[API_TITLE_TT].ApiKey) ? AzureApi[API_TITLE_TT].ApiKey : string.Empty
-            };
-
-            if (opt.ShowDialog() == DialogResult.OK)
-            {
-                AzureApi[API_TITLE_CV] = new AzureAPI() { Name = API_TITLE_CV, ApiKey = opt.APIKEY_CV };
-                AzureApi[API_TITLE_TT] = new AzureAPI() { Name = API_TITLE_TT, ApiKey = opt.APIKEY_TT };
-                SaveConfig();
-            }
-            opt.Dispose();
         }
 
         private void tsmiTranslateLanguage_Click(object sender, EventArgs e)
