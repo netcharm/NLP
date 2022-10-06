@@ -60,11 +60,12 @@ namespace OCR_MS
                 if (ModifierKeys == Keys.Alt && !string.IsNullOrEmpty((string)tsmiTranslateSrc.Tag))
                     lang_src = (string)tsmiTranslateSrc.Tag;
                 else if (ModifierKeys == Keys.Shift)
-                    lang_src = cbLanguage.SelectedValue.ToString();
+                    //lang_src = cbLanguage.SelectedValue.ToString();
+                    lang_src = string.IsNullOrEmpty(Result_Lang) ? "unk" : Result_Lang;
                 else if (ModifierKeys == Keys.Control)
                     lang_src = "unk";
-                else if (ModifierKeys == Keys.None)
-                    lang_src = string.IsNullOrEmpty(Result_Lang) ? "unk" : Result_Lang;
+                else if (ModifierKeys == Keys.None)                    
+                    lang_src = cbLanguage.SelectedValue.ToString();
             }
             catch { }
             return (lang_src.ToLower());
