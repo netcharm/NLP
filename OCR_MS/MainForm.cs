@@ -1647,13 +1647,13 @@ namespace OCR_MS
             {
                 switch (cbLanguage.SelectedIndex)
                 {
-                    case 0: cbLanguage.SelectedIndex = 1; break;   //Auto
-                    case 1: cbLanguage.SelectedIndex = 2; break;   //ChineseS
-                    case 2: cbLanguage.SelectedIndex = 13; break;   //ChineseT
-                    case 6: cbLanguage.SelectedIndex = 0; break;   //English
-                    case 13: cbLanguage.SelectedIndex = 14; break;  //Japanese
-                    case 14: cbLanguage.SelectedIndex = 6; break;  //Korean
-                    default: break;
+                    case 00: cbLanguage.SelectedIndex = 01; break;   // Auto     -> ChineseS
+                    case 01: cbLanguage.SelectedIndex = 02; break;   // ChineseS -> ChineseT
+                    case 02: cbLanguage.SelectedIndex = 13; break;   // ChineseT -> Japanese
+                    case 06: cbLanguage.SelectedIndex = 00; break;   // English  -> Auto
+                    case 13: cbLanguage.SelectedIndex = 14; break;   // Japanese -> Korean
+                    case 14: cbLanguage.SelectedIndex = 06; break;   // Korean   -> English
+                    default: cbLanguage.SelectedIndex = 00; break;   // Others   -> Auto
                 }
             }
             else if (e.KeyCode == Keys.F4)
