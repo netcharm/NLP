@@ -706,21 +706,46 @@ namespace OCR_MS
             return (result);
         }
 
-        internal string GetFirefoxPath()
+        internal string GetFirefoxPath(string firefox_name = "firefox.exe")
         {
             string result = string.Empty;
 
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Process");
-
-            var firefox_name = "firefox.exe";
-            var items = searcher.Get().Cast<ManagementObject>().Where(p => p["Name"].ToString().Equals(firefox_name)).ToList();
-            foreach (var item in items)
+            var firefox_path = string.Empty;
+            string wmiQueryString = $"SELECT ExecutablePath FROM Win32_Process WHERE Name LIKE '%{Path.GetFileNameWithoutExtension(firefox_name)}%'";
+            using (var searcher = new ManagementObjectSearcher("root\\CIMV2", wmiQueryString))
             {
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine($"{item["ProcessId"]} => {item["Name"]}, {item["ExecutablePath"]}");
-#endif
-                result = item["ExecutablePath"].ToString();
-                break;
+                ManagementObject mo = searcher.Get().Cast<ManagementObject>().FirstOrDefault();
+                result = mo != null ? (string)mo["ExecutablePath"] : string.Empty;
+            }
+            //using (var id = System.Security.Principal.WindowsIdentity.GetCurrent())
+            //{
+            //    var is_admin = new System.Security.Principal.WindowsPrincipal(id).IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+            //    if (is_admin)
+            //    {
+            //        edResult.Lines = edResult.Lines.Append("IsAdmin").ToArray();
+            //        var ff_list = System.Diagnostics.Process.GetProcessesByName("firefox");
+            //        if (ff_list is System.Diagnostics.Process[] && ff_list.Length > 0)
+            //        {
+            //            var ff = ff_list.First();
+            //            result = ff.MainModule.FileName;
+            //        }
+            //    }
+            //}
+            if (string.IsNullOrEmpty(result) || !result.EndsWith(firefox_name))
+            {
+                using (var searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Process"))
+                {
+                    var items = searcher.Get().Cast<ManagementObject>().Where(p => p["Name"].ToString().Equals(firefox_name)).ToList();
+                    result = items.FirstOrDefault() != null ? items.FirstOrDefault()["ExecutablePath"].ToString() : string.Empty;
+//                    foreach (var item in items)
+//                    {
+//#if DEBUG
+//                        System.Diagnostics.Debug.WriteLine($"{item["ProcessId"]} => {item["Name"]}, {item["ExecutablePath"]}");
+//#endif
+//                        result = item["ExecutablePath"].ToString();
+//                        break;
+//                    }
+                }
             }
             return (result);
         }
@@ -2397,6 +2422,32 @@ namespace OCR_MS
                 else edResult.Lines = lines;
             }
             catch (Exception) { }
+        }
+
+        private void tsmiTextSearch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int select_s = edResult.SelectionStart;
+                int select_l = edResult.SelectionLength;
+                var HasSelection = edResult.SelectionLength > 0;
+                string text = HasSelection ? edResult.SelectedText : edResult.Text;
+
+                if (text.Length > 0)
+                {
+                    new Action(() =>
+                    {
+                        var url_bing = $"\"https://www.bing.com/search?q={text}\"";
+                        var url_baidu = $"\"https://www.baidu.com/s?wd={text}\"";
+                        var url = ModifierKeys == Keys.Shift ? url_baidu : url_bing;
+
+                        var firefox = GetFirefoxPath();
+                        if (!string.IsNullOrEmpty(firefox)) System.Diagnostics.Process.Start(firefox, url);
+                        else System.Diagnostics.Process.Start(url);
+                    }).DynamicInvoke();
+                }
+            }
+            catch (Exception ex) { MessageBox.Show($"{ex.Message} ({ex.GetType().ToString()}){Environment.NewLine}{ex.StackTrace}"); }
         }
 
         private void tsmiCorrectionTable_Click(object sender, EventArgs e)
