@@ -615,6 +615,9 @@
   <data name="tsmiTextLineReverse.Text" xml:space="preserve">
     <value>Reverse Line Text</value>
   </data>
+  <data name="tsmiTextSearch.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>F12</value>
+  </data>
   <data name="tsmiTextSearch.Size" type="System.Drawing.Size, System.Drawing">
     <value>244, 22</value>
   </data>
@@ -1020,6 +1023,12 @@
   <data name="&gt;&gt;tsmiTextLineReverse.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;tsmiTextSearch.Name" xml:space="preserve">
+    <value>tsmiTextSearch</value>
+  </data>
+  <data name="&gt;&gt;tsmiTextSearch.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;tsmiSep3.Name" xml:space="preserve">
     <value>tsmiSep3</value>
   </data>
@@ -1180,12 +1189,6 @@
     <value>tsmiExit</value>
   </data>
   <data name="&gt;&gt;tsmiExit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tsmiTextSearch.Name" xml:space="preserve">
-    <value>tsmiTextSearch</value>
-  </data>
-  <data name="&gt;&gt;tsmiTextSearch.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

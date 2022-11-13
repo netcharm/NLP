@@ -75,6 +75,7 @@
             this.tsmiTextH2V = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiText2QR = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextLineReverse = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextSearch = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTranslateAuto = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTranslateEngine = new System.Windows.Forms.ToolStripMenuItem();
@@ -102,7 +103,6 @@
             this.tsmiSep9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiRestart = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiTextSearch = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -466,6 +466,12 @@
             resources.ApplyResources(this.tsmiTextLineReverse, "tsmiTextLineReverse");
             this.tsmiTextLineReverse.Click += new System.EventHandler(this.tsmiTextLineReverse_Click);
             // 
+            // tsmiTextSearch
+            // 
+            this.tsmiTextSearch.Name = "tsmiTextSearch";
+            resources.ApplyResources(this.tsmiTextSearch, "tsmiTextSearch");
+            this.tsmiTextSearch.Click += new System.EventHandler(this.tsmiTextSearch_Click);
+            // 
             // tsmiSep3
             // 
             this.tsmiSep3.Name = "tsmiSep3";
@@ -634,12 +640,6 @@
             this.tsmiExit.Name = "tsmiExit";
             resources.ApplyResources(this.tsmiExit, "tsmiExit");
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
-            // 
-            // tsmiTextSearch
-            // 
-            this.tsmiTextSearch.Name = "tsmiTextSearch";
-            resources.ApplyResources(this.tsmiTextSearch, "tsmiTextSearch");
-            this.tsmiTextSearch.Click += new System.EventHandler(this.tsmiTextSearch_Click);
             // 
             // MainForm
             // 

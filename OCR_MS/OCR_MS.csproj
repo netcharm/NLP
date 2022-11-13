@@ -161,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="general-ocr.ico" />
+    <None Include="Resources\GB2JIS.dat" />
     <None Include="Resources\Translate_32x.png" />
     <None Include="Resources\Speech_32x.png" />
     <None Include="Resources\speaker_32x.png" />

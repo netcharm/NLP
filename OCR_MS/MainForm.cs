@@ -37,7 +37,8 @@ namespace OCR_MS
         private static string[] line_break = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
         private static char[] trim_ends = new char[] { ' ', '　' };
 
-        private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
+        private InputLanguage LastInputLanguage { get; set; } = InputLanguage.DefaultInputLanguage;
+        private InputLanguage CurrentInputLanguage { get; set; } = InputLanguage.CurrentInputLanguage;
 
         private bool CFGLOADED = false;
         private bool ALWAYS_ON_TOP = false;
@@ -808,6 +809,99 @@ namespace OCR_MS
         internal IList<string> ConvertSpaceToHalf(IEnumerable<string> lines)
         {
             return (lines.Select(l => l.Replace("　", " ")).ToList());
+        }
+
+        private Encoding GB2312 = Encoding.GetEncoding("GB2312");
+        private Encoding JIS = Encoding.GetEncoding("SHIFT_JIS");
+        private List<char> GB2312_List { get; set; } = new List<char>();
+        private List<char> JIS_List { get; set; } = new List<char>();
+        private void InitGBJISTable()
+        {
+            if (JIS_List.Count == 0 || GB2312_List.Count == 0)
+            {
+                JIS_List.Clear();
+                GB2312_List.Clear();
+
+                var jis_data =  Properties.Resources.GB2JIS;
+                var jis_count = jis_data.Length / 2;
+                JIS_List = JIS.GetString(jis_data).ToList();
+                GB2312_List = GB2312.GetString(jis_data).ToList();
+
+                var jis = new byte[2];
+                var gb2312 = new byte[2];
+                for (var i = 0; i < 94; i++)
+                {
+                    gb2312[0] = (byte)(i + 0xA1);
+                    for (var j = 0; j < 94; j++)
+                    {
+                        gb2312[1] = (byte)(j + 0xA1);
+                        var offset = i * 94 + j;
+                        GB2312_List[offset] = GB2312.GetString(gb2312).First();
+
+                        jis[0] = jis_data[2 * offset];
+                        jis[1] = jis_data[2 * offset + 1];
+                        JIS_List[i * 94 + j] = JIS.GetString(jis).First();
+                    }
+                }
+            }
+        }
+
+        internal char ConvertChinese2Japanese(char character)
+        {
+            var result = character;
+
+            InitGBJISTable();
+            var idx = GB2312_List.IndexOf(result);
+            if (idx >= 0) result = JIS_List[idx];
+
+            return (result);
+        }
+
+        internal string ConvertChinese2Japanese(string line)
+        {
+            var result = line;
+
+            result = string.Join("", line.ToList().Select(c => ConvertChinese2Japanese(c)));
+
+            return (result);
+        }
+
+        internal IList<string> ConvertChinese2Japanese(IEnumerable<string> lines)
+        {
+            var result = new List<string>();
+
+            result.AddRange(lines.Select(l => ConvertChinese2Japanese(l)));
+
+            return (result);
+        }
+
+        internal char ConvertJapanese2Chinese(char character)
+        {
+            var result = character;
+
+            InitGBJISTable();
+            var idx = JIS_List.IndexOf(result);
+            if (idx >= 0) result = GB2312_List[idx];
+
+            return (result);
+        }
+
+        internal string ConvertJapanese2Chinese(string line)
+        {
+            var result = line;
+
+            result = line.ToList().Select(c => ConvertJapanese2Chinese(c)).ToString();
+
+            return (result);
+        }
+
+        internal IList<string> ConvertJapanese2Chinese(IEnumerable<string> lines)
+        {
+            var result = new List<string>();
+
+            result.AddRange(lines.Select(l => ConvertJapanese2Chinese(l)));
+
+            return (result);
         }
         #endregion
 
@@ -1689,6 +1783,10 @@ namespace OCR_MS
             {
                 btnOCR.PerformClick();
             }
+            else if (e.KeyCode == Keys.F12)
+            {
+                tsmiTextSearch.PerformClick();
+            }
             else e.Handled = false;
         }
 
@@ -1894,6 +1992,25 @@ namespace OCR_MS
                 edResult.Lines = edResult.Lines.Select(l => l.TrimEnd(trim_ends)).ToArray();
                 //edResult.SelectionStart = idx;
                 //edResult.SelectionLength = len;
+            }
+            else if (e.Control && e.KeyCode == Keys.OemQuestion)
+            {
+                if (InputLanguage.CurrentInputLanguage.LayoutName != InputLanguage.DefaultInputLanguage.LayoutName)
+                {
+                    LastInputLanguage = CurrentInputLanguage;
+                    InputLanguage.CurrentInputLanguage = InputLanguage.DefaultInputLanguage;
+                }
+                else
+                    InputLanguage.CurrentInputLanguage = LastInputLanguage;
+            }
+            else if(e.Control && e.KeyCode == Keys.T)
+            {
+                int select_s = edResult.SelectionStart;
+                int select_l = edResult.SelectionLength;
+                string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
+                text = ConvertChinese2Japanese(text);
+                if (edResult.SelectionLength > 0) edResult.SelectedText = text;
+                else edResult.Text = text;
             }
             else e.Handled = false;
         }
@@ -2444,7 +2561,7 @@ namespace OCR_MS
                         var firefox = GetFirefoxPath();
                         if (!string.IsNullOrEmpty(firefox)) System.Diagnostics.Process.Start(firefox, url);
                         else System.Diagnostics.Process.Start(url);
-                    }).DynamicInvoke();
+                    }).Invoke();
                 }
             }
             catch (Exception ex) { MessageBox.Show($"{ex.Message} ({ex.GetType().ToString()}){Environment.NewLine}{ex.StackTrace}"); }
@@ -2455,7 +2572,7 @@ namespace OCR_MS
             if (sender == tsmiReloadCorrectionTable)
             {
                 LoadCorrectionDictionary();
-                edResult.Text = AutoCorrecting(edResult.Text, GetLanguageFrom());
+                edResult.Text = AutoCorrecting(CurrentInputLanguage.LayoutName.StartsWith("ja") ? ConvertChinese2Japanese(edResult.Text) : edResult.Text, GetLanguageFrom());
             }
             else if (sender == tsmiEditCorrectionTable)
             {
