@@ -75,6 +75,7 @@
             this.tsmiTextH2V = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiText2QR = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextLineReverse = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiTextCorrection = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTextSearch = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiTranslateAuto = new System.Windows.Forms.ToolStripMenuItem();
@@ -229,6 +230,7 @@
             this.tsmiTextH2V,
             this.tsmiText2QR,
             this.tsmiTextLineReverse,
+            this.tsmiTextCorrection,
             this.tsmiTextSearch,
             this.tsmiSep3,
             this.tsmiTranslateAuto,
@@ -465,6 +467,12 @@
             this.tsmiTextLineReverse.Name = "tsmiTextLineReverse";
             resources.ApplyResources(this.tsmiTextLineReverse, "tsmiTextLineReverse");
             this.tsmiTextLineReverse.Click += new System.EventHandler(this.tsmiTextLineReverse_Click);
+            // 
+            // tsmiTextCorrection
+            // 
+            this.tsmiTextCorrection.Name = "tsmiTextCorrection";
+            resources.ApplyResources(this.tsmiTextCorrection, "tsmiTextCorrection");
+            this.tsmiTextCorrection.Click += new System.EventHandler(this.tsmiCorrectionTable_Click);
             // 
             // tsmiTextSearch
             // 
@@ -749,6 +757,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiHideWinOnCapture;
         private System.Windows.Forms.ToolStripMenuItem tsmiTextLineReverse;
         private System.Windows.Forms.ToolStripMenuItem tsmiTextSearch;
+        private System.Windows.Forms.ToolStripMenuItem tsmiTextCorrection;
     }
 }
 

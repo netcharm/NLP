@@ -930,6 +930,9 @@ namespace OCR_MS
 
     public static class Speech
     {
+        public static string[] LineBreak { get; } = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
+        public static char[] TagBreak { get; } = new char[] { '#', '@' };
+
         #region Speech Synthesizer events actions
         public static Action<SpeakStartedEventArgs> SpeakStarted
         {
@@ -1041,8 +1044,21 @@ namespace OCR_MS
             return (SpeechTTS.DetectCulture(text));
         }
 
-        public static char[] TagBreak = new char[] { '#', '@' };
-        public static string[] LineBreak = new string[] { Environment.NewLine, "\n\r", "\r\n", "\r", "\n", "<br/>", "<br />", "<br>", "</br>" };
+        public static bool IsReady()
+        {
+            return (State == SynthesizerState.Ready);
+        }
+
+        public static bool IsBusy()
+        {
+            return (State == SynthesizerState.Speaking || State == SynthesizerState.Paused);
+        }
+
+        public static bool IsPaused()
+        {
+            return (State == SynthesizerState.Paused);
+        }
+
         public static void Play(this string text, CultureInfo culture, bool async = true)
         {
             try

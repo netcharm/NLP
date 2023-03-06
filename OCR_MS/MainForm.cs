@@ -140,9 +140,10 @@ namespace OCR_MS
 
             try
             {
-                if (AutoCorrections is CorrectionDicts && !string.IsNullOrEmpty(lang) && AutoCorrections.Dictionaries.ContainsKey(lang))
+                if (AutoCorrections is CorrectionDicts)
                 {
-                    var dict = AutoCorrections.Dictionaries[lang].Words;
+                    var common = AutoCorrections.Contains("common") ? AutoCorrections.Get("common").Words : new OrderedDictionary();
+                    var dict = AutoCorrections.Contains(lang) ? AutoCorrections.Get(lang).Insert(common).Words : common;
                     if (dict is OrderedDictionary)
                     {
                         foreach (DictionaryEntry entry in dict)
@@ -861,7 +862,8 @@ namespace OCR_MS
         {
             var result = line;
 
-            result = string.Join("", line.ToList().Select(c => ConvertChinese2Japanese(c)));
+            result = string.Join("", line.ToCharArray().Select(c => ConvertChinese2Japanese(c)));
+            //result = new string(line.ToCharArray().Select(c => ConvertChinese2Japanese(c)).ToArray());
 
             return (result);
         }
@@ -890,7 +892,8 @@ namespace OCR_MS
         {
             var result = line;
 
-            result = line.ToList().Select(c => ConvertJapanese2Chinese(c)).ToString();
+            result = string.Join("", line.ToCharArray().Select(c => ConvertJapanese2Chinese(c)));
+            //result = new string(line.ToCharArray().Select(c => ConvertJapanese2Chinese(c)).ToArray());
 
             return (result);
         }
@@ -2003,14 +2006,16 @@ namespace OCR_MS
                 else
                     InputLanguage.CurrentInputLanguage = LastInputLanguage;
             }
-            else if(e.Control && e.KeyCode == Keys.T)
+            else if (e.Control && e.KeyCode == Keys.T)
             {
                 int select_s = edResult.SelectionStart;
                 int select_l = edResult.SelectionLength;
                 string text = edResult.SelectionLength > 0 ? edResult.SelectedText : edResult.Text;
-                text = ConvertChinese2Japanese(text);
+                text = e.Shift ? ConvertJapanese2Chinese(text) : ConvertChinese2Japanese(text);
                 if (edResult.SelectionLength > 0) edResult.SelectedText = text;
                 else edResult.Text = text;
+                edResult.SelectionStart = select_s;
+                edResult.SelectionLength = select_l;
             }
             else e.Handled = false;
         }
@@ -2586,6 +2591,20 @@ namespace OCR_MS
                     }
                 }
             }
+            else if (sender == tsmiTextCorrection)
+            {
+                int select_s = edResult.SelectionStart;
+                int select_l = edResult.SelectionLength;
+                var HasSelection = edResult.SelectionLength > 0;
+                string text = HasSelection ? edResult.SelectedText : edResult.Text;
+
+                if (text.Length > 0)
+                {
+                    var lines = AutoCorrecting(CurrentInputLanguage.LayoutName.StartsWith("ja") ? ConvertChinese2Japanese(text) : text, GetLanguageFrom());
+                    if (HasSelection) edResult.SelectedText = string.Join(Environment.NewLine, lines);
+                    else edResult.Lines = lines.Split(line_break, StringSplitOptions.None);
+                }
+            }
         }
 
         private void tsmiEditConfig_Click(object sender, EventArgs e)
@@ -2654,6 +2673,72 @@ namespace OCR_MS
         public string Description { get; set; } = string.Empty;
         public OrderedDictionary Words { get; set; } = new OrderedDictionary();
 
+        public CorrectionDict Insert(CorrectionDict dict)
+        {
+            return (Union(dict, is_first: true));
+        }
+
+        public CorrectionDict Insert(OrderedDictionary dict)
+        {
+            return (Union(dict, is_first: true));
+        }
+
+        public CorrectionDict Append(CorrectionDict dict)
+        {
+            return (Union(dict, is_first: false));
+        }
+
+        public CorrectionDict Append(OrderedDictionary dict)
+        {
+            return (Union(dict, is_first: false));
+        }
+
+        private CorrectionDict Union(CorrectionDict dict, bool is_first = false)
+        {
+            var result = new CorrectionDict();
+            if (dict is CorrectionDict)
+            {
+                if (is_first)
+                {
+                    foreach (DictionaryEntry w in dict.Words)
+                        result.Words.Add(w.Key, w.Value);
+                    foreach (DictionaryEntry w in Words)
+                        result.Words.Add(w.Key, w.Value);
+                }
+                else
+                {
+                    foreach (DictionaryEntry w in Words)
+                        result.Words.Add(w.Key, w.Value);
+                    foreach (DictionaryEntry w in dict.Words)
+                        result.Words.Add(w.Key, w.Value);
+                }
+            }
+            return (result);
+        }
+
+        private CorrectionDict Union(OrderedDictionary dict, bool is_first = false)
+        {
+            var result = new CorrectionDict();
+            if (dict is OrderedDictionary)
+            {
+                if (is_first)
+                {
+                    foreach (DictionaryEntry w in dict)
+                        result.Words.Add(w.Key, w.Value);
+                    foreach (DictionaryEntry w in Words)
+                        result.Words.Add(w.Key, w.Value);
+                }
+                else
+                {
+                    foreach (DictionaryEntry w in Words)
+                        result.Words.Add(w.Key, w.Value);
+                    foreach (DictionaryEntry w in dict)
+                        result.Words.Add(w.Key, w.Value);
+                }
+            }
+            return (result);
+        }
+
         public void Clear()
         {
             if (Words is OrderedDictionary) Words.Clear();
@@ -2664,6 +2749,24 @@ namespace OCR_MS
     public class CorrectionDicts
     {
         public Dictionary<string, CorrectionDict> Dictionaries { get; set; } = new Dictionary<string, CorrectionDict>(StringComparer.OrdinalIgnoreCase);
+
+        public bool Contains(string key)
+        {
+            return (string.IsNullOrEmpty(key) ? false : Dictionaries.ContainsKey(key));
+        }
+
+        public CorrectionDict Get(string key, bool nullable = false)
+        {
+            return (Contains(key) ? Dictionaries[key] : (nullable ? null : new CorrectionDict()));
+        }
+
+        public void Union(CorrectionDicts dicts)
+        {
+            if (dicts is CorrectionDicts)
+            {
+                Dictionaries = Dictionaries.Union(dicts.Dictionaries).ToDictionary(d => d.Key, d => d.Value);
+            }
+        }
 
         public void Clear()
         {
